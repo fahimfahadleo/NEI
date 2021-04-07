@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+F:/essential/projects/CLion/message/main.cpp
+iostream
+-
+string
+-
+cstring
+-
+wchar.h
+-
+cwchar
+-
+locale
+-
+clocale
+-
+md5.h
+F:/essential/projects/CLion/message/md5.h
+sha1.h
+F:/essential/projects/CLion/message/sha1.h
+
+F:/essential/projects/CLion/message/md5.h
+cstring
+-
+iostream
+-
+
+F:/essential/projects/CLion/message/sha1.h
+iostream
+-
+string
+-
+

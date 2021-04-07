@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "585735373691",
+    "project_id": "nei-project",
+    "storage_bucket": "nei-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:585735373691:android:e2b96338bf5dd5b6ee73de",
+        "android_client_info": {
+          "package_name": "com.horofbd.nei"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "585735373691-g46svoug45llohcjqs7tergf9bg8fcic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5D23pPnVYbZ1rJt_ntDfUuaaMEfx5INE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "585735373691-g46svoug45llohcjqs7tergf9bg8fcic.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
