@@ -7,14 +7,20 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-public class UserVerificationActivity extends AppCompatActivity {
+import org.json.JSONException;
 
-    TextInputEditText code;
-    MaterialButton proceedbutton;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
+
+public class UserVerificationActivity extends AppCompatActivity implements ServerResponse{
+
+    EditText code;
+    TextView proceedbutton;
     DatabaseHelper helper;
 
     String userpass;
@@ -26,29 +32,41 @@ public class UserVerificationActivity extends AppCompatActivity {
         proceedbutton = findViewById(R.id.proceedbutton);
         helper = new DatabaseHelper(this);
 
+        new Functions(this);
+
+
         Cursor c = helper.getUserPassword(1);
         if (c.moveToFirst()){
              userpass = c.getString(1);
-            Log.e("tag",userpass);
+
         }
-
-
         proceedbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String pass = code.getText().toString();
+                pass = code.getText().toString();
 
                 if(pass.equals(userpass)){
-                    startActivity(new Intent(UserVerificationActivity.this,MainActivity.class));
-                    Functions.isActive = true;
-                    finish();
+
+                    ServerRequest.PageLogin(UserVerificationActivity.this,pass,1);
                 }
-
-
-
             }
         });
         c.close();
+
+    }
+    String pass;
+
+    @Override
+    public void onResponse(String response, int code, int requestcode) throws JSONException {
+        if(requestcode == 1){
+            startActivity(new Intent(UserVerificationActivity.this,MainActivity.class));
+            Functions.isActive = true;
+            finish();
+        }
+    }
+
+    @Override
+    public void onFailure(String failresponse) throws JSONException {
 
     }
 }

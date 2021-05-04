@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WatchVideoActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Video Point Balance"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Video Count"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <VideoView
+        android:layout_width="@dimen/_160sdp"
+        android:layout_height="@dimen/_160sdp"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/bannerad"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Buy Congrats Premium"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+</LinearLayout>

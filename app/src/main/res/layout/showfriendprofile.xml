@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User Profile"
+        android:background="@drawable/toolbarbg"
+        android:gravity="center"
+        android:paddingTop="@dimen/_4sdp"
+        android:paddingBottom="@dimen/_4sdp"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="0.0"
+        android:shadowDy="0.0"
+        android:shadowRadius="8"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="@dimen/_120sdp"
+        android:layout_height="@dimen/_120sdp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_launcher_background"
+        android:id="@+id/profilepicture"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
+        android:text="Fahim Fahad leo"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:id="@+id/username"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        android:text="+8801914616453"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:id="@+id/userphone"/>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_32sdp"
+            android:text="Send Request"
+            android:layout_gravity="center"
+            android:background="@drawable/buttonbackground"
+            android:gravity="center"
+            android:paddingStart="@dimen/_16sdp"
+            android:id="@+id/sendbutton"
+            android:textSize="@dimen/_14sdp"
+            android:paddingEnd="@dimen/_16sdp"
+            android:textColor="@color/white"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_32sdp"
+            android:text="Block"
+            android:layout_gravity="center"
+            android:background="@drawable/buttonbackground"
+            android:gravity="center"
+            android:paddingStart="@dimen/_16sdp"
+            android:id="@+id/proceedbutton"
+            android:textSize="@dimen/_14sdp"
+            android:paddingEnd="@dimen/_16sdp"
+            android:textColor="@color/white"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

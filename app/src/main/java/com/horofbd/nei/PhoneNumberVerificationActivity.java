@@ -6,7 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,6 +20,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
@@ -25,9 +29,9 @@ import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
-public class PhoneNumberVerificationActivity extends AppCompatActivity implements ServerResponse{
-    TextInputEditText verificationcode;
-    MaterialButton button;
+public class PhoneNumberVerificationActivity extends AppCompatActivity implements ServerResponse {
+    EditText verificationcode;
+    TextView button;
     FirebaseAuth mAuth;
     private String verificationId;
 
@@ -36,18 +40,18 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_number_verification);
-        verificationcode = findViewById(R.id.verificationcode);
-        button = findViewById(R.id.proceedbutton);
+        verificationcode = findViewById(R.id.verifycode);
+        button = findViewById(R.id.verifybutton);
         mAuth = FirebaseAuth.getInstance();
         new Functions(this);
 
 
-        String phonenumber = Functions.getSharedPreference("phone_no","+880");
-        if(!phonenumber.contains("+880")){
-            phonenumber = "+880"+phonenumber;
+        String phonenumber = Functions.getSharedPreference("phone_no", "+880");
+        if (!phonenumber.contains("+880")) {
+            phonenumber = "+880" + phonenumber;
         }
 
-        ServerRequest.getUserPhoneVerificationCode(this);
+        ServerRequest.getUserPhoneVerificationCode(this, 1);
 
         sendVerificationCode(phonenumber);
 
@@ -58,20 +62,25 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
                 verifyCode(verificationcodestr);
 
 
-
             }
         });
     }
 
 
     String serververificationcode;
+
     @Override
-    public void onResponse(String response) throws JSONException {
-        JSONObject jsonObject = new JSONObject(response);
-        if(jsonObject.has("code")){
-            serververificationcode = jsonObject.getString("code");
-        }else {
-            Intent i = new Intent(PhoneNumberVerificationActivity.this, RegisterVerifiedUser.class);
+    public void onResponse(String response, int code, int requestcode) throws JSONException {
+        Log.e("verification", response);
+        if (requestcode == 1) {
+            JSONObject jsonObject = new JSONObject(response);
+            if (jsonObject.has("code")) {
+                serververificationcode = jsonObject.getString("code");
+            }
+        }
+
+        if (requestcode == 2) {
+            Intent i = new Intent(PhoneNumberVerificationActivity.this, MainActivity.class);
             startActivity(i);
             finish();
         }
@@ -94,7 +103,11 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
                             // if the code is correct and the task is successful
                             // we are sending our user to new activity.
 
-                            ServerRequest.VerifyPhoneNumber(PhoneNumberVerificationActivity.this,serververificationcode);
+                            ServerRequest.VerifyPhoneNumber(PhoneNumberVerificationActivity.this, serververificationcode, 2);
+                            Functions.isActive = true;
+
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            user.delete();
 
                         } else {
                             // if the code is not correct then we are
@@ -119,6 +132,8 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
                 mCallBack // we are calling callback method when we recieve OTP for
                 // auto verification of user.
         );
+
+        Toast.makeText(this, "Verification Code sent!", Toast.LENGTH_SHORT).show();
     }
 
     // callback method is called on Phone auth provider.
@@ -182,8 +197,6 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
         // calling sign in method.
         signInWithCredential(credential);
     }
-
-
 
 
 }

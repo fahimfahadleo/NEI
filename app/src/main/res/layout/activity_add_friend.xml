@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddFriend">
+
+    <include layout="@layout/global_toolbar"
+        android:id="@+id/toolbar"/>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/_16sdp"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_32sdp"
+            android:layout_weight="7"
+            android:hint="Phone Number"
+            android:background="@drawable/edtshapewhite"
+            android:paddingTop="@dimen/_6sdp"
+            android:paddingBottom="@dimen/_6sdp"
+            android:textColorHint="@color/hintcolor"
+            android:paddingStart="@dimen/_16sdp"
+            android:id="@+id/phone"
+            android:inputType="phone"
+            android:paddingEnd="@dimen/_16sdp"
+            android:textSize="@dimen/_12sdp"
+            android:textColor="@color/textcolor"
+            />
+        <ImageView
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:src="@drawable/contact"
+            android:id="@+id/contact"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_32sdp"
+        android:text="Submit"
+        android:layout_gravity="center"
+        android:background="@drawable/buttonbackground"
+        android:gravity="center"
+        android:paddingStart="@dimen/_16sdp"
+        android:id="@+id/proceedbutton"
+        android:textSize="@dimen/_14sdp"
+        android:paddingEnd="@dimen/_16sdp"
+        android:textColor="@color/white"/>
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_32sdp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:paddingStart="@dimen/_16sdp"
+        android:id="@+id/text"
+        android:textSize="@dimen/_14sdp"
+        android:paddingEnd="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:textColor="@color/red"/>
+
+</LinearLayout>

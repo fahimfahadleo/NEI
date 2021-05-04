@@ -41,6 +41,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void deleteAllData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+         db.execSQL("delete from APP_PASSWORD");
+         db.close();
+    }
+
 
     public boolean setUserPassword(String password){
         SQLiteDatabase db = this.getWritableDatabase();

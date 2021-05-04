@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ReferralActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My Reference Code"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My Refer Code"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Buy Premium"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My referral"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wallet"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Withdraw"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+</LinearLayout>

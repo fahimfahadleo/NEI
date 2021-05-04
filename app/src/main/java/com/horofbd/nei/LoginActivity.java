@@ -1,15 +1,20 @@
 package com.horofbd.nei;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONException;
@@ -18,10 +23,17 @@ import org.json.JSONObject;
 public class LoginActivity extends AppCompatActivity implements ServerResponse{
 
 
-    TextInputEditText phone,password;
-    MaterialButton proceed;
-    TextView register;
+    EditText phone,password;
+    TextView proceed,worningtext,forgotpassword;
+    TextView register,donthaveaccount;
 
+
+    static {
+        System.loadLibrary("native-lib");
+    }
+
+    static native void LoginRequest(ServerResponse serverResponse,String phone,String passwrod,int requestcode);
+    static native void SaveLogindata(JSONObject jsonObject,JSONObject jsonObject1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,19 +44,43 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse{
         password = findViewById(R.id.password);
         proceed = findViewById(R.id.proceedbutton);
         register = findViewById(R.id.register);
+        donthaveaccount = findViewById(R.id.donthaveaccount);
+        forgotpassword = findViewById(R.id.forgotpassword);
+
+
+        forgotpassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this,ForgotProfilePassword.class));
+            }
+        });
+
+        worningtext = findViewById(R.id.worningtext);
 
         new Functions(this);
 
+
+//        AppCompatDelegate
+//                .setDefaultNightMode(
+//                        AppCompatDelegate
+//                                .MODE_NIGHT_NO);
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 String phonestr = phone.getText().toString();
                 String passwordstr = password.getText().toString();
-                ServerRequest.LoginRegisteredUser(LoginActivity.this,phonestr,passwordstr);
+                //ServerRequest.LoginRegisteredUser(LoginActivity.this,phonestr,passwordstr,1);
+
+                LoginRequest(LoginActivity.this,phonestr,passwordstr,1);
 
             }
         });
+
+        if(!Functions.getSharedPreference("private_token", "").equals("")){
+            register.setVisibility(View.GONE);
+            donthaveaccount.setVisibility(View.GONE);
+        }
 
         register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,38 +94,48 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse{
     }
 
     @Override
-    public void onResponse(String response) throws JSONException {
+    public void onResponse(String response,int responsecode,int requestcode) throws JSONException {
 
         Log.e("responsqqqqe",response);
 
-        JSONObject jsonObject = new JSONObject(response);
-        Log.e("status","checking");
-            String accesstoken = jsonObject.getString("access_token");
-            String expirytime = jsonObject.getString("expires_in");
-        Log.e("status","checking");
-            JSONObject jsonObject1 = jsonObject.getJSONObject("user");
-        Log.e("status","checking3");
+        if(requestcode == 1 ){
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                String accesstoken = jsonObject.getString("access_token");
+                if(!TextUtils.isEmpty(accesstoken)){
+                    JSONObject jsonObject1 = jsonObject.getJSONObject("user");
+                    if(jsonObject1!=null && !TextUtils.isEmpty(jsonObject1.getString("name"))){
+                        SaveLogindata(jsonObject,jsonObject1);
+                        startActivity(new Intent(this,MainActivity.class));
+                        Functions.isActive = false;
+                    }
 
-        Log.e("jsonobe",jsonObject1.toString());
-            Functions.setSharedPreference("private_token",accesstoken);
-            Functions.setSharedPreference("expires_in",String.valueOf(System.currentTimeMillis()+(Long.parseLong(expirytime)*1000)));
-            Functions.setSharedPreference("user_name",jsonObject1.getString("name"));
-            Functions.setSharedPreference("ref",jsonObject1.getString("ref"));
-           // Functions.setSharedPreference("premium",jsonObject1.getString("premium"));
-            Functions.setSharedPreference("loginstatus","true");
-            Functions.setSharedPreference("phone_no",jsonObject1.getString("phone_no"));
-            Log.e("status","checking");
-            startActivity(new Intent(this,MainActivity.class));
-
-
-
-
-
+            }else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LoginActivity.this,"Unauthorised Access!",Toast.LENGTH_LONG).show();
+                            worningtext.setText("Unauthorised Access!");
+                        }
+                    });
+                }
+            }catch (Exception e){
+                Toast.makeText(this, "error occurred!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
     public void onFailure(String failresponse) {
 
-        Toast.makeText(this, "There was an error in login!", Toast.LENGTH_SHORT).show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(LoginActivity.this, "There was an error in login!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+
+
 }

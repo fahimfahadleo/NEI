@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical"
+    tools:context=".ProfileActivity">
+
+    <LinearLayout
+        android:id="@+id/titlelayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/toolbarbg"
+        android:orientation="horizontal">
+
+
+        <ImageView
+            android:id="@+id/backbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="@dimen/_6sdp"
+            android:src="@drawable/backbutton" />
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/_4sdp"
+            android:paddingBottom="@dimen/_4sdp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@drawable/toolbarbg"
+            android:gravity="center"
+            android:shadowColor="@color/shadow"
+            android:shadowDx="0.0"
+            android:shadowDy="0.0"
+            android:shadowRadius="8"
+            android:text="User Profile"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@color/textcolor" />
+            <ImageView
+                android:id="@+id/options"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="@dimen/_8sdp"
+                android:src="@drawable/menu_white" />
+    </LinearLayout>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_6sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_6sdp"
+        android:layout_marginBottom="8dp"
+        app:cardBackgroundColor="@color/colorPrimaryDark"
+
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="8dp">
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/mainbalance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_weight="2"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="11dp"
+            app:cardElevation="8dp">
+
+
+            <RelativeLayout
+                android:id="@+id/rootview"
+                android:layout_width="match_parent"
+                android:background="@color/background"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/mainbalancetext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edtshapewhite"
+                    android:gravity="end"
+                    android:paddingStart="@dimen/_8sdp"
+                    android:paddingTop="@dimen/_3sdp"
+                    android:paddingEnd="@dimen/_6sdp"
+                    android:paddingBottom="@dimen/_3sdp"
+                    android:text="Main Balance"
+                    android:textColor="@color/textcolor"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/toggolmainstartopen"
+                    android:layout_width="18sp"
+                    android:layout_height="18sp"
+                    android:layout_marginStart="@dimen/_2sdp"
+                    android:background="@drawable/gol"
+                    android:layout_alignStart="@id/mainbalancetext"
+                    android:layout_centerVertical="true"
+                     />
+
+
+                <ImageView
+                    android:id="@+id/toggolmainopen"
+                    android:layout_width="18sp"
+                    android:layout_height="18sp"
+                    android:layout_marginEnd="@dimen/_2sdp"
+                    android:background="@drawable/gol"
+                    android:layout_alignEnd="@id/mainbalancetext"
+                    android:layout_centerVertical="true"
+                     />
+
+            </RelativeLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="@dimen/_100sdp"
+            android:layout_gravity="center"
+            android:layout_height="@dimen/_100sdp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_image"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="@dimen/_100sdp"
+                android:src="@drawable/ic_launcher_background"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:civ_border_color="#000"
+                app:civ_border_width="2dp" />
+
+
+            <ImageView
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:src="@drawable/camera"
+                app:layout_constraintEnd_toEndOf="@id/profile_image"
+                app:layout_constraintBottom_toBottomOf="@id/profile_image"
+                android:layout_marginEnd="@dimen/_4sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:id="@+id/editprofilepicture"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/referralbalanceview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_weight="2"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="11dp"
+            app:cardElevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/profile_image"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:id="@+id/rootview2"
+                android:background="@color/background"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/refbalance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edtshapewhite"
+                    android:gravity="end"
+                    android:paddingStart="@dimen/_8sdp"
+                    android:paddingTop="@dimen/_3sdp"
+                    android:paddingEnd="@dimen/_6sdp"
+                    android:paddingBottom="@dimen/_3sdp"
+                    android:text="Ref. Balance"
+                    android:textColor="@color/textcolor"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                     />
+
+                <ImageView
+                    android:id="@+id/toggolrefstartopen"
+                    android:layout_width="18sp"
+                    android:layout_height="18sp"
+                    android:layout_marginStart="@dimen/_2sdp"
+                    android:background="@drawable/gol"
+                    android:layout_alignStart="@id/refbalance"
+                    android:layout_centerVertical="true"
+                    />
+
+
+                <ImageView
+                    android:id="@+id/toggolrefopen"
+                    android:layout_width="18sp"
+                    android:layout_height="18sp"
+                    android:layout_marginEnd="@dimen/_2sdp"
+                    android:background="@drawable/gol"
+                    android:layout_alignEnd="@id/refbalance"
+                    android:layout_centerVertical="true"/>
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:text="Fahim Fahad Leo"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@color/skyblue"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/nameedit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:layout_toEndOf="@id/username"
+            android:src="@drawable/edit" />
+
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/userphonenumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="01914616453"
+        android:layout_marginBottom="@dimen/_16sdp"
+
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/blue_grey_550" />
+    </LinearLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <ScrollView
+        android:id="@+id/sctollview"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_8sdp"
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/settingsview"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_35sdp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="@dimen/_4sdp"
+                app:cardBackgroundColor="@color/cardbgcolor"
+
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/_30sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/_8sdp"
+                        android:padding="@dimen/_1sdp"
+                        android:src="@drawable/premium" />
+
+                    <TextView
+                        android:id="@+id/premiumstatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:fontFamily="sans-serif-thin"
+                        android:gravity="start|center"
+                        android:text="Premium Status: Not Premium"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/textcolor"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/gopremiumview"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_35sdp"
+                app:cardBackgroundColor="@color/cardbgcolor"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:clickable="true"
+
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/_30sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/_8sdp"
+                        android:padding="@dimen/_1sdp"
+                        android:src="@drawable/reference" />
+
+                    <TextView
+                        android:id="@+id/reference"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:fontFamily="sans-serif-thin"
+                        android:gravity="start|center"
+                        android:text="Referral"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/textcolor"
+                        android:textStyle="bold" />
+
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/mystuffview"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_35sdp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:layout_marginTop="@dimen/_4sdp"
+                app:cardBackgroundColor="@color/cardbgcolor"
+
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/_30sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/_8sdp"
+                        android:padding="@dimen/_1sdp"
+                        android:src="@drawable/premium" />
+
+                    <TextView
+                        android:id="@+id/mystuff"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:fontFamily="sans-serif-thin"
+                        android:gravity="start|center"
+                        android:text="My Stuff"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/textcolor"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/accountdetailsview"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_35sdp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="@dimen/_4sdp"
+                app:cardBackgroundColor="@color/cardbgcolor"
+
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/_30sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/_8sdp"
+                        android:padding="@dimen/_1sdp"
+                        android:src="@drawable/premium" />
+
+                    <TextView
+                        android:id="@+id/accountdetails"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:fontFamily="sans-serif-thin"
+                        android:gravity="start|center"
+                        android:text="Account Details"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/textcolor"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/friendlistview"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_35sdp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="@dimen/_4sdp"
+                app:cardBackgroundColor="@color/cardbgcolor"
+
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/_30sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/_8sdp"
+                        android:padding="@dimen/_1sdp"
+                        android:src="@drawable/premium" />
+
+                    <TextView
+                        android:id="@+id/friendlisttext"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:fontFamily="sans-serif-thin"
+                        android:gravity="start|center"
+                        android:text="Friend List"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/textcolor"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/accountcreatetime"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:fontFamily="sans-serif-thin"
+                android:gravity="start|center"
+                android:text="Account Creation Time"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/textcolor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/accountupdatetime"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:fontFamily="sans-serif-thin"
+                android:gravity="start|center"
+                android:text="Account Update Time"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/textcolor"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</LinearLayout>

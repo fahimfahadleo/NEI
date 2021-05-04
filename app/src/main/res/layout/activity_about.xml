@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AboutActivity">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="App Name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Logo"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="App Version"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Previous Version"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Update Status"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Contact Email"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Terms And Conditions"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Policy"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Copyright"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+
+</LinearLayout>

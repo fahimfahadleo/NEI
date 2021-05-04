@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:background="@color/background"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/AppTheme.NoActionBar"
+    android:background="@color/background"
     tools:context=".LoginActivity">
 
 
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="NEI"
-        android:textColor="@color/ashcolor"
+        android:textColor="@color/textcolor"
         android:textSize="@dimen/_20sdp"
         app:layout_constraintBottom_toTopOf="@+id/imageview"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,101 +28,168 @@
         android:layout_width="@dimen/_75sdp"
         android:layout_height="@dimen/_75sdp"
         android:src="@drawable/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@id/passwordview"
+        app:layout_constraintBottom_toTopOf="@id/worningtext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView"
         app:layout_constraintStart_toStartOf="parent" />
 
 
-    <View
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_20sdp"
-        android:id="@+id/view"
-        app:layout_constraintTop_toBottomOf="@id/passwordview"
-        app:layout_constraintBottom_toTopOf="@id/textlayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/worningtext"
+        android:textSize="@dimen/_16sdp"
+        android:gravity="center"
+        android:textColor="@color/red"
+        app:layout_constraintTop_toBottomOf="@id/imageview"
+        app:layout_constraintBottom_toTopOf="@id/passwordview"/>
+
+
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/imageview"
-        app:layout_constraintBottom_toTopOf="@id/view"
+        app:layout_constraintTop_toBottomOf="@id/worningtext"
+        app:layout_constraintBottom_toTopOf="@id/textlayout"
         android:id="@+id/passwordview"
+
         android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_8sdp"
-            app:boxStrokeColor="@color/ashcolor"
-            android:textColorHint="@color/ashcolor"
-            app:errorTextColor="@color/colorPrimary"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            android:layout_marginBottom="@dimen/_16sdp"
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Phone..."
-                android:textColor="@color/ashcolor"
-                android:inputType="textEmailAddress"
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_weight="7"
+                android:hint="Phone Number"
+                android:background="@drawable/edtshapewhite"
+                android:paddingTop="@dimen/_6sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:textColorHint="@color/hintcolor"
+                android:paddingStart="@dimen/_16sdp"
                 android:id="@+id/phone"
+                android:inputType="phone"
+                android:paddingEnd="@dimen/_16sdp"
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/textcolor"
                 />
-        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_8sdp"
-            app:boxStrokeColor="@color/ashcolor"
-            android:textColorHint="@color/ashcolor"
-            app:errorTextColor="@color/colorPrimary"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Password..."
-                android:textColor="@color/ashcolor"
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_weight="7"
+                android:hint="Password"
                 android:inputType="textPassword"
+                android:textColorHint="@color/hintcolor"
+                android:layout_marginBottom="@dimen/_16sdp"
+                android:background="@drawable/edtshapewhite"
+                android:paddingTop="@dimen/_6sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:paddingStart="@dimen/_16sdp"
                 android:id="@+id/password"
+                android:paddingEnd="@dimen/_16sdp"
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/textcolor"
                 />
-        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.button.MaterialButton
-            style="@style/Widget.AppCompat.Button.Borderless"
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="?attr/actionBarSize"
-            android:text="Proceed"
-            android:textColor="@color/ashcolor"
-            android:textSize="15sp"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="0.0"
-            android:shadowDy="0.0"
-            android:shadowRadius="8"
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="5dp"
-            app:rippleColor="#33AAAAAA"
+            android:layout_height="@dimen/_32sdp"
+            android:text="Submit"
             android:layout_gravity="center"
-            app:strokeColor="@color/ashcolor"
+            android:background="@drawable/buttonbackground"
+            android:gravity="center"
+            android:paddingStart="@dimen/_16sdp"
             android:id="@+id/proceedbutton"
-            app:strokeWidth="2dp" />
+            android:textSize="@dimen/_14sdp"
+            android:paddingEnd="@dimen/_16sdp"
+            android:textColor="@color/white"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="@dimen/_16sdp"
+            android:orientation="vertical"
+            android:id="@+id/forgotpasswordlayout">
+            <TextView
+                android:id="@+id/forgotpasstext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/textcolor"
+                android:layout_gravity="center"
+                android:text="Forgot Your Password?"/>
+            <TextView
+                android:id="@+id/forgotpassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="@dimen/_15sdp"
+                android:textColor="@color/registertextcolor"
+                android:text="Click Here."/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/view"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passwordview"
+        app:layout_constraintBottom_toTopOf="@id/extra"
         android:orientation="vertical"
         android:id="@+id/textlayout">
         <TextView
+            android:id="@+id/donthaveaccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/_20sdp"
-            android:textColor="@color/ashcolor"
+            android:textSize="@dimen/_12sdp"
+            android:textColor="@color/textcolor"
             android:layout_gravity="center"
             android:text="Don't have an account?"/>
         <TextView
@@ -130,9 +197,51 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="@dimen/_20sdp"
-            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/_15sdp"
+            android:textColor="@color/registertextcolor"
             android:text="Register here"/>
 
+
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/_16sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="horizontal"
+        android:id="@+id/extra">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contact Us"
+            android:id="@+id/contactus"
+            android:textColor="@color/textcolor"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vault"
+            android:id="@+id/vault"
+            android:textColor="@color/textcolor"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,11 +1,14 @@
 package com.horofbd.nei;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -13,9 +16,11 @@ import com.google.android.material.textfield.TextInputEditText;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class RegisterVerifiedUser extends AppCompatActivity implements ServerResponse{
-    TextInputEditText password,confirmpassword;
-    MaterialButton proceed;
+import java.util.function.Function;
+
+public class RegisterVerifiedUser extends AppCompatActivity implements ServerResponse {
+    EditText password, confirmpassword;
+    TextView proceed;
     DatabaseHelper helper;
 
     @Override
@@ -29,16 +34,24 @@ public class RegisterVerifiedUser extends AppCompatActivity implements ServerRes
         new ServerRequest();
         new Functions(this);
 
+//        AppCompatDelegate
+//                .setDefaultNightMode(
+//                        AppCompatDelegate
+//                                .MODE_NIGHT_YES);
+
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String pass = password.getText().toString();
                 String confirmpass = confirmpassword.getText().toString();
 
-                ServerRequest.SetUserAppPassword(RegisterVerifiedUser.this,pass,confirmpass);
 
-                if(pass.equals(confirmpass)){
+
+                if (pass.equals(confirmpass)) {
+
+                    ServerRequest.SetUserAppPassword(RegisterVerifiedUser.this, pass, confirmpass,1);
                     helper.setUserPassword(pass);
+
                 }
 
             }
@@ -46,21 +59,30 @@ public class RegisterVerifiedUser extends AppCompatActivity implements ServerRes
     }
 
     @Override
-    public void onResponse(String response) throws JSONException {
-        Log.e("response",response);
-        JSONObject object = new JSONObject(response);
-        if(object.has("error")&& object.getString("error").equals("Unauthorized: Phone number verification failed")){
-            startActivity(new Intent(this,PhoneNumberVerificationActivity.class));
-        }else {
-            startActivity(new Intent(this,MainActivity.class));
-            Functions.isActive = true;
+    public void onResponse(String response,int code,int requestcode) throws JSONException {
+        Log.e("response", response);
+
+        if(requestcode == 1){
+            JSONObject jsonObject = new JSONObject(response);
+
+            if(jsonObject.getString("error").equals("Unauthorized: Phone number verification failed")){
+                Log.e("testing","testing");
+                startActivity(new Intent(this,PhoneNumberVerificationActivity.class));
+                finish();
+            }else {
+                startActivity(new Intent(this, MainActivity.class));
+                Functions.isActive = true;
+            }
+
+            finish();
         }
-        finish();
     }
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-        Log.e("response",failresponse);
+        Log.e("response", failresponse);
 
     }
+
+
 }

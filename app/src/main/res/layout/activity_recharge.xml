@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:background="@color/background"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RechargeActivity">
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Video Tutorial"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Text Tutorial"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User Code"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bkash Marcent Account"
+        android:textIsSelectable="true"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recharge Now"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bkash QR Code"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <ImageView
+        android:layout_width="@dimen/_160sdp"
+        android:layout_height="@dimen/_160sdp"
+        android:src="@drawable/ic_launcher_background"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recharge History"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Check Recharge Status"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Buy Premium"
+        android:textColor="@color/textcolor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="@dimen/_16sdp"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edtshapewhite"
+        android:layout_margin="@dimen/_16sdp"
+        android:paddingStart="@dimen/_16sdp"
+        android:paddingEnd="@dimen/_16sdp"
+        android:paddingTop="@dimen/_8sdp"
+        android:textColor="@color/textcolor"
+        android:paddingBottom="@dimen/_8sdp"
+        android:hint="amount"
+        android:inputType="number"
+        android:id="@+id/amount"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SUBMIT"
+        android:paddingStart="@dimen/_16sdp"
+        android:paddingEnd="@dimen/_16sdp"
+        android:paddingTop="@dimen/_8sdp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:layout_gravity="center"
+        android:id="@+id/submitbutton"
+        android:paddingBottom="@dimen/_8sdp"
+        android:background="@drawable/buttonbackgroundgreen"/>
+
+
+    <LinearLayout
+        android:id="@+id/containerlayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_135sdp"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="@dimen/_80sdp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/month1"
+                android:layout_width="@dimen/_78sdp"
+                android:layout_height="@dimen/_78sdp"
+                android:layout_gravity="center"
+                android:padding="@dimen/_2sdp"
+                android:src="@drawable/ic_launcher_background"
+                app:civ_border_color="#000"
+                app:civ_border_width="2dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="১ মাসের জন্য প্রিমিয়াম কিনুন"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/textcolor" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="@dimen/_80sdp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/month2"
+                android:layout_width="@dimen/_78sdp"
+                android:layout_height="@dimen/_78sdp"
+                android:layout_gravity="center"
+                android:padding="@dimen/_2sdp"
+                android:src="@drawable/ic_launcher_background"
+                app:civ_border_color="#000"
+                app:civ_border_width="2dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="২ মাসের জন্য প্রিমিয়াম কিনুন"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/textcolor" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="@dimen/_80sdp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/month6"
+                android:layout_width="@dimen/_78sdp"
+                android:layout_height="@dimen/_78sdp"
+                android:layout_gravity="center"
+                android:padding="@dimen/_2sdp"
+                android:src="@drawable/ic_launcher_background"
+                app:civ_border_color="#000"
+                app:civ_border_width="2dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="৬ মাসের জন্য প্রিমিয়াম কিনুন"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/textcolor" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+</LinearLayout>

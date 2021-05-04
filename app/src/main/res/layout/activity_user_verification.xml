@@ -14,7 +14,7 @@
     <ImageView
         android:layout_width="@dimen/_100sdp"
         android:layout_height="@dimen/_100sdp"
-        app:layout_constraintTop_toBottomOf="@id/titleview"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/passwordfieldlayout"
@@ -23,20 +23,18 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/_10sdp"/>
 
+
+
     <TextView
-        android:id="@+id/titleview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imageview"
-        android:layout_centerHorizontal="true"
+        android:text="LOCKED"
+        android:textColor="@color/red"
         android:gravity="center"
-        android:text="NEI"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/ashcolor"
-        app:layout_constraintBottom_toTopOf="@id/imageview"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
+        android:textStyle="bold"
+        android:textSize="@dimen/_22sdp"
+        app:layout_constraintTop_toBottomOf="@+id/imageview"
+        app:layout_constraintBottom_toTopOf="@id/passwordfieldlayout"/>
 
 
 
@@ -49,44 +47,86 @@
         app:layout_constraintTop_toBottomOf="@id/imageview"
         android:id="@+id/passwordfieldlayout"
         android:orientation="vertical">
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/outlinedTextField"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_8sdp"
-            app:boxStrokeColor="@color/ashcolor"
-            android:textColorHint="@color/ashcolor"
-            app:errorTextColor="@color/colorPrimary"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            android:layout_marginBottom="@dimen/_16sdp"
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_weight="7"
                 android:hint="Password"
-                android:textColor="@color/ashcolor"
+                android:background="@drawable/edtshapewhite"
+                android:paddingTop="@dimen/_6sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:textColorHint="@color/hintcolor"
+                android:paddingStart="@dimen/_16sdp"
                 android:id="@+id/passwordfield"
+                android:paddingEnd="@dimen/_16sdp"
                 android:inputType="textPassword"
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/textcolor"
                 />
-        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.button.MaterialButton
-            style="@style/Widget.AppCompat.Button.Borderless"
+
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="?attr/actionBarSize"
-            android:text="Proceed"
-            android:textColor="@color/ashcolor"
-            android:textSize="15sp"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="0.0"
-            android:shadowDy="0.0"
-            android:shadowRadius="8"
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="5dp"
-            app:rippleColor="#33AAAAAA"
+            android:layout_height="@dimen/_32sdp"
+            android:text="Unlock"
             android:layout_gravity="center"
-            app:strokeColor="@color/ashcolor"
+            android:background="@drawable/buttonbackgroundgreen"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:paddingStart="@dimen/_16sdp"
             android:id="@+id/proceedbutton"
-            app:strokeWidth="2dp" />
+            android:textSize="@dimen/_14sdp"
+            android:paddingEnd="@dimen/_16sdp"
+            android:textColor="@color/white"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:orientation="vertical"
+            android:id="@+id/forgotpasswordlayout">
+            <TextView
+                android:id="@+id/forgotpasstext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/textcolor"
+                android:layout_gravity="center"
+                android:text="Forgot Your Password?"/>
+            <TextView
+                android:id="@+id/forgotpassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="@dimen/_15sdp"
+                android:textColor="@color/registertextcolor"
+                android:text="Click Here."/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 

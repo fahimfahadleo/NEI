@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create New Page"
+        android:background="@drawable/toolbarbg"
+        android:gravity="center"
+        android:paddingTop="@dimen/_4sdp"
+        android:paddingBottom="@dimen/_4sdp"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="0.0"
+        android:shadowDy="0.0"
+        android:shadowRadius="8"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="7"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_32sdp"
+            android:hint="Page Name"
+            android:background="@drawable/edtshapewhite"
+            android:paddingTop="@dimen/_6sdp"
+            android:paddingBottom="@dimen/_6sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:layout_marginBottom="@dimen/_4sdp"
+            android:textColorHint="@color/hintcolor"
+            android:paddingStart="@dimen/_16sdp"
+            android:id="@+id/pagename"
+            android:inputType="text"
+            android:paddingEnd="@dimen/_16sdp"
+            android:textSize="@dimen/_12sdp"
+            android:textColor="@color/textcolor"
+            />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_32sdp"
+                android:hint="Page Password"
+                android:background="@drawable/edtshapewhite"
+                android:paddingTop="@dimen/_6sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:textColorHint="@color/hintcolor"
+                android:paddingStart="@dimen/_16sdp"
+                android:id="@+id/pagepassword"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:inputType="textPassword"
+                android:paddingEnd="@dimen/_16sdp"
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/textcolor"
+                />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_32sdp"
+                android:hint="Page Confirm Password"
+                android:background="@drawable/edtshapewhite"
+                android:paddingTop="@dimen/_6sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:textColorHint="@color/hintcolor"
+                android:paddingStart="@dimen/_16sdp"
+                android:id="@+id/pageconfirmpassword"
+                android:inputType="textPassword"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:paddingEnd="@dimen/_16sdp"
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/textcolor"
+                />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_32sdp"
+                android:text="Submit"
+                android:layout_gravity="center"
+                android:background="@drawable/buttonbackground"
+                android:gravity="center"
+                android:paddingStart="@dimen/_16sdp"
+                android:id="@+id/proceedbutton"
+                android:textSize="@dimen/_14sdp"
+                android:paddingEnd="@dimen/_16sdp"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+</LinearLayout>

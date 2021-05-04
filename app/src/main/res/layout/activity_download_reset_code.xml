@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DownloadResetCode">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Download Reset Code"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="View Reset Code"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Upload To Vault"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Download Reset Certificate"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Country"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Mobile no"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="State/Division"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="District"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Postal Code"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Street Address(1)"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Street Address(2)"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Email Address"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Download Existing Certificate"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:text="Submit"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor" />
+
+
+
+</LinearLayout>
