@@ -138,7 +138,7 @@
                     android:textColor="@color/textcolor"
                     android:textStyle="bold" />
 
-                <com.horofbd.nei.ExpandableTextView
+                <com.horofbd.MeCloak.ExpandableTextView
                     android:id="@+id/expandabletextview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -165,7 +165,7 @@
                     android:textColor="@color/textcolor"
                     android:textStyle="bold" />
 
-                <com.horofbd.nei.ExpandableTextView
+                <com.horofbd.MeCloak.ExpandableTextView
                     android:id="@+id/expandabletextview2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -192,7 +192,7 @@
                     android:textColor="@color/textcolor"
                     android:textStyle="bold" />
 
-                <com.horofbd.nei.ExpandableTextView
+                <com.horofbd.MeCloak.ExpandableTextView
                     android:id="@+id/expandabletextview3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

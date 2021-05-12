@@ -282,7 +282,8 @@
         android:id="@+id/sctollview"
         android:layout_width="match_parent"
         android:layout_marginTop="@dimen/_16sdp"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -291,13 +292,10 @@
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/settingsview"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_35sdp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="@dimen/_4sdp"
                 app:cardBackgroundColor="@color/cardbgcolor"
-
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:clickable="true"
@@ -309,93 +307,80 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="@dimen/_30sdp"
-                        android:layout_height="@dimen/_30sdp"
+                        android:layout_width="@dimen/_26sdp"
+                        android:layout_height="@dimen/_26sdp"
                         android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:padding="@dimen/_1sdp"
-                        android:src="@drawable/premium" />
+                        android:src="@drawable/premiumpremium"
+                        android:layout_marginStart="@dimen/_8sdp"/>
 
                     <TextView
                         android:id="@+id/premiumstatus"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/_30sdp"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:fontFamily="sans-serif-thin"
-                        android:gravity="start|center"
-                        android:text="Premium Status: Not Premium"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="@dimen/_35sdp"
+                        android:gravity="center|start"
+                        android:text="Premium status:Not Premium"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/textcolor"
-                        android:textStyle="bold" />
-
+                        android:textColor="#000" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/gopremiumview"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_35sdp"
-                app:cardBackgroundColor="@color/cardbgcolor"
-
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                app:cardBackgroundColor="@color/cardbgcolor"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="@dimen/_4sdp"
                 android:clickable="true"
-
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
 
-
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="@dimen/_30sdp"
-                        android:layout_height="@dimen/_30sdp"
+                        android:layout_width="@dimen/_26sdp"
+                        android:layout_height="@dimen/_26sdp"
                         android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:padding="@dimen/_1sdp"
-                        android:src="@drawable/reference" />
+                        android:src="@drawable/referral"
+                        android:layout_marginStart="@dimen/_8sdp"/>
 
                     <TextView
-                        android:id="@+id/reference"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/_30sdp"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:fontFamily="sans-serif-thin"
-                        android:gravity="start|center"
+                        android:id="@+id/referral"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="@dimen/_35sdp"
+                        android:gravity="center|start"
                         android:text="Referral"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/textcolor"
-                        android:textStyle="bold" />
-
-
+                        android:textColor="#000" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
 
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/mystuffview"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_35sdp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                app:cardBackgroundColor="@color/cardbgcolor"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:clickable="true"
-                android:layout_marginTop="@dimen/_4sdp"
-                app:cardBackgroundColor="@color/cardbgcolor"
-
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:foreground="?android:attr/selectableItemBackground"
@@ -404,40 +389,38 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="@dimen/_30sdp"
-                        android:layout_height="@dimen/_30sdp"
+                        android:layout_width="@dimen/_26sdp"
+                        android:layout_height="@dimen/_26sdp"
                         android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:padding="@dimen/_1sdp"
-                        android:src="@drawable/premium" />
+                        android:src="@drawable/my_stuff"
+                        android:layout_marginStart="@dimen/_8sdp"/>
 
                     <TextView
                         android:id="@+id/mystuff"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/_30sdp"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:fontFamily="sans-serif-thin"
-                        android:gravity="start|center"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="@dimen/_35sdp"
+                        android:gravity="center|start"
                         android:text="My Stuff"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/textcolor"
-                        android:textStyle="bold" />
-
+                        android:textColor="#000" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/accountdetailsview"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_35sdp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="@dimen/_4sdp"
-                app:cardBackgroundColor="@color/cardbgcolor"
 
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:cardBackgroundColor="@color/cardbgcolor"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:clickable="true"
@@ -449,106 +432,56 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="@dimen/_30sdp"
-                        android:layout_height="@dimen/_30sdp"
+                        android:layout_width="@dimen/_26sdp"
+                        android:layout_height="@dimen/_26sdp"
                         android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:padding="@dimen/_1sdp"
-                        android:src="@drawable/premium" />
+                        android:src="@drawable/friends"
+                        android:layout_marginStart="@dimen/_8sdp"/>
 
                     <TextView
-                        android:id="@+id/accountdetails"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/_30sdp"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:fontFamily="sans-serif-thin"
-                        android:gravity="start|center"
-                        android:text="Account Details"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/textcolor"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/friendlistview"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_35sdp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="@dimen/_4sdp"
-                app:cardBackgroundColor="@color/cardbgcolor"
-
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="@dimen/_30sdp"
-                        android:layout_height="@dimen/_30sdp"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:padding="@dimen/_1sdp"
-                        android:src="@drawable/premium" />
-
-                    <TextView
-                        android:id="@+id/friendlisttext"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/_30sdp"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:fontFamily="sans-serif-thin"
-                        android:gravity="start|center"
+                        android:id="@+id/friendlist"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="@dimen/_35sdp"
+                        android:gravity="center|start"
                         android:text="Friend List"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/textcolor"
-                        android:textStyle="bold" />
-
+                        android:textColor="#000" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:id="@+id/accountcreatetime"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_30sdp"
-                android:layout_marginStart="@dimen/_4sdp"
-                android:fontFamily="sans-serif-thin"
-                android:gravity="start|center"
-                android:text="Account Creation Time"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/textcolor"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/accountupdatetime"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_30sdp"
-                android:layout_marginStart="@dimen/_4sdp"
-                android:fontFamily="sans-serif-thin"
-                android:gravity="start|center"
-                android:text="Account Update Time"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/textcolor"
-                android:textStyle="bold" />
         </LinearLayout>
 
 
     </ScrollView>
+    <TextView
+        android:id="@+id/accountcreatetime"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_marginStart="@dimen/_4sdp"
+        android:fontFamily="sans-serif-thin"
+        android:gravity="center"
+        android:text="Account Creation Time"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor"
+        android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/accountupdatetime"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_marginStart="@dimen/_4sdp"
+        android:fontFamily="sans-serif-thin"
+        android:gravity="center"
+        android:text="Account Update Time"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/textcolor"
+        android:textStyle="bold" />
 
 </LinearLayout>

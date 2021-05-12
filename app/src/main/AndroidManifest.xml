@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.horofbd.nei">
+    package="com.horofbd.MeCloak">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -17,7 +18,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:windowSoftInputMode="adjustPan">
-        <activity android:name=".VaultActivity"></activity>
+        <activity android:name=".Animation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".VaultActivity" />
         <activity android:name=".BlockListActivity" />
         <activity android:name=".DownloadResetCode" />
         <activity android:name=".ChangeOrUpdateProfilePassword" />
@@ -46,7 +54,6 @@
         <activity android:name=".NotificationActivity" />
         <activity android:name=".RechargeActivity" />
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".SendMessage" />
         <activity android:name=".GetPremiumActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".PhoneNumberVerificationActivity" />
@@ -55,13 +62,7 @@
         <activity android:name=".UserVerificationActivity" />
         <activity android:name=".RegisterNewUser" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".MainActivity"/>
     </application>
 
 </manifest>

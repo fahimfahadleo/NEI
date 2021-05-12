@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer"
     android:layout_width="match_parent"
-    tools:openDrawer="end"
     android:layout_height="match_parent"
+    tools:openDrawer="end"
     android:background="@color/background"
     android:theme="@style/AppTheme.NoActionBar"
     tools:context=".MainActivity">
@@ -70,7 +70,7 @@
                     android:layout_width="@dimen/_38sdp"
                     android:layout_height="@dimen/_38sdp"
                     android:padding="@dimen/_8sdp"
-                    android:src="@drawable/nonotification" />
+                    android:src="@drawable/bell" />
 
 
                 <ImageView
@@ -142,18 +142,17 @@
             android:layout_height="@dimen/_46sdp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-
             android:layout_margin="@dimen/_16sdp"
-
             app:cardBackgroundColor="@color/background"
             app:cardCornerRadius="@dimen/_23sdp"
             app:cardElevation="@dimen/_8sdp">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/newmessage"
-                android:layout_width="@dimen/_45sdp"
-                android:layout_height="@dimen/_45sdp"
-                android:src="@drawable/add_white"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_height="match_parent"
+                android:src="@drawable/add_friend"
 
                 />
         </androidx.cardview.widget.CardView>
@@ -238,19 +237,30 @@
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
 
-                <TextView
-                    android:id="@+id/gopremiumtxt"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_35sdp"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="Go Premium"
-                    android:paddingStart="@dimen/_8sdp"
-                    android:paddingEnd="@dimen/_8sdp"
-                    android:drawableStart="@drawable/gopremiumicon"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000" />
+                    <ImageView
+                        android:layout_width="@dimen/_26sdp"
+                        android:layout_height="@dimen/_26sdp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/premium"
+                        android:layout_marginStart="@dimen/_8sdp"/>
+
+                    <TextView
+                        android:id="@+id/gopremiumtxt"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="@dimen/_35sdp"
+                        android:gravity="center|start"
+                        android:text="Go Premium"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="#000" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -268,18 +278,31 @@
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
 
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/_26sdp"
+                    android:layout_height="@dimen/_26sdp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/setting"
+                    android:layout_marginStart="@dimen/_8sdp"/>
                 <TextView
                     android:id="@+id/settings"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_35sdp"
-                    android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="center|start"
+
                     android:text="Settings"
                     android:paddingStart="@dimen/_8sdp"
                     android:paddingEnd="@dimen/_8sdp"
-                    android:drawableStart="@drawable/gopremiumicon"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="#000" />
+
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -297,18 +320,30 @@
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
 
-                <TextView
-                    android:id="@+id/help"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/_26sdp"
+                    android:layout_height="@dimen/_26sdp"
                     android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="Help"
-                    android:paddingEnd="@dimen/_8sdp"
-                    android:paddingStart="@dimen/_8sdp"
-                    android:drawableStart="@drawable/helpicon"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000" />
+                    android:src="@drawable/help"
+                    android:layout_marginStart="@dimen/_8sdp"/>
+
+                    <TextView
+                        android:id="@+id/help"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_35sdp"
+                        android:gravity="center|start"
+
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
+                        android:text="Help"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="#000" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
 
@@ -326,19 +361,29 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
+                <ImageView
+                    android:layout_width="@dimen/_26sdp"
+                    android:layout_height="@dimen/_26sdp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/contact_us"
+                    android:layout_marginStart="@dimen/_8sdp"/>
                 <TextView
                     android:id="@+id/contactus"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_35sdp"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:drawableStart="@drawable/contacticon"
+                    android:gravity="center|start"
+
                     android:paddingStart="@dimen/_8sdp"
                     android:paddingEnd="@dimen/_8sdp"
                     android:text="Contact Us"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="#000" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
 
@@ -357,19 +402,29 @@
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/_26sdp"
+                    android:layout_height="@dimen/_26sdp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/tandc"
+                    android:layout_marginStart="@dimen/_8sdp"/>
                 <TextView
                     android:id="@+id/termsandconditions"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_35sdp"
+                    android:gravity="center|start"
 
-                    android:layout_gravity="center"
-                    android:gravity="center"
                     android:text="Terms and Conditions"
                     android:paddingStart="@dimen/_8sdp"
                     android:paddingEnd="@dimen/_8sdp"
-                    android:drawableStart="@drawable/gopremiumicon"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="#000" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
 
@@ -387,20 +442,30 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
+                <ImageView
+                    android:layout_width="@dimen/_26sdp"
+                    android:layout_height="@dimen/_26sdp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/policy"
+                    android:layout_marginStart="@dimen/_8sdp"/>
                 <TextView
                     android:id="@+id/policytext"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_35sdp"
 
-                    android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="center|start"
+
                     android:text="Policy"
                     android:paddingStart="@dimen/_8sdp"
                     android:paddingEnd="@dimen/_8sdp"
-                    android:drawableStart="@drawable/gopremiumicon"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="#000" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
 
@@ -418,19 +483,29 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
+                <ImageView
+                    android:layout_width="@dimen/_26sdp"
+                    android:layout_height="@dimen/_26sdp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/logout"
+                    android:layout_marginStart="@dimen/_8sdp"/>
                 <TextView
                     android:id="@+id/logout"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_35sdp"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:drawableStart="@drawable/contacticon"
+                    android:gravity="center|start"
+
                     android:paddingStart="@dimen/_8sdp"
                     android:paddingEnd="@dimen/_8sdp"
                     android:text="Logout"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="#000" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
 
@@ -448,20 +523,30 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
+                <ImageView
+                    android:layout_width="@dimen/_26sdp"
+                    android:layout_height="@dimen/_26sdp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/about"
+                    android:layout_marginStart="@dimen/_8sdp"/>
                 <TextView
                     android:id="@+id/abouttext"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_35sdp"
 
-                    android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="center|start"
+
                     android:text="About"
                     android:paddingStart="@dimen/_8sdp"
                     android:paddingEnd="@dimen/_8sdp"
-                    android:drawableStart="@drawable/gopremiumicon"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="#000" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
 

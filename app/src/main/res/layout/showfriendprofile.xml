@@ -4,19 +4,36 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="User Profile"
-        android:background="@drawable/toolbarbg"
-        android:gravity="center"
-        android:paddingTop="@dimen/_4sdp"
-        android:paddingBottom="@dimen/_4sdp"
-        android:shadowColor="@color/shadow"
-        android:shadowDx="0.0"
-        android:shadowDy="0.0"
-        android:shadowRadius="8"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="User Profile"
+            android:background="@drawable/toolbarbg"
+            android:gravity="center"
+            android:paddingTop="@dimen/_4sdp"
+            android:paddingBottom="@dimen/_4sdp"
+            android:shadowColor="@color/shadow"
+            android:shadowDx="0.0"
+            android:shadowDy="0.0"
+            android:shadowRadius="8"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+        <ImageButton
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="match_parent"
+            android:src="@drawable/close"
+            android:id="@+id/closedialogue"
+            android:background="@color/toolbarcolor"/>
+
+    </LinearLayout>
+
 
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -69,7 +86,7 @@
             android:background="@drawable/buttonbackground"
             android:gravity="center"
             android:paddingStart="@dimen/_16sdp"
-            android:id="@+id/sendbutton"
+            android:id="@+id/sendfriendrequest"
             android:textSize="@dimen/_14sdp"
             android:paddingEnd="@dimen/_16sdp"
             android:textColor="@color/white"/>
@@ -87,7 +104,7 @@
             android:background="@drawable/buttonbackground"
             android:gravity="center"
             android:paddingStart="@dimen/_16sdp"
-            android:id="@+id/proceedbutton"
+            android:id="@+id/blockfriend"
             android:textSize="@dimen/_14sdp"
             android:paddingEnd="@dimen/_16sdp"
             android:textColor="@color/white"/>
