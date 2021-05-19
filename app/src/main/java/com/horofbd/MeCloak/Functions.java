@@ -27,6 +27,8 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,7 +57,14 @@ public class Functions {
     }
 
 
-
+    public static JSONObject map(String id,JSONObject jsonObject){
+        try {
+            jsonObject.put("table_id",id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
     public static void Logcat(String tag,String s){
         Log.e(tag,s);
     }

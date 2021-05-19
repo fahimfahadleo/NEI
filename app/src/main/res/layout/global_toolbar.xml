@@ -25,13 +25,9 @@
         android:gravity="center"
         android:paddingTop="@dimen/_4sdp"
         android:paddingBottom="@dimen/_4sdp"
-        android:shadowColor="@color/shadow"
-        android:shadowDx="0.0"
-        android:shadowDy="0.0"
-        android:shadowRadius="8"
         android:text="Title"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/textcolor" />
+        android:textColor="@color/colorPrimaryDark" />
 
     <ImageView
         android:id="@+id/options"

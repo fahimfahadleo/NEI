@@ -3,7 +3,9 @@ package com.horofbd.MeCloak;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import org.json.JSONException;
 
@@ -59,11 +62,40 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
         passunhide = findViewById(R.id.showpass);
         conpassunhide = findViewById(R.id.showconfirmpass);
         proceed = findViewById(R.id.proceedbutton);
-
         termsandconditions = findViewById(R.id.termsandconditions);
         policy = findViewById(R.id.policy);
         context = this;
 
+        password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                passunhide.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+        confirmpassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                conpassunhide.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
         passunhide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,7 +105,6 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
                     ispasshidden = false;
                 } else {
                     passunhide.setImageDrawable(getResources().getDrawable(R.drawable.eye));
-
                     password.setTransformationMethod(null);
                     ispasshidden = true;
                 }
@@ -94,32 +125,60 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
             }
         });
 
+        proceed.setEnabled(false);
+        proceed.setBackground(ContextCompat.getDrawable(this, R.drawable.buttonbackgroundgrey));
+
         termsandconditions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (istandcchecked) {
                     termsandconditions.setChecked(false);
                     istandcchecked = false;
+                    proceed.setEnabled(false);
+                    proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundgrey));
+
                 } else {
                     termsandconditions.setChecked(true);
                     istandcchecked = true;
-                }
 
+                    if (ispolicyischecked) {
+                        proceed.setEnabled(true);
+                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundoceanblue));
+                    } else {
+                        proceed.setEnabled(false);
+                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundgrey));
+                    }
+                }
             }
         });
 
         policy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (ispolicyischecked) {
                     policy.setChecked(false);
                     ispolicyischecked = false;
+
+                    proceed.setEnabled(false);
+                    proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundgrey));
+
                 } else {
                     policy.setChecked(true);
                     ispolicyischecked = true;
+                    if (istandcchecked) {
+                        proceed.setEnabled(true);
+                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundoceanblue));
+                    } else {
+                        proceed.setEnabled(false);
+                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundgrey));
+                    }
+
                 }
             }
         });
+
 
         proceed.setOnClickListener(new View.OnClickListener() {
 
@@ -135,51 +194,40 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
                 if (TextUtils.isEmpty(referencestr)) {
                     referencestr = "";
                 }
-
-
                 boolean isOk = false;
-
-
                 if (TextUtils.isEmpty(namestr)) {
                     name.setError("Field Can Not Be Empty!");
-                    name.requestFocus();
                     isOk = true;
                 }
                 if (TextUtils.isEmpty(phonestr)) {
                     phone.setError("Field Can Not Be Empty!");
-                    phone.requestFocus();
                     isOk = true;
                 }
-
                 if (TextUtils.isEmpty(passwordstr)) {
                     password.setError("Field Can Not Be Empty!");
-                    password.requestFocus();
+                    passunhide.setVisibility(View.INVISIBLE);
                     isOk = true;
                 }
                 if (passwordstr.length() < 6) {
-                    password.setError("Password Should Be At Least Of 8 Characters!");
-                    password.requestFocus();
+                    password.setError("Password Should Be At Least Of 6 Characters!");
+                    passunhide.setVisibility(View.INVISIBLE);
                     isOk = true;
                 }
                 if (TextUtils.isEmpty(confirmpasswrodstr)) {
                     confirmpassword.setError("Field Can Not Be Empty!");
-                    confirmpassword.requestFocus();
+                    conpassunhide.setVisibility(View.INVISIBLE);
                     isOk = true;
                 }
                 if (!passwordstr.equals(confirmpasswrodstr)) {
                     confirmpassword.setError("Password Did Not Match!");
-                    confirmpassword.requestFocus();
+                    conpassunhide.setVisibility(View.INVISIBLE);
                     isOk = true;
                 }
                 if (!termsandconditions.isChecked()) {
-                    termsandconditions.setError("Review Our Terms And Conditions?");
-                    termsandconditions.requestFocus();
                     isOk = true;
                 }
 
                 if (!policy.isChecked()) {
-                    policy.setError("Review Our Policy?");
-                    policy.requestFocus();
                     isOk = true;
                 }
 
@@ -205,7 +253,7 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.e("errpr",failresponse);
+                Log.e("errpr", failresponse);
                 Toast.makeText(RegisterNewUser.this, "There was an error creating your account!", Toast.LENGTH_SHORT).show();
 
             }

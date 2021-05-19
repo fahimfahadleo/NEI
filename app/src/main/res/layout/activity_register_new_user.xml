@@ -207,14 +207,25 @@
                             android:textColor="@color/textcolor" />
 
                         <TextView
+                            android:id="@+id/text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/_15sdp"
                             android:background="@color/background"
                             android:paddingStart="@dimen/_2sdp"
-                            android:paddingEnd="@dimen/_2sdp"
-                            android:text="My Referal (Optional)"
+                            android:paddingEnd="@dimen/_1sdp"
+                            android:text="My Referal"
                             android:textColor="@color/oceanblue" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@color/background"
+                            android:paddingStart="@dimen/_1sdp"
+                            android:paddingEnd="@dimen/_2sdp"
+                            android:layout_toEndOf="@id/text"
+                            android:text="(Optional)"
+                            android:textColor="@color/blue_grey_550" />
+
                     </RelativeLayout>
 
                     <View
@@ -388,7 +399,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="Please Read Out"
                                     android:textColor="#000"
-                                    android:textSize="12sp" />
+                                    android:textSize="13sp" />
 
                                 <TextView
                                     android:id="@+id/tandctext"
@@ -397,7 +408,7 @@
                                     android:layout_marginStart="@dimen/_4sdp"
                                     android:text="@string/terms_and_conditions"
                                     android:textColor="@color/red"
-                                    android:textSize="12sp" />
+                                    android:textSize="13sp" />
 
                             </LinearLayout>
 
@@ -406,7 +417,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Carefully And Acknowledge"
                                 android:textColor="#000"
-                                android:textSize="12sp" />
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
@@ -443,7 +454,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="Also Acknowledge our"
                                     android:textColor="#000"
-                                    android:textSize="12sp" />
+                                    android:textSize="13sp" />
 
                                 <TextView
                                     android:id="@+id/policytext"
@@ -452,16 +463,23 @@
                                     android:layout_marginStart="@dimen/_4sdp"
                                     android:text="@string/policy"
                                     android:textColor="@color/red"
-                                    android:textSize="12sp" />
+                                    android:textSize="13sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text=" To Know"
+                                    android:textColor="#000"
+                                    android:textSize="13sp" />
 
                             </LinearLayout>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="To Know Limitations"
+                                android:text="Limitations"
                                 android:textColor="#000"
-                                android:textSize="12sp" />
+                                android:textSize="13sp" />
 
                         </LinearLayout>
 
@@ -480,13 +498,14 @@
             <TextView
                 android:id="@+id/proceedbutton"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/_32sdp"
+                android:layout_height="@dimen/_26sdp"
                 android:layout_gravity="center"
                 android:background="@drawable/buttonbackgroundoceanblue"
                 android:gravity="center"
                 android:paddingStart="@dimen/_16sdp"
                 android:paddingEnd="@dimen/_16sdp"
                 android:text="Submit"
+                android:layout_marginBottom="@dimen/_16sdp"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_14sdp" />
 

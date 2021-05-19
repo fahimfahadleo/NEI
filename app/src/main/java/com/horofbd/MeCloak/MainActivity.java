@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
@@ -26,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.horofbd.MeCloak.Models.FriendListModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,19 +49,26 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
     public native String tryencode(String message, String type, String password);
+
     static native void StartActivity(Context context, String activity);
+
     public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
 
+    static native void InitLinks();
+    static native void CheckResponse(ServerResponse serverResponse,Context context, String response,int requestcode);
+
+    public static native String getLoginInfo(String key);
 
 
-    CircleImageView profileimage,newmessage;
+    CircleImageView profileimage, newmessage;
     public static boolean active = false;
     DatabaseHelper helper;
-    ImageView  options, notification;
+    ImageView options, notification;
 
     boolean isopen = false;
-    RecyclerView recyclerView;
+    static RecyclerView recyclerView;
     public static final int PICK_IMAGE = 1;
     String number;
     DrawerLayout drawerLayout;
@@ -135,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
         return cursor.getString(idx);
     }
+
     static Context context;
 
     public static void closeActivtiy() {
@@ -162,24 +170,24 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         SettingsView = findViewById(R.id.settingsview);
         Settings = findViewById(R.id.settings);
 
+        InitLinks();
 
-        Intent i = new Intent();
 
         SettingsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this,"Settings");
+                StartActivity(MainActivity.this, "Settings");
             }
         });
         Settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this,"Settings");
+                StartActivity(MainActivity.this, "Settings");
             }
         });
 
 
-        namelist = new ArrayList<>();
+        //  namelist = new ArrayList<>();
 
 
         search.setOnClickListener(new View.OnClickListener() {
@@ -202,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         notification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this,"Notification");
+                StartActivity(MainActivity.this, "Notification");
             }
         });
 
@@ -236,14 +244,14 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 //                i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
 //                startActivityForResult(i, 2);
 
-                StartActivity(MainActivity.this,"AddFriend");
+                StartActivity(MainActivity.this, "AddFriend");
             }
         });
 
         profileimage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this,"Profile");
+                StartActivity(MainActivity.this, "Profile");
 
             }
         });
@@ -259,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 
         new Functions(this);
         helper = new DatabaseHelper(this);
-        long expires = Long.parseLong(Functions.getSharedPreference("expires_in", "0"));
+
 
 
         AppCompatDelegate
@@ -267,95 +275,58 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
                         AppCompatDelegate
                                 .MODE_NIGHT_NO);
 
-        if (!Functions.getSharedPreference("private_token", "").equals("") || System.currentTimeMillis() <= expires) {
-            if (Functions.isActive) {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("page", "1");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                globalRequest(this, "POST", "http://10.0.2.2:8000/api/get-friends", jsonObject, 1);
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                // startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-            }
 
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("page_id",getLoginInfo("page_id"));
+            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        // startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
 
 
     }
 
-    ArrayList<FriendListModel> namelist;
-
-    ListviewAdapter adapter;
-
+    static ListviewAdapter adapter;
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
-        Log.e("Mainresponse", response);
-
-
-
+        Log.e("MainResponse",response);
+        CheckResponse(this,this,response,requestcode);
     }
 
     @Override
     public void onFailure(String failresponse) {
 
     }
-
-    public class ListviewAdapter extends RecyclerView.Adapter<ListviewAdapter.ViewHolder> {
-        private ArrayList<FriendListModel> listdata;
-
-        // RecyclerView recyclerView;
-        public ListviewAdapter(ArrayList<FriendListModel> listdata) {
-            Log.e("listview", listdata.toString());
-            this.listdata = listdata;
-        }
-
-        @Override
-        public ListviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-            View listItem = layoutInflater.inflate(R.layout.singlefriend, parent, false);
-            return new ListviewAdapter.ViewHolder(listItem);
-        }
-
-        @Override
-        public void onBindViewHolder(ListviewAdapter.ViewHolder holder, int position) {
-            final FriendListModel myListData = listdata.get(position);
-            holder.textView.setText(myListData.getName());
-//        holder.imageView.setImageResource(listdata[position].getImgId());
-            holder.phonenumber.setText(myListData.getPhone_no());
-            holder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent i = new Intent(MainActivity.this, ShowUserMessage.class);
-                    i.putExtra("phone", myListData.getPhone_no());
-                    startActivity(i);
-                }
-            });
-        }
-
-
-        @Override
-        public int getItemCount() {
-            return listdata.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public CircleImageView imageView;
-            public TextView textView;
-            public CardView cardView;
-            public TextView phonenumber;
-
-            public ViewHolder(View itemView) {
-                super(itemView);
-                this.imageView = (CircleImageView) itemView.findViewById(R.id.profile_image);
-                this.textView = (TextView) itemView.findViewById(R.id.name);
-                this.cardView = (CardView) itemView.findViewById(R.id.singlecardview);
-                this.phonenumber = (TextView) itemView.findViewById(R.id.phonenumber);
+    public static void setUpData(ArrayList<JSONObject> listdata) {
+        Log.e("mainlist",listdata.toString());
+        ((Activity) context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.e("listviewdata", listdata.toString());
+                adapter = new ListviewAdapter(listdata, context,R.layout.singlefriend);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                recyclerView.setAdapter(adapter);
             }
+        });
+
+    }
+    static class ListviewAdapter extends ListViewAdapter {
+        public ListviewAdapter(ArrayList<JSONObject> listdata, Context context, int view) {
+            super(listdata, context, view);
+        }
+
+        @Override
+        public void showDialogue() {
         }
     }
 

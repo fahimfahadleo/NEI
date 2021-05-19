@@ -35,13 +35,26 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class NotificationActivity extends AppCompatActivity implements ServerResponse {
     static Context context;
-    public static void closeActivtiy(){
-        ((Activity)context).finish();
+
+    public static void closeActivtiy() {
+        ((Activity) context).finish();
     }
 
     TabLayout tabLayout;
     ViewPager viewPager;
     ArrayList<String> namelist;
+
+    static {
+        System.loadLibrary("native-lib");
+    }
+
+    public static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
+
+    static native void StartActivity(Context context, String activity);
+
+    public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+
+    public static native String getLoginInfo(String key);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +64,7 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
         viewPager = findViewById(R.id.viewpager);
         namelist = new ArrayList<>();
         //ServerRequest.RetriveFriendRequest(this,1);
-context = this;
-
-
+        context = this;
 
 
         final MyAdapter adapter = new MyAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount());
@@ -80,29 +91,10 @@ context = this;
     }
 
 
-//        View root = tabLayout.getChildAt(0);
-//        if (root instanceof LinearLayout) {
-//            ((LinearLayout) root).setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
-//            GradientDrawable drawable = new GradientDrawable();
-//            drawable.setColor(getResources().getColor(R.color.black));
-//            drawable.setSize(2, 5);
-//            ((LinearLayout) root).setDividerPadding(10);
-//            ((LinearLayout) root).setDividerDrawable(drawable);
-//        }
-
-
-
-
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
-        if (requestcode == 1) {
-            Log.e("Notification", response);
-
-
-
-
-
-        }
+        Log.e("notification", response);
+        CheckResponse(this, this, response, requestcode);
     }
 
     @Override
@@ -127,11 +119,11 @@ context = this;
         public Fragment getItem(int position) {
             switch (position) {
                 case 1:
-                    return new ContactRequest(NotificationActivity.this);
+                    return new ContactRequest(NotificationActivity.this, NotificationActivity.this);
                 case 0:
 
                 default:
-                    return new NotificationFragment(NotificationActivity.this);
+                    return new NotificationFragment(NotificationActivity.this, NotificationActivity.this);
             }
         }
 
@@ -141,8 +133,6 @@ context = this;
             return totalTabs;
         }
     }
-
-
 
 
 }

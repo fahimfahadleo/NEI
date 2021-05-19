@@ -12,8 +12,9 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
 
-public class Animation extends AppCompatActivity {
+public class Animation extends AppCompatActivity{
     static {
         System.loadLibrary("native-lib");
     }
@@ -31,18 +32,34 @@ public class Animation extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_animation);
-        findViewById(R.id.animation).setAnimation(AnimationUtils.loadAnimation(this,R.anim.fadein));
+       ImageView iv =  findViewById(R.id.animation);
+
+        android.view.animation.Animation animation = AnimationUtils.loadAnimation(this,R.anim.fadein);
+        animation.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(android.view.animation.Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(android.view.animation.Animation animation) {
+                StartActivity(Animation.this,"Login");
+            }
+
+            @Override
+            public void onAnimationRepeat(android.view.animation.Animation animation) {
+
+            }
+        });
+        iv.setAnimation(animation);
+
+
 
         context = this;
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-               StartActivity(Animation.this,"UserVerification");
-            }
-        },2250);
 
 
 
     }
+
+
 }

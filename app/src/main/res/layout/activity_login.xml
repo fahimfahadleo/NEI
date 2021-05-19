@@ -80,9 +80,6 @@
                 android:orientation="vertical">
 
 
-
-
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -158,13 +155,14 @@
                 <TextView
                     android:id="@+id/proceedbutton"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/_32sdp"
+                    android:layout_height="@dimen/_26sdp"
                     android:layout_gravity="center"
                     android:background="@drawable/buttonbackgroundoceanblue"
-                    android:gravity="center"
                     android:paddingStart="@dimen/_16sdp"
+                    android:gravity="center"
                     android:paddingEnd="@dimen/_16sdp"
                     android:text="Login"
+                    android:paddingBottom="@dimen/_2sdp"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_14sdp" />
 
@@ -173,8 +171,9 @@
                     android:id="@+id/forgotpasswordlayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/_16sdp"
                     android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/_16sdp"
+                    android:layout_marginBottom="@dimen/_8sdp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -186,7 +185,7 @@
                         android:text="Forgot Your Password?"
                         android:textColor="@color/red"
                         android:layout_marginEnd="@dimen/_4sdp"
-                        android:textSize="12sp" />
+                        android:textSize="@dimen/_12sdp" />
 
                     <TextView
                         android:id="@+id/forgotpassword"
@@ -195,7 +194,7 @@
                         android:layout_gravity="center"
                         android:text="Click Here."
                         android:textColor="@color/oceanblue"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/_12sdp" />
 
                 </LinearLayout>
 
@@ -206,9 +205,7 @@
                 android:id="@+id/textlayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="@id/extra"
-                app:layout_constraintTop_toBottomOf="@id/passwordview">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/donthaveaccount"
@@ -217,7 +214,7 @@
                     android:layout_gravity="center"
                     android:text="Don't have an account?"
                     android:textColor="@color/textcolor"
-                    android:textSize="12sp" />
+                    android:textSize="@dimen/_12sdp" />
 
                 <TextView
                     android:id="@+id/register"
@@ -226,7 +223,7 @@
                     android:layout_gravity="center"
                     android:text="Register here"
                     android:textColor="@color/oceanblue"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/_12sdp" />
 
 
             </LinearLayout>

@@ -29,6 +29,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     String userpass;
     EditText autotext;
     LinearLayout passwordfieldlayout;
+    TextView initialize;
 
     static {
         System.loadLibrary("native-lib");
@@ -65,9 +66,9 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         helper = new DatabaseHelper(this);
         autotext = findViewById(R.id.autotext);
         passwordfieldlayout = findViewById(R.id.passwordfieldlayout);
+        initialize = findViewById(R.id.initialize);
 
-
-
+        passwordfieldlayout.setVisibility(View.VISIBLE);
 
 
         String s = "~+8801914616453@MeCloak> auth status\n" +
@@ -120,7 +121,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
                                                 public void run() {
                                                     autotext.setVisibility(View.GONE);
                                                     passwordfieldlayout.setVisibility(View.VISIBLE);
-
+                                                    initialize.setText("Page Login");
                                                 }
                                             });
                                         }
@@ -133,16 +134,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
                 },
                 0,      // run first occurrence immediatetly
                 200); // run every two seconds
-
-
-
-
-
-
-
-
-
-
+        
         InitLinks();
         new Functions(this);
 

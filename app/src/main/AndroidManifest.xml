@@ -61,7 +61,9 @@
         <activity android:name=".RegisterVerifiedUser" />
         <activity android:name=".UserVerificationActivity" />
         <activity android:name=".RegisterNewUser" />
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".LoginActivity">
+
+        </activity>
         <activity android:name=".MainActivity"/>
     </application>
 

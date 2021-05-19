@@ -6,7 +6,6 @@
     android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:openDrawer="end"
     android:background="@color/background"
     android:theme="@style/AppTheme.NoActionBar"
     tools:context=".MainActivity">

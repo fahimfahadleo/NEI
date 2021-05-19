@@ -34,9 +34,15 @@ public class Important {
     protected static String block_friend_list;
     protected static String unfriend_friend;
     protected static String cancel_friend_request;
+    protected static String accept_friend;
+
+
+
     protected static String delete_friend_request;
     protected static String ignore_friend;
     protected static String friend_list;
+    protected static String retrive_request_list;
+
 
     /////////////message//////////////
     protected static String send_message;
@@ -49,21 +55,6 @@ public class Important {
     protected static String buy_premium;
     protected static String activate_previous_premium;
 
-    public static String getActivate_previous_premium() {
-        return activate_previous_premium;
-    }
-
-    public static void setActivate_previous_premium(String activate_previous_premium) {
-        Important.activate_previous_premium = activate_previous_premium;
-    }
-
-    public static String getBuy_page() {
-        return buy_page;
-    }
-
-    public static void setBuy_page(String buy_page) {
-        Important.buy_page = buy_page;
-    }
 
     protected static String buy_page;
 
@@ -86,6 +77,38 @@ public class Important {
 
     /////////notification////////////
     protected static String getNotification;
+
+
+    public static String getAccept_friend() {
+        return accept_friend;
+    }
+
+    public static void setAccept_friend(String accept_friend) {
+        Important.accept_friend = accept_friend;
+    }
+    public static String getRetrive_request_list() {
+        return retrive_request_list;
+    }
+
+    public static void setRetrive_request_list(String retrive_request_list) {
+        Important.retrive_request_list = retrive_request_list;
+    }
+
+    public static String getActivate_previous_premium() {
+        return activate_previous_premium;
+    }
+
+    public static void setActivate_previous_premium(String activate_previous_premium) {
+        Important.activate_previous_premium = activate_previous_premium;
+    }
+
+    public static String getBuy_page() {
+        return buy_page;
+    }
+
+    public static void setBuy_page(String buy_page) {
+        Important.buy_page = buy_page;
+    }
 
     public static String getGetNotification() {
         return getNotification;

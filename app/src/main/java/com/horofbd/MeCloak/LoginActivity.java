@@ -49,19 +49,13 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         new Functions(this);
 
 
-        //StartActivity(this,"Main");
 
         AppCompatDelegate
                 .setDefaultNightMode(
                         AppCompatDelegate
                                 .MODE_NIGHT_NO);
 
-//        String isRegistered = GetLoginInfo("RegisterStatus");
-//        Log.e("registerinfo", isRegistered);
-//        if (!isRegistered.equals("0")) {
-//            register.setVisibility(View.GONE);
-//            donthaveaccount.setVisibility(View.GONE);
-//        }
+
         forgotpassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

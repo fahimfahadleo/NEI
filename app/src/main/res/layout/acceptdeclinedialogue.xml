@@ -1,103 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:text="Alert"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:background="@color/skyblue"/>
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="@dimen/_100sdp"
-        android:layout_height="@dimen/_100sdp"
-        android:src="@drawable/ic_launcher_background"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/_8sdp"
-        app:civ_border_color="#000"
-        app:civ_border_width="2dp"
-        android:id="@+id/proflepic"/>
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:text="name"
-        android:id="@+id/name"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        android:textColor="@color/skyblue"
-     />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:text="Phone"
-        android:id="@+id/phonenumber"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        android:textColor="@color/skyblue"
-        />
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
+    app:cardBackgroundColor="#80030A25"
+    app:cardCornerRadius="5dp"
+    app:cardElevation="8dp"
+    app:contentPadding="@dimen/_4sdp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_35sdp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-<View
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:layout_weight="1"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/_32sdp"
-            android:text="Decline"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/skyblue"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="match_parent"
+                android:background="@color/skyblue" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/skyblue"
+                android:gravity="center"
+                android:paddingTop="@dimen/_4sdp"
+                android:paddingBottom="@dimen/_4sdp"
+                android:text="Friend Request"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <ImageButton
+                android:id="@+id/closedialogue"
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="match_parent"
+                android:background="@color/skyblue"
+                android:src="@drawable/close" />
+
+        </LinearLayout>
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/proflepic"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
             android:layout_gravity="center"
-            android:background="@drawable/buttonbackgroundred"
+            android:layout_margin="@dimen/_8sdp"
+            android:src="@drawable/person"
+            app:civ_border_color="@color/oceanblue"
+            app:civ_border_width="1dp" />
+
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_8sdp"
             android:gravity="center"
-            android:paddingStart="@dimen/_16sdp"
-            android:id="@+id/declinebutton"
-            android:textSize="@dimen/_14sdp"
-            android:paddingEnd="@dimen/_16sdp"
-            android:textColor="@color/white"/>
+            android:text="Fahim Fahad leo"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/oceanblue"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/userphone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="+8801914616453"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/oceanblue"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_35sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/declinebutton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_16sdp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonbackgroundred"
+                android:gravity="center"
+                android:paddingStart="@dimen/_16sdp"
+                android:paddingEnd="@dimen/_16sdp"
+                android:text="Decline"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp" />
+
+
+            <TextView
+                android:id="@+id/accpetbutton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_16sdp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonbackground"
+                android:gravity="center"
+                android:paddingStart="@dimen/_16sdp"
+                android:paddingEnd="@dimen/_16sdp"
+                android:text="Accept"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp" />
+
+
+        </LinearLayout>
 
         <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/_32sdp"
-            android:text="Accept"
-            android:layout_gravity="center"
-            android:background="@drawable/buttonbackgroundgreen"
-            android:gravity="center"
-            android:paddingStart="@dimen/_16sdp"
-            android:id="@+id/accpetbutton"
-            android:textSize="@dimen/_14sdp"
-            android:paddingEnd="@dimen/_16sdp"
-            android:textColor="@color/white"/>
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
-
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_8sdp" />
     </LinearLayout>
 
-
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>

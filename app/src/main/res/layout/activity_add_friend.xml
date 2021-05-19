@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".AddFriend">
 
     <include layout="@layout/global_toolbar"
@@ -15,8 +16,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/_32sdp"
         android:layout_gravity="center"
+        android:layout_marginTop="@dimen/_4sdp"
         android:gravity="center"
         android:layout_marginBottom="@dimen/_16sdp"
         android:orientation="horizontal">
@@ -26,29 +28,51 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_32sdp"
-            android:layout_weight="7"
-            android:hint="Phone Number"
-            android:background="@drawable/edtshapewhite"
-            android:paddingTop="@dimen/_6sdp"
-            android:paddingBottom="@dimen/_6sdp"
-            android:textColorHint="@color/hintcolor"
-            android:paddingStart="@dimen/_16sdp"
-            android:id="@+id/phone"
-            android:inputType="phone"
-            android:paddingEnd="@dimen/_16sdp"
-            android:textSize="@dimen/_12sdp"
-            android:textColor="@color/textcolor"
-            />
+     <RelativeLayout
+         android:layout_width="0dp"
+         android:layout_height="match_parent"
+         android:layout_weight="7">
+
+         <EditText
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:hint="Phone Number"
+             android:background="@drawable/edtshapewhite"
+             android:paddingTop="@dimen/_6sdp"
+             android:paddingBottom="@dimen/_6sdp"
+             android:textColorHint="@color/hintcolor"
+             android:paddingStart="@dimen/_16sdp"
+             android:id="@+id/phone"
+             android:inputType="phone"
+             android:paddingEnd="@dimen/_16sdp"
+             android:textSize="@dimen/_12sdp"
+             android:textColor="@color/textcolor"
+             />
+
+         <ImageButton
+             android:layout_width="@dimen/_24sdp"
+             android:layout_height="match_parent"
+             android:layout_margin="@dimen/_5sdp"
+             android:src="@drawable/search"
+             android:layout_alignParentEnd="true"
+             android:id="@+id/proceedbutton"
+             android:background="@color/background"/>
+
+
+     </RelativeLayout>
+
+
+
+
         <ImageView
-            android:layout_width="@dimen/_24sdp"
+
+            android:layout_width="@dimen/_32sdp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginStart="@dimen/_8sdp"
-            android:src="@drawable/contact"
+            android:src="@drawable/contacts"
             android:id="@+id/contact"/>
+
 
         <View
             android:layout_width="0dp"
@@ -57,31 +81,70 @@
 
     </LinearLayout>
 
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Search"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:background="@drawable/buttonbackground"-->
+<!--        android:gravity="center"-->
+<!--        android:paddingStart="@dimen/_16sdp"-->
+<!--        android:paddingTop="@dimen/_4sdp"-->
+<!--        android:paddingBottom="@dimen/_4sdp"-->
+<!--        android:id="@+id/proceedbutton"-->
+<!--        android:textSize="@dimen/_14sdp"-->
+<!--        android:paddingEnd="@dimen/_16sdp"-->
+<!--        android:textColor="@color/white"/>-->
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:id="@+id/showcontactlist"/>
+
+
+
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="@dimen/_32sdp"
-        android:text="Submit"
-        android:layout_gravity="center"
-        android:background="@drawable/buttonbackground"
-        android:gravity="center"
-        android:paddingStart="@dimen/_16sdp"
-        android:id="@+id/proceedbutton"
-        android:textSize="@dimen/_14sdp"
-        android:paddingEnd="@dimen/_16sdp"
-        android:textColor="@color/white"/>
-
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/_32sdp"
         android:layout_gravity="center"
         android:gravity="center"
+        android:text="No Result Found"
         android:paddingStart="@dimen/_16sdp"
         android:id="@+id/text"
-        android:textSize="@dimen/_14sdp"
+        android:visibility="gone"
+        android:textSize="@dimen/_12sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
         android:paddingEnd="@dimen/_16sdp"
         android:layout_marginTop="@dimen/_8sdp"
         android:textColor="@color/red"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Friend Suggestions"
+        android:textColor="@color/oceanblue"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="@dimen/_16sdp"
+        android:id="@+id/initialize"
+        />
+
+
+
+
+
+   <androidx.recyclerview.widget.RecyclerView
+       android:layout_width="match_parent"
+       android:layout_height="0dp"
+       android:layout_weight="1"
+       android:visibility="gone"
+       android:id="@+id/suggestion"/>
+
+
+
 
 </LinearLayout>

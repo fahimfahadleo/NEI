@@ -3,7 +3,7 @@
     <color name="colorPrimary">#172BDD</color>
     <color name="colorPrimaryDark">#030A25</color>
     <color name="colorAccent">#08398E</color>
-    <color name="red">#FF0000</color>
+    <color name="red">#B30000</color>
     <color name="green">#2BA602</color>
     <color name="blue_grey_500">#607D8B</color>
     <color name="blue_grey_550">#73919F</color>
@@ -11,6 +11,7 @@
     <color name="blue_grey_700">#455A64</color>
     <color name="blue_grey_800">#37474F</color>
     <color name="blue_grey_900">#263238</color>
+    <color name="black_grey">#AFAFAF</color>
 
     <color name="cardbgcolor">#D5DAFF</color>
     <color name="cardbgdeepcolor">#D5DAFF</color>

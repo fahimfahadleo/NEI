@@ -14,9 +14,11 @@ import org.json.JSONException;
 
 public class NotificationFragment extends Fragment implements ServerResponse {
     Context context;
+    ServerResponse serverResponse;
 
-    public NotificationFragment(Context context) {
+    public NotificationFragment(Context context,ServerResponse serverResponse) {
         this.context = context;
+        this.serverResponse = serverResponse;
     }
 
     @Override
@@ -27,6 +29,7 @@ public class NotificationFragment extends Fragment implements ServerResponse {
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
+
 
     }
 
