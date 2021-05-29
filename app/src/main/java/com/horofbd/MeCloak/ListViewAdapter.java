@@ -9,9 +9,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
+import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.content.Context.ALARM_SERVICE;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHolder> {
@@ -54,7 +58,7 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                 holder.textView.setText(myListData.getString("name") + "(" + myListData.getString("phone_no") + ")");
             }else if(vi == R.layout.singlefriend){
                 holder.textView.setText(myListData.getString("name"));
-                holder.phonenumber.setText(myListData.getString("phone_no"));
+                holder.phonenumber.setText("Last Contact at");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -72,7 +76,43 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
 
             }
         });
+        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                AlertDialog dialog;
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                View view1 = inflater.inflate(R.layout.friendlongpressoption,null,false);
+                CardView mutenotificationview = view1.findViewById(R.id.mutenotificationview);
+                TextView mutenotification = view1.findViewById(R.id.mutenotification);
+                CardView markasunreadview = view1.findViewById(R.id.markasunreadview);
+                TextView markasunread = view1.findViewById(R.id.markasunread);
+                CardView ignoremessageview = view1.findViewById(R.id.ignoremessageview);
+                TextView ignoremessage = view1.findViewById(R.id.ignoremessage);
+                CardView sealview = view1.findViewById(R.id.sealview);
+                TextView seal = view1.findViewById(R.id.seal);
+                CardView blockview = view1.findViewById(R.id.blockview);
+                TextView block = view1.findViewById(R.id.block);
+                CardView deleteview = view1.findViewById(R.id.deleteview);
+                TextView delete = view1.findViewById(R.id.delete);
+//                Animation animation = AnimationUtils.loadAnimation(context,R.anim.fadein);
+//                view1.setAnimation(animation);
+//                view1.startAnimation(animation);
+
+
+                builder.setView(view1);
+                builder.setCancelable(true);
+                dialog = builder.create();
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                dialog.show();
+
+                return true;
+            }
+        });
     }
+
+
+
 
 protected JSONObject mylistdata;
     private void initDialogue(JSONObject myList) {

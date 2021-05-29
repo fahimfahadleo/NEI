@@ -12,7 +12,7 @@
         android:id="@+id/titlelayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/toolbarbg"
+        android:background="@color/colorPrimaryDark"
         android:orientation="horizontal">
 
         <ImageView
@@ -29,13 +29,9 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:gravity="center"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="0.0"
-            android:shadowDy="0.0"
-            android:shadowRadius="8"
             android:text="Notifications"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@color/textcolor" />
+            android:textColor="@color/oceanblue" />
 
 
         <ImageView
@@ -61,7 +57,9 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:tabIndicatorColor="@color/cardbgcolor"
+        app:tabIndicatorColor="@color/colorPrimaryDark"
+        app:tabSelectedTextColor="@color/oceanblue"
+
         app:tabIndicatorHeight="?attr/actionBarSize">
 
             <com.google.android.material.tabs.TabItem

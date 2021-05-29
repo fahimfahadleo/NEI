@@ -1,79 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".PhoneNumberVerificationActivity">
 
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/gopremiumview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="-10dp"
+        android:layout_marginBottom="@dimen/_16sdp"
+        android:layout_weight="2"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/colorPrimaryDark"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/colorPrimaryDark"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/imageview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimaryDark"
+                    android:src="@drawable/appicon" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:src="@drawable/app_name" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="NEI"
-        android:textColor="@color/textcolor"
-        android:textSize="@dimen/_20sdp"
-        app:layout_constraintBottom_toTopOf="@+id/imageview"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginBottom="@dimen/_20sdp"
+        android:gravity="center"
+        android:text="Verify Phone"
+        android:textColor="@color/colorPrimaryDarktext"
+        android:textSize="@dimen/_16sdp"
+        android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/imageview"
-        android:layout_width="@dimen/_75sdp"
-        android:layout_height="@dimen/_75sdp"
-        android:src="@drawable/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@id/passwordview"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/imageview"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:id="@+id/passwordview"
+        android:layout_height="0dp"
+        android:layout_weight="3"
         android:orientation="vertical">
 
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_16sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
             android:orientation="horizontal">
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
 
 
-            <EditText
+            <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_32sdp"
-                android:layout_weight="7"
-                android:hint="Verification Code"
-                android:background="@drawable/edtshapewhite"
-                android:paddingTop="@dimen/_6sdp"
-                android:paddingBottom="@dimen/_6sdp"
-                android:textColorHint="@color/hintcolor"
-                android:paddingStart="@dimen/_16sdp"
-                android:id="@+id/verifycode"
-                android:paddingEnd="@dimen/_16sdp"
-                android:textSize="@dimen/_12sdp"
-                android:textColor="@color/textcolor"
-                />
+                android:layout_height="wrap_content"
+                android:layout_weight="7">
 
+                <EditText
+                    android:id="@+id/verifycode"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_32sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:layout_marginBottom="@dimen/_8sdp"
+                    android:background="@drawable/edtshapewhite"
+                    android:gravity="start|center"
+                    android:paddingStart="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp"
+                    android:textColor="@color/textcolor" />
 
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:background="@color/background"
+                    android:paddingStart="@dimen/_2sdp"
+                    android:paddingEnd="@dimen/_2sdp"
+                    android:text="Verification Code"
+                    android:textColor="@color/black" />
+            </RelativeLayout>
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
         </LinearLayout>
 
@@ -81,53 +174,82 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/_32sdp"
-                android:text="Submit"
-                android:layout_gravity="center"
-                android:background="@drawable/buttonbackgroundgreen"
-                android:gravity="center"
-                android:paddingStart="@dimen/_16sdp"
                 android:id="@+id/verifybutton"
-                android:textStyle="bold"
-                android:textSize="@dimen/_14sdp"
-                android:paddingEnd="@dimen/_16sdp"
-                android:textColor="@color/white"/>
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/_32sdp"
-                android:text="Resend"
+                android:layout_height="@dimen/_26sdp"
                 android:layout_gravity="center"
                 android:background="@drawable/buttonbackgroundgreen"
                 android:gravity="center"
                 android:paddingStart="@dimen/_16sdp"
-                android:id="@+id/resend"
-                android:textStyle="bold"
-                android:textSize="@dimen/_14sdp"
                 android:paddingEnd="@dimen/_16sdp"
-                android:textColor="@color/white"/>
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_margin="@dimen/_8sdp"
+                android:text="Submit"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp"
+                android:textStyle="bold" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Verification code usually arrives within 1 minute."/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Didn't get any code?"
+                    android:textColor="@color/red"
+                    android:layout_marginEnd="@dimen/_4sdp"
+                    android:textSize="@dimen/_12sdp" />
+
+                <TextView
+                    android:id="@+id/resend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Resend"
+                    android:textColor="@color/oceanblue"
+                    android:textSize="@dimen/_14sdp"
+                    />
+
+
+            </LinearLayout>
+
+
 
         </LinearLayout>
 
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="6" />
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Report A Problem"
+        android:gravity="center"
+        android:textColor="@color/oceanblue"
+        android:layout_marginBottom="@dimen/_16sdp"/>
+
+</LinearLayout>

@@ -36,6 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.xml.transform.Source;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements ServerResponse {
@@ -66,16 +68,16 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
     public static boolean active = false;
     DatabaseHelper helper;
     ImageView options, notification;
-
     boolean isopen = false;
     static RecyclerView recyclerView;
     public static final int PICK_IMAGE = 1;
     String number;
-    DrawerLayout drawerLayout;
+    static DrawerLayout drawerLayout;
     TextView logout, Settings;
     CardView logoutview, SettingsView;
     ImageView search;
     LinearLayout searchlayout;
+
 
 
     @Override
@@ -150,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
     }
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,6 +173,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         recyclerView = findViewById(R.id.recyclerview);
         SettingsView = findViewById(R.id.settingsview);
         Settings = findViewById(R.id.settings);
+
+       // drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         InitLinks();
 
@@ -256,19 +262,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
             }
         });
 
-        String s = tryencode("this is the message", "encode", "password");
-        Log.e("encoded", s);
-
-        Log.e("encoded", Functions.Base64encode(s));
-        String d = tryencode(s, "decode", "password");
-
-        Log.e("decoded", d);
-
-
         new Functions(this);
         helper = new DatabaseHelper(this);
-
-
 
         AppCompatDelegate
                 .setDefaultNightMode(
@@ -320,13 +315,30 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         });
 
     }
+
+
+//    public void showid(){
+//        String id = android.telephony.TelephonyManager.getDeviceId();
+//
+//
+//        Log.e("Imei",id);
+//    }
+
+    public static void setData(JSONObject jsonObject){
+        Log.e("longpress",jsonObject.toString());
+    }
+
+
+
     static class ListviewAdapter extends ListViewAdapter {
         public ListviewAdapter(ArrayList<JSONObject> listdata, Context context, int view) {
             super(listdata, context, view);
-        }
 
+        }
         @Override
         public void showDialogue() {
+
+
         }
     }
 

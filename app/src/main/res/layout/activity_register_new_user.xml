@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -13,9 +14,9 @@
         android:id="@+id/gopremiumview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
         android:layout_marginTop="-10dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="@dimen/_16sdp"
+        android:layout_weight="2"
         android:clickable="true"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -31,37 +32,84 @@
             android:background="@color/colorPrimaryDark"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageview"
-                android:layout_width="@dimen/_75sdp"
-                android:layout_height="@dimen/_75sdp"
-                android:layout_gravity="center"
-                android:background="@color/colorPrimaryDark"
-                android:src="@drawable/appicon" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                >
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/imageview"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/colorPrimaryDark"
+                    android:src="@drawable/appicon" />
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
 
 
 
-            <ImageView
-                android:layout_width="@dimen/_150sdp"
-                android:layout_gravity="center"
-                android:layout_height="@dimen/_50sdp"
-                android:src="@drawable/app_name"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                >
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/app_name" />
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/_16sdp"
-        android:text="Register Profile"
         android:layout_gravity="center"
-        android:gravity="center"
         android:layout_marginBottom="@dimen/_20sdp"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"/>
+        android:gravity="center"
+        android:text="Register Profile"
+        android:textColor="@color/colorPrimaryDarktext"
+        android:textSize="@dimen/_16sdp"
+        android:textStyle="bold" />
 
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4">
@@ -77,9 +125,7 @@
                 android:id="@+id/passwordview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textView">
+                android:orientation="vertical">
 
 
                 <LinearLayout
@@ -216,13 +262,14 @@
                             android:paddingEnd="@dimen/_1sdp"
                             android:text="My Referal"
                             android:textColor="@color/oceanblue" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/text"
                             android:background="@color/background"
                             android:paddingStart="@dimen/_1sdp"
                             android:paddingEnd="@dimen/_2sdp"
-                            android:layout_toEndOf="@id/text"
                             android:text="(Optional)"
                             android:textColor="@color/blue_grey_550" />
 
@@ -500,12 +547,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_26sdp"
                 android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/_16sdp"
                 android:background="@drawable/buttonbackgroundoceanblue"
                 android:gravity="center"
                 android:paddingStart="@dimen/_16sdp"
                 android:paddingEnd="@dimen/_16sdp"
                 android:text="Submit"
-                android:layout_marginBottom="@dimen/_16sdp"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_14sdp" />
 
@@ -515,6 +562,6 @@
                 android:layout_weight="1" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

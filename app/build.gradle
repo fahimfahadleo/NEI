@@ -70,6 +70,12 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.14.1'
     implementation 'com.squareup.okio:okio:2.8.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.google.android.exoplayer:exoplayer:r2.4.0'
+    implementation 'com.google.android.exoplayer:exoplayer-core:r2.4.0'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:r2.4.0'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:r2.4.0'
+    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.4.0'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:r2.4.0'
 
 
 }

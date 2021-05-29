@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
@@ -16,8 +17,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:windowSoftInputMode="adjustPan">
+        android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".TutorialActivity"></activity>
         <activity android:name=".Animation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,11 +61,13 @@
         <activity android:name=".ShowUserMessage" />
         <activity android:name=".RegisterVerifiedUser" />
         <activity android:name=".UserVerificationActivity" />
-        <activity android:name=".RegisterNewUser" />
-        <activity android:name=".LoginActivity">
-
-        </activity>
-        <activity android:name=".MainActivity"/>
+        <activity
+            android:name=".RegisterNewUser"
+            android:windowSoftInputMode="stateHidden|adjustResize"></activity>
+        <activity
+            android:name=".LoginActivity"
+            android:windowSoftInputMode="adjustNothing"></activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

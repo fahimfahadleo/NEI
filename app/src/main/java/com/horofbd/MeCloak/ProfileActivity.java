@@ -12,16 +12,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 public class ProfileActivity extends AppCompatActivity {
 
-    TextView premium, mainbalancetext, refbalance;
+    TextView premium, mainbalancetext, refbalance,accountcreationtime,accountupdatetime,friendlist;
     ImageView toggolmainstartopen, toggolmainopen, toggolrefstartopen, toggolrefopen;
+    LinearLayout friendlistlayout;
     RelativeLayout rootview, rootview2;
 
 
@@ -29,9 +34,25 @@ public class ProfileActivity extends AppCompatActivity {
     boolean isMainbalanceopened = false;
     boolean isRefbalanceopened = false;
     static Context context;
-    public static void closeActivtiy(){
-        ((Activity)context).finish();
+
+    public static void closeActivtiy() {
+        ((Activity) context).finish();
     }
+
+
+    static {
+        System.loadLibrary("native-lib");
+    }
+
+    static native void StartActivity(Context context, String activity);
+
+    static native void InitLinks();
+
+    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+
+    static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
+
+    static native String getLoginInfo(String key);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +69,30 @@ public class ProfileActivity extends AppCompatActivity {
         refbalance = findViewById(R.id.refbalance);
         rootview2 = findViewById(R.id.rootview2);
         toggolrefopen.setVisibility(View.INVISIBLE);
-        context= this;
+        accountcreationtime = findViewById(R.id.accountcreatetime);
+        accountupdatetime = findViewById(R.id.accountupdatetime);
+        friendlist = findViewById(R.id.friendlist);
+        friendlistlayout = findViewById(R.id.firendlistlayout);
+
+
+        friendlistlayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StartActivity(ProfileActivity.this,"FriendList");
+            }
+        });
+
+        friendlist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StartActivity(ProfileActivity.this,"FriendList");
+            }
+        });
+
+
+        accountcreationtime.setText(getLoginInfo("created_at"));
+        accountupdatetime.setText(getLoginInfo("updated_at"));
+        context = this;
 
 
         rootview.setOnClickListener(new View.OnClickListener() {
@@ -67,45 +111,40 @@ public class ProfileActivity extends AppCompatActivity {
         toggolmainopen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 maincloseanimation();
             }
         });
-
         toggolmainstartopen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mainopenanimation();
-
             }
         });
 
         rootview2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isRefbalanceopened){
+                if (isRefbalanceopened) {
                     refcloseanimation();
-                }else {
+                } else {
                     refopenanimation();
                 }
             }
         });
 
-
         toggolrefstartopen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               refopenanimation();
+                refopenanimation();
             }
         });
 
         toggolrefopen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               refcloseanimation();
+                refcloseanimation();
             }
         });
-
 
         premium.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,7 +237,7 @@ public class ProfileActivity extends AppCompatActivity {
                 toggolmainopen.setVisibility(View.VISIBLE);
                 toggolmainstartopen.setVisibility(View.INVISIBLE);
                 mainbalancetext.setVisibility(View.VISIBLE);
-                mainbalancetext.setText("0.00 BDT");
+                mainbalancetext.setText(getLoginInfo("main_balance"));
                 mainbalancetext.setGravity(GravityCompat.START);
             }
 
@@ -257,7 +296,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
-    void refopenanimation(){
+    void refopenanimation() {
         Rect fromRect = new Rect();
         Rect toRect = new Rect();
         toggolrefstartopen.getGlobalVisibleRect(fromRect);
@@ -279,7 +318,7 @@ public class ProfileActivity extends AppCompatActivity {
                 toggolrefopen.setVisibility(View.VISIBLE);
                 toggolrefstartopen.setVisibility(View.INVISIBLE);
                 refbalance.setVisibility(View.VISIBLE);
-                refbalance.setText("0.00 BDT");
+                refbalance.setText(getLoginInfo("referral_balance"));
                 refbalance.setGravity(GravityCompat.START);
             }
 
@@ -297,7 +336,7 @@ public class ProfileActivity extends AppCompatActivity {
         isRefbalanceopened = true;
     }
 
-    void refcloseanimation(){
+    void refcloseanimation() {
         Rect fromRect = new Rect();
         Rect toRect = new Rect();
         toggolrefopen.getGlobalVisibleRect(fromRect);

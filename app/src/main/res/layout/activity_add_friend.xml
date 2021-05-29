@@ -9,8 +9,7 @@
     android:background="@color/background"
     tools:context=".AddFriend">
 
-    <include layout="@layout/global_toolbar"
-        android:id="@+id/toolbar"/>
+
 
 
 

@@ -61,6 +61,8 @@ public class ContactRequest extends Fragment {
 
         }
 
+
+
         @Override
         public void showDialogue() {
             accept.setOnClickListener(new View.OnClickListener() {

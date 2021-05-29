@@ -746,8 +746,26 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                 jstring phone_no = (jstring) env->CallObjectMethod(jobject1 , getString ,
                                                                    env->NewStringUTF(
                                                                            "phone_no"));
+                jstring login_token_expiry = (jstring)env->CallObjectMethod(jobject1,getString,env->NewStringUTF("login_token_expiry"));
+                jstring main_balance = (jstring)env->CallObjectMethod(jobject1,getString,env->NewStringUTF("main_balance"));
+                jstring referral_balance = (jstring)env->CallObjectMethod(jobject1,getString,env->NewStringUTF("referral_balance"));
+                jstring recharge_balance = (jstring)env->CallObjectMethod(jobject1,getString,env->NewStringUTF("recharge_balance"));
+                jstring view_ad_point_balance = (jstring)env->CallObjectMethod(jobject1,getString,env->NewStringUTF("view_ad_point_balance"));
+                jstring created_at = (jstring)env->CallObjectMethod(jobject1,getString,env->NewStringUTF("created_at"));
+                jstring updated_at = (jstring)env->CallObjectMethod(jobject1,getString,env->NewStringUTF("updated_at"));
+                jstring premium = (jstring)env->CallObjectMethod(object,getString,env->NewStringUTF("premium"));
 
                 setSharedPreference(env , env->NewStringUTF("access_token") , access_token);
+
+                setSharedPreference(env , env->NewStringUTF("login_token_expiry") , login_token_expiry);
+                setSharedPreference(env , env->NewStringUTF("referral_balance") , referral_balance);
+                setSharedPreference(env , env->NewStringUTF("recharge_balance") , recharge_balance);
+                setSharedPreference(env , env->NewStringUTF("view_ad_point_balance") , view_ad_point_balance);
+                setSharedPreference(env , env->NewStringUTF("created_at") , created_at);
+                setSharedPreference(env , env->NewStringUTF("updated_at") , updated_at);
+                setSharedPreference(env , env->NewStringUTF("premium") , premium);
+                setSharedPreference(env , env->NewStringUTF("main_balance") , main_balance);
+
                 setSharedPreference(env , env->NewStringUTF("token_type") , token_type);
                 setSharedPreference(env , env->NewStringUTF("expires_in") , token_expiry);
                 setSharedPreference(env , env->NewStringUTF("login_time") ,
@@ -758,9 +776,6 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                 setSharedPreference(env , env->NewStringUTF("phone_no") , phone_no);
                 setSharedPreference(env , env->NewStringUTF("login_status") ,
                                     env->NewStringUTF("true"));
-
-
-                printlogcat(env , "savelogindata" , "trying");
 
                 if (env->CallBooleanMethod(object , has , env->NewStringUTF("error"))) {
                     setSharedPreference(env , env->NewStringUTF("code") ,
@@ -1061,13 +1076,11 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                    env->CallStaticObjectMethod(Function , map ,
                                                                                friendtableid ,
                                                                                touser));
-                            printlogcat(env,"fromuser","fromuser");
                         } else{
                             env->CallBooleanMethod(list , addMethod ,
                                                    env->CallStaticObjectMethod(Function , map ,
                                                                                friendtableid ,
                                                                                fromuser));
-                            printlogcat(env,"touser","touser");
 
                         }
 
@@ -1082,10 +1095,84 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                         }
                     }
 
-
                 }
                 break;
 
+            }case 13:{
+                jint currentpage = (jint) env->CallIntMethod(jsonobject , getInt ,
+                                                             env->NewStringUTF("current_page"));
+                jint total = (jint) env->CallIntMethod(jsonobject , getInt ,
+                                                       env->NewStringUTF("total"));
+
+                if (total == 0) {
+                    showToast(env , context , env->NewStringUTF("Friend List Empty!"));
+                } else {
+                    jobject jsonArray = env->CallObjectMethod(jsonobject , getJSONArray ,
+                                                              env->NewStringUTF("data"));
+                    jint length = (jint) env->CallIntMethod(jsonArray , jsonarraylength);
+
+                    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+                    jmethodID arrayListConstructor = env->GetMethodID(arrayListClass , "<init>" ,
+                                                                      "()V");
+                    jmethodID addMethod = env->GetMethodID(arrayListClass , "add" ,
+                                                           "(Ljava/lang/Object;)Z");
+
+                    // The list we're going to return:
+                    jobject list = env->NewObject(arrayListClass , arrayListConstructor);
+
+
+                    for (int i = 0; i < length; i++) {
+
+                        jobject tempjsonobject = env->CallObjectMethod(jsonArray ,
+                                                                       jsonarraygetjsonobject , i);
+
+                        jobject friendobject = env->CallObjectMethod(tempjsonobject ,
+                                                                     getJsonObject ,
+                                                                     env->NewStringUTF("friend"));
+
+                        jstring friendtableid = (jstring) env->CallObjectMethod(friendobject ,
+                                                                                getString ,
+                                                                                env->NewStringUTF(
+                                                                                        "id"));
+
+                        jobject fromuser = env->CallObjectMethod(friendobject , getJsonObject ,
+                                                                 env->NewStringUTF("from_user"));
+
+                        jobject touser = env->CallObjectMethod(friendobject , getJsonObject ,
+                                                               env->NewStringUTF("to_user"));
+
+                        jmethodID map = env->GetStaticMethodID(Function , "map" ,
+                                                               "(Ljava/lang/String;Lorg/json/JSONObject;)Lorg/json/JSONObject;");
+
+                        if (jstring2string(env ,
+                                           (jstring) env->CallObjectMethod(fromuser , getString ,
+                                                                           env->NewStringUTF(
+                                                                                   "phone_no"))) ==
+                            jstring2string(env , (jstring) getSharedPreference(env ,
+                                                                               env->NewStringUTF(
+                                                                                       "phone_no")))) {
+                            env->CallBooleanMethod(list , addMethod ,
+                                                   env->CallStaticObjectMethod(Function , map ,
+                                                                               friendtableid ,
+                                                                               touser));
+                        } else {
+                            env->CallBooleanMethod(list , addMethod ,
+                                                   env->CallStaticObjectMethod(Function , map ,
+                                                                               friendtableid ,
+                                                                               fromuser));
+
+                        }
+
+                        if (i == length - 1) {
+                            jclass MainActivity = env->FindClass(
+                                    "com/horofbd/MeCloak/FriendListActivity");
+                            jmethodID SetUpData = env->GetStaticMethodID(MainActivity ,
+                                                                         "setUpData" ,
+                                                                         "(Ljava/util/ArrayList;)V");
+                            env->CallStaticVoidMethod(MainActivity , SetUpData , list);
+                        }
+                    }
+                }
             }
         }
     }
@@ -1437,4 +1524,59 @@ Java_com_horofbd_MeCloak_MainActivity_CheckResponse(JNIEnv *env , jclass clazz ,
                                                     jobject server_response , jobject context ,
                                                     jstring response , jint requestcode) {
     CheckResponse(env , server_response , context , response , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ProfileActivity_StartActivity(JNIEnv *env , jclass clazz ,
+                                                       jobject context , jstring activity) {
+    startActivity(env , context , jstring2string(env , activity));
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ProfileActivity_InitLinks(JNIEnv *env , jclass clazz) {
+    initver(env);
+    SetUpLinks(env);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ProfileActivity_globalRequest(JNIEnv *env , jclass clazz ,
+                                                       jobject server_response ,
+                                                       jstring requesttype , jstring link ,
+                                                       jobject json_object , jint requestcode) {
+    request(env , server_response , requesttype , link , json_object , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ProfileActivity_CheckResponse(JNIEnv *env , jclass clazz ,
+                                                       jobject server_response , jobject context ,
+                                                       jstring response , jint requestcode) {
+    CheckResponse(env , server_response , context , response , requestcode);
+}extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_horofbd_MeCloak_ProfileActivity_getLoginInfo(JNIEnv *env , jclass clazz , jstring key) {
+    return getSharedPreference(env , key);
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_FriendListActivity_StartActivity(JNIEnv *env , jclass clazz ,
+                                                          jobject context , jstring activity) {
+    startActivity(env , context , jstring2string(env , activity));
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_FriendListActivity_InitLinks(JNIEnv *env , jclass clazz) {
+    initver(env);
+    SetUpLinks(env);}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_FriendListActivity_globalRequest(JNIEnv *env , jclass clazz ,
+                                                          jobject server_response ,
+                                                          jstring requesttype , jstring link ,
+                                                          jobject json_object , jint requestcode) {
+    request(env , server_response , requesttype , link , json_object , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_FriendListActivity_CheckResponse(JNIEnv *env , jclass clazz ,
+                                                          jobject server_response ,
+                                                          jobject context , jstring response ,
+                                                          jint requestcode) {
+    CheckResponse(env , server_response , context , response , requestcode);
+}extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_horofbd_MeCloak_FriendListActivity_getLoginInfo(JNIEnv *env , jclass clazz , jstring key) {
+    return getSharedPreference(env , key);
 }

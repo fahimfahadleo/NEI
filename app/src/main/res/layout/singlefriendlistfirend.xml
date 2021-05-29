@@ -55,9 +55,6 @@
 
             </RelativeLayout>
 
-
-
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -76,10 +73,10 @@
                     android:textColor="@color/textcolor" />
 
                 <TextView
-                    android:id="@+id/text"
+                    android:id="@+id/mutualfirend"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Last Contact at"
+                    android:text="Mutual Friend"
                     android:textSize="12sp"
                     android:textColor="@color/textcolor" />
 
@@ -91,25 +88,26 @@
                 android:layout_weight="1"/>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="@dimen/_24sdp"
-                android:layout_height="@dimen/_24sdp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
                 android:layout_gravity="center"
                 app:cardBackgroundColor="@color/cardbgcolor"
-                app:cardCornerRadius="@dimen/_12sdp"
+                app:cardCornerRadius="@dimen/_10sdp"
                 app:cardElevation="8dp"
                 android:layout_marginEnd="@dimen/_8sdp"
-                app:contentPadding="@dimen/_4sdp">
+                >
 
 
                 <TextView
+                    android:id="@+id/options"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="99"
-                    android:textColor="@color/notificationnotifier"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
+                    android:fontFamily="serif"
                     android:gravity="center"
-                    android:id="@+id/seenstatus"/>
+                    android:text="i"
+                    android:textColor="@color/notificationnotifier"
+                    android:textSize="20sp"
+                    android:textStyle="italic" />
 
 
             </androidx.cardview.widget.CardView>

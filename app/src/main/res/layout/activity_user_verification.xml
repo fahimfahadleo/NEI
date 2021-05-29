@@ -1,327 +1,302 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer"
     android:layout_width="match_parent"
-    android:theme="@style/AppTheme.NoActionBar"
-    android:background="@color/background"
+    tools:openDrawer="end"
     android:layout_height="match_parent"
+    android:background="@color/background"
+    android:theme="@style/AppTheme.NoActionBar"
     tools:context=".UserVerificationActivity">
 
     <LinearLayout
-        android:id="@+id/titlelayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/toolbarbg"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        android:orientation="vertical"
+        tools:context=".UserVerificationActivity">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:padding="@dimen/_10sdp"
+            android:layout_marginTop="-10dp"
+            android:layout_marginBottom="@dimen/_16sdp"
+            android:layout_weight="2"
+            app:cardBackgroundColor="@color/colorPrimaryDark"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="8dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+
+                <View
+                    android:layout_width="0dp"
+                    android:id="@+id/viewid"
+                    android:layout_height="0dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/profile_image"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintVertical_weight="1"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="@dimen/_100sdp"
+                    android:layout_height="@dimen/_100sdp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/viewid"
+                    app:layout_constraintBottom_toTopOf="@id/namelayout"
+                    android:layout_gravity="center"
+                    android:src="@drawable/person"
+                    app:civ_border_color="@color/oceanblue"
+                    app:civ_border_width="2dp" />
+
+
+                <RelativeLayout
+                    android:id="@+id/namelayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/profile_image"
+                    app:layout_constraintBottom_toTopOf="@id/userphonenumber"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/username"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="center"
+                        android:text="Fahim Fahad Leo"
+                        android:textColor="@color/skyblue"
+                        android:textSize="@dimen/_14sdp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/nameedit"
+                        android:layout_width="@dimen/_14sdp"
+                        android:layout_height="@dimen/_14sdp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_toEndOf="@id/username"
+                        android:src="@drawable/edit" />
+
+
+                </RelativeLayout>
+
+
+                <TextView
+                    android:id="@+id/userphonenumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/namelayout"
+                    app:layout_constraintBottom_toBottomOf="@id/viewid2"
+                    android:gravity="center"
+                    android:text="01914616453"
+                    android:textColor="@color/blue_grey_550"
+                    android:textSize="@dimen/_14sdp" />
+
+
+                <View
+                    android:layout_width="0dp"
+                    android:id="@+id/viewid2"
+                    android:layout_height="0dp"
+                    app:layout_constraintTop_toBottomOf="@id/userphonenumber"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintVertical_weight="1"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/_4sdp"
-            android:paddingBottom="@dimen/_4sdp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@drawable/toolbarbg"
-            android:gravity="center"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="0.0"
-            android:shadowDy="0.0"
-            android:shadowRadius="8"
-            android:text="User Profile"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@color/textcolor" />
-    </LinearLayout>
-
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_6sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_6sdp"
-        android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="@color/colorPrimaryDark"
-
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="5dp"
-        app:cardElevation="8dp">
-
-
-
-
-        <LinearLayout
+            android:id="@+id/initialize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:gravity="center"
+            android:text="Initializing MeCloak"
+            android:textColor="@color/notificationnotifier"
+            android:textSize="@dimen/_16sdp"
+            android:textStyle="bold" />
 
 
+        <EditText
+            android:id="@+id/autotext"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/_8sdp"
+            android:layout_weight="3"
+            android:background="@color/black"
+            android:fontFamily="sans-serif-light"
+            android:gravity="start|top"
+            android:inputType="none"
+            android:textColor="#3ECD5E"
+            android:textSize="12sp"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/passwordfieldlayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_16sdp"
-                android:layout_gravity="center"
-                android:gravity="center"
+                android:layout_marginBottom="@dimen/_16sdp"
                 android:orientation="horizontal">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="@dimen/_100sdp"
-                    android:layout_gravity="center"
-                    android:layout_height="@dimen/_100sdp">
-
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/profile_image"
-                        android:layout_width="@dimen/_100sdp"
-                        android:layout_height="@dimen/_100sdp"
-                        android:src="@drawable/ic_launcher_background"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:civ_border_color="@color/oceanblue"
-                        app:civ_border_width="2dp" />
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
 
-                    <ImageView
-                        android:layout_width="@dimen/_24sdp"
-                        android:layout_height="@dimen/_24sdp"
-                        android:src="@drawable/camera"
-                        app:layout_constraintEnd_toEndOf="@id/profile_image"
-                        app:layout_constraintBottom_toBottomOf="@id/profile_image"
-                        android:layout_marginEnd="@dimen/_4sdp"
-                        android:layout_marginBottom="@dimen/_4sdp"
-                        android:id="@+id/editprofilepicture"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <EditText
+                    android:id="@+id/passwordfield"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_32sdp"
+                    android:layout_weight="7"
+                    android:background="@drawable/edtshapewhite"
+                    android:hint="Password"
+                    android:text="12"
+                    android:inputType="textPassword"
+                    android:paddingStart="@dimen/_16sdp"
+                    android:paddingTop="@dimen/_6sdp"
+                    android:paddingEnd="@dimen/_16sdp"
+                    android:paddingBottom="@dimen/_6sdp"
+                    android:textColor="@color/textcolor"
+                    android:textColorHint="@color/hintcolor"
+                    android:textSize="@dimen/_12sdp" />
 
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/proceedbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/_16sdp"
+                android:background="@drawable/buttonbackgroundgreen"
+                android:gravity="center"
+                android:paddingStart="@dimen/_16sdp"
+                android:paddingEnd="@dimen/_16sdp"
+                android:text="Unlock"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp"
+                android:textStyle="bold" />
 
-            <RelativeLayout
+
+            <LinearLayout
+                android:id="@+id/forgotpasswordlayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view">
 
                 <TextView
-                    android:id="@+id/username"
+                    android:id="@+id/forgotpasstext"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
                     android:layout_gravity="center"
-                    android:text="Fahim Fahad Leo"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/skyblue"
-                    android:textStyle="bold" />
+                    android:text="Forgot Your Password?"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/_12sdp" />
 
-                <ImageView
-                    android:id="@+id/nameedit"
+                <TextView
+                    android:id="@+id/forgotpassword"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_4sdp"
-                    android:layout_toEndOf="@id/username"
-                    android:src="@drawable/edit" />
+                    android:layout_gravity="center"
+                    android:text="Click Here."
+                    android:textColor="@color/oceanblue"
+                    android:textSize="@dimen/_12sdp" />
 
-
-            </RelativeLayout>
-
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/userphonenumber"
-                android:layout_width="match_parent"
+                android:id="@+id/registernewpage"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="01914616453"
-                android:layout_marginBottom="@dimen/_16sdp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_8sdp"
+                android:text="Regsiter New Page"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_12sdp" />
 
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/blue_grey_550" />
         </LinearLayout>
 
 
-    </androidx.cardview.widget.CardView>
-
-
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Initializing MeCloak"
-        android:textColor="@color/red"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="@dimen/_16sdp"
-        android:id="@+id/initialize"
- />
-
-
-    <EditText
-        android:id="@+id/autotext"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/_8sdp"
-        android:layout_weight="1"
-        android:background="@color/black"
-        android:fontFamily="sans-serif-light"
-        android:textSize="12sp"
-        android:gravity="start|top"
-        android:inputType="none"
-        android:textColor="#3ECD5E"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/passwordfieldlayout"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:visibility="visible"
-        android:orientation="vertical">
         <LinearLayout
+            android:id="@+id/extra"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_16sdp"
-            android:orientation="horizontal">
+            android:background="@color/background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-            <View
+
+            <TextView
+                android:id="@+id/contactus"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-
-
-            <EditText
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_32sdp"
-                android:layout_weight="7"
-                android:hint="Password"
-                android:background="@drawable/edtshapewhite"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/_16sdp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonbackgroundoceanblue"
+                android:gravity="center"
                 android:paddingTop="@dimen/_6sdp"
                 android:paddingBottom="@dimen/_6sdp"
-                android:textColorHint="@color/hintcolor"
-                android:paddingStart="@dimen/_16sdp"
-                android:id="@+id/passwordfield"
-                android:paddingEnd="@dimen/_16sdp"
-                android:inputType="textPassword"
-                android:textSize="@dimen/_12sdp"
-                android:textColor="@color/textcolor"
-                />
+                android:text="Contact Us"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
 
 
-
-            <View
+            <TextView
+                android:id="@+id/vault"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/_16sdp"
+                android:layout_weight="1"
+                android:background="@drawable/buttonbackgroundoceanblue"
+                android:gravity="center"
+                android:paddingTop="@dimen/_6sdp"
+                android:paddingBottom="@dimen/_6sdp"
+                android:text="Vault"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
 
         </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/_32sdp"
-            android:text="Unlock"
-            android:layout_gravity="center"
-            android:background="@drawable/buttonbackgroundgreen"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:paddingStart="@dimen/_16sdp"
-            android:id="@+id/proceedbutton"
-            android:textSize="@dimen/_14sdp"
-            android:layout_marginBottom="@dimen/_16sdp"
-            android:paddingEnd="@dimen/_16sdp"
-            android:textColor="@color/white"/>
-
-
-
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/view"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:orientation="vertical"
-            android:id="@+id/forgotpasswordlayout">
-            <TextView
-                android:id="@+id/forgotpasstext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/_12sdp"
-                android:textColor="@color/red"
-                android:layout_gravity="center"
-                android:text="Forgot Your Password?"/>
-            <TextView
-                android:id="@+id/forgotpassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="@dimen/_12sdp"
-                android:textColor="@color/oceanblue"
-                android:text="Click Here."/>
-
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_8sdp"
-            android:text="Regsiter New Page"
-            android:layout_gravity="center"
-            android:textSize="@dimen/_12sdp"
-            android:textColor="@color/black"
-            android:id="@+id/registernewpage"/>
-
     </LinearLayout>
 
 
 
-    <LinearLayout
-        android:id="@+id/extra"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:background="@color/background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-
-
-        <TextView
-            android:id="@+id/contactus"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:text="Contact Us"
-            android:background="@drawable/buttonbackgroundoceanblue"
-            android:gravity="center"
-            android:layout_margin="@dimen/_16sdp"
-            android:paddingTop="@dimen/_6sdp"
-            android:paddingBottom="@dimen/_6sdp"
-            android:textSize="14sp"
-            android:textColor="@color/white" />
-
-
-        <TextView
-            android:id="@+id/vault"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:text="Vault"
-            android:background="@drawable/buttonbackgroundoceanblue"
-            android:layout_margin="@dimen/_16sdp"
-            android:paddingTop="@dimen/_6sdp"
-            android:paddingBottom="@dimen/_6sdp"
-            android:gravity="center"
-            android:textSize="14sp"
-            android:textColor="@color/white" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="-10dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="@dimen/_16sdp"
         android:layout_weight="2"
         android:clickable="true"
         android:focusable="true"
@@ -32,20 +32,67 @@
             android:background="@color/colorPrimaryDark"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageview"
-                android:layout_width="@dimen/_75sdp"
-                android:layout_height="@dimen/_75sdp"
-                android:layout_gravity="center"
-                android:background="@color/colorPrimaryDark"
-                android:src="@drawable/appicon" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/imageview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimaryDark"
+                    android:src="@drawable/appicon" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
 
 
-            <ImageView
-                android:layout_width="@dimen/_150sdp"
-                android:layout_height="@dimen/_50sdp"
-                android:layout_gravity="center"
-                android:src="@drawable/app_name" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:src="@drawable/app_name" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
@@ -69,7 +116,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="Create New Page"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/colorPrimaryDarktext"
         android:textSize="@dimen/_16sdp"
         android:textStyle="bold" />
 
@@ -79,143 +126,177 @@
         android:layout_height="0dp"
         android:layout_weight="4">
 
+
         <LinearLayout
+            android:id="@+id/passwordview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/passwordview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/imageview">
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+
+                <RelativeLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/_16sdp"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
+                    android:layout_weight="7">
 
                     <EditText
                         android:id="@+id/pagename"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="@dimen/_32sdp"
-                        android:layout_weight="7"
+                        android:layout_marginTop="@dimen/_8sdp"
+
                         android:background="@drawable/edtshapewhite"
-                        android:hint="Page Name"
-                        android:inputType="text"
-                        android:paddingStart="@dimen/_16sdp"
-                        android:paddingTop="@dimen/_6sdp"
-                        android:paddingEnd="@dimen/_16sdp"
-                        android:paddingBottom="@dimen/_6sdp"
-                        android:textColor="@color/textcolor"
-                        android:textColorHint="@color/hintcolor"
-                        android:textSize="@dimen/_12sdp" />
+                        android:gravity="start|center"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/textcolor" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:background="@color/background"
+                        android:paddingStart="@dimen/_2sdp"
+                        android:paddingEnd="@dimen/_2sdp"
+                        android:text="Page Name"
+                        android:textColor="@color/black" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
 
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <RelativeLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/_16sdp"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
+                    android:layout_weight="7">
 
                     <EditText
                         android:id="@+id/password"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="@dimen/_32sdp"
-                        android:layout_weight="7"
+                        android:layout_marginTop="@dimen/_8sdp"
                         android:background="@drawable/edtshapewhite"
-                        android:hint="Password"
-                        android:inputType="textPassword"
-                        android:paddingStart="@dimen/_16sdp"
-                        android:paddingTop="@dimen/_6sdp"
-                        android:paddingEnd="@dimen/_16sdp"
-                        android:paddingBottom="@dimen/_6sdp"
-                        android:textColor="@color/textcolor"
-                        android:textColorHint="@color/hintcolor"
-                        android:textSize="@dimen/_12sdp" />
+                        android:gravity="start|center"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/textcolor" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:background="@color/background"
+                        android:paddingStart="@dimen/_2sdp"
+                        android:paddingEnd="@dimen/_2sdp"
+                        android:text="Password"
+                        android:textColor="@color/black" />
+                </RelativeLayout>
 
 
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
-                </LinearLayout>
+            </LinearLayout>
 
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+
+                <RelativeLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
+                    android:layout_weight="7">
 
                     <EditText
                         android:id="@+id/confirmpassword"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="@dimen/_32sdp"
-                        android:layout_marginBottom="@dimen/_16sdp"
-                        android:layout_weight="7"
+                        android:layout_marginTop="@dimen/_8sdp"
+                        android:layout_marginBottom="@dimen/_8sdp"
                         android:background="@drawable/edtshapewhite"
-                        android:hint="Confirm Password"
-                        android:inputType="textPassword"
-                        android:paddingStart="@dimen/_16sdp"
-                        android:paddingTop="@dimen/_6sdp"
-                        android:paddingEnd="@dimen/_16sdp"
-                        android:paddingBottom="@dimen/_6sdp"
-                        android:textColor="@color/textcolor"
-                        android:textColorHint="@color/hintcolor"
-                        android:textSize="@dimen/_12sdp" />
+                        android:gravity="start|center"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/textcolor" />
 
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:background="@color/background"
+                        android:paddingStart="@dimen/_2sdp"
+                        android:paddingEnd="@dimen/_2sdp"
+                        android:text="Confirm Password"
+                        android:textColor="@color/black" />
+                </RelativeLayout>
 
-                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/proceedbutton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/_32sdp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/buttonbackgroundoceanblue"
-                    android:gravity="center"
-                    android:paddingStart="@dimen/_16sdp"
-                    android:paddingEnd="@dimen/_16sdp"
-                    android:text="Lock Now"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_14sdp" />
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/proceedbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_gravity="center"
+                android:background="@drawable/buttonbackgroundoceanblue"
+                android:gravity="center"
+                android:paddingStart="@dimen/_16sdp"
+                android:paddingEnd="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:text="Lock Now"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp" />
         </LinearLayout>
+
     </ScrollView>
 
 

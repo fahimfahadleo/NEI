@@ -2,8 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <color name="colorPrimary">#172BDD</color>
     <color name="colorPrimaryDark">#030A25</color>
+    <color name="colorPrimaryDarktext">#061243</color>
     <color name="colorAccent">#08398E</color>
     <color name="red">#B30000</color>
+    <color name="notificationnotifier">#FF1111</color>
     <color name="green">#2BA602</color>
     <color name="blue_grey_500">#607D8B</color>
     <color name="blue_grey_550">#73919F</color>
@@ -12,34 +14,20 @@
     <color name="blue_grey_800">#37474F</color>
     <color name="blue_grey_900">#263238</color>
     <color name="black_grey">#AFAFAF</color>
-
     <color name="cardbgcolor">#D5DAFF</color>
-    <color name="cardbgdeepcolor">#D5DAFF</color>
-
-
+    <color name="cardbgdeepcolor">#C3CAFD</color>
     <color name="oceanblue">#00A3E6</color>
-
     <color name="shadow">#4548F3</color>
     <color name="background">#E3E8FF</color>
     <color name="textcolor">#000</color>
     <color name="inverttextcolor">#0b7cfe</color>
     <color name="skyblue">#60B6FF</color>
     <color name="toolbarcolor">#C5CFFF</color>
-
-
-    <color name="color">#DFB324</color>
-
-
+    <color name="goldencolor">#DFB324</color>
     <color name="registertextcolor">#172BDD</color>
-
     <color name="black">#000</color>
     <color name="white">#fff</color>
-
     <color name="hintcolor">#BCB6B6</color>
-
-
-
-
 
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#201F1F</color>
 
