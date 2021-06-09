@@ -115,7 +115,8 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(LoginActivity.this, "There was an error in login!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, failresponse, Toast.LENGTH_SHORT).show();
+                Log.e("error",failresponse);
             }
         });
     }

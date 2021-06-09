@@ -50,7 +50,7 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
 
     public static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
-    static native void StartActivity(Context context, String activity);
+    static native void StartActivity(Context context, String activity,String data);
 
     public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
 

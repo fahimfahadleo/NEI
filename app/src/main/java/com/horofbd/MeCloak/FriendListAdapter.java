@@ -29,6 +29,18 @@ public abstract class FriendListAdapter extends RecyclerView.Adapter<FriendListA
     protected AlertDialog dialog;
     protected TextView unfriend;
     protected TextView blockfriend;
+    protected CardView viewprofileview;
+    protected TextView viewprofile;
+    protected CardView sendmessageview;
+    protected TextView sendmessage;
+    protected CardView unfriendview;
+    protected TextView unfriend1;
+    protected CardView ignoreview;
+    protected TextView ignore;
+    protected CardView blockview;
+    protected TextView block;
+    protected CardView reportuserview;
+    protected TextView reportuser;
 
     Context context;
 
@@ -60,8 +72,7 @@ public abstract class FriendListAdapter extends RecyclerView.Adapter<FriendListA
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initDialogue(listdata.get(position));
-
+                initDialogue(listdata.get(position),position);
             }
         });
 
@@ -72,23 +83,21 @@ public abstract class FriendListAdapter extends RecyclerView.Adapter<FriendListA
                 AlertDialog dialog;
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-                View view1 = inflater.inflate(R.layout.singlefriendoptions,null,false);
+                View view1 = inflater.inflate(R.layout.singlefriendoptions, null, false);
 
-                CardView viewprofileview = view1.findViewById(R.id.mutenotificationview);
-                TextView viewprofile = view1.findViewById(R.id.mutenotification);
-                CardView sendmessageview = view1.findViewById(R.id.markasunreadview);
-                TextView sendmessage = view1.findViewById(R.id.markasunread);
-                CardView unfriendview = view1.findViewById(R.id.ignoremessageview);
-                TextView unfriend = view1.findViewById(R.id.ignoremessage);
-                CardView ignoreview = view1.findViewById(R.id.sealview);
-                TextView ignore = view1.findViewById(R.id.seal);
-                CardView blockview = view1.findViewById(R.id.blockview);
-                TextView block = view1.findViewById(R.id.block);
-                CardView reportuserview = view1.findViewById(R.id.deleteview);
-                TextView reportuser = view1.findViewById(R.id.delete);
-
-
-
+                viewprofileview = view1.findViewById(R.id.viewprofileview);
+                viewprofile = view1.findViewById(R.id.viewprofile);
+                sendmessageview = view1.findViewById(R.id.sendmessageview);
+                sendmessage = view1.findViewById(R.id.sendmessage);
+                unfriendview = view1.findViewById(R.id.unfriendview);
+                unfriend1 = view1.findViewById(R.id.unfriend);
+                ignoreview = view1.findViewById(R.id.ignoreview);
+                ignore = view1.findViewById(R.id.ignore);
+                blockview = view1.findViewById(R.id.blockview);
+                block = view1.findViewById(R.id.block);
+                reportuserview = view1.findViewById(R.id.reportuserview);
+                reportuser = view1.findViewById(R.id.report);
+                SetUpOnClick(position);
                 builder.setView(view1);
                 builder.setCancelable(true);
                 dialog = builder.create();
@@ -134,18 +143,14 @@ public abstract class FriendListAdapter extends RecyclerView.Adapter<FriendListA
 
     protected JSONObject mylistdata;
 
-    private void initDialogue(JSONObject myList) {
+    private void initDialogue(JSONObject myList,int position) {
         mylistdata = myList;
-        Log.e("mylist", myList.toString());
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-        assert inflater != null;
         View VI = inflater.inflate(R.layout.singlefriendprofile, null, false);
         builder.setView(VI);
-
         TextView titletext;
         ImageView closeButton;
-
         TextView name = VI.findViewById(R.id.username);
         TextView phonenumber = VI.findViewById(R.id.userphone);
         CircleImageView profilepic = VI.findViewById(R.id.proflepic);
@@ -153,11 +158,7 @@ public abstract class FriendListAdapter extends RecyclerView.Adapter<FriendListA
         blockfriend = VI.findViewById(R.id.blockfriend);
         titletext = VI.findViewById(R.id.titletext);
         closeButton = VI.findViewById(R.id.closedialogue);
-
-
         titletext.setText("Friend Profile");
-
-
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -170,15 +171,16 @@ public abstract class FriendListAdapter extends RecyclerView.Adapter<FriendListA
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        showDialogue();
+        showDialogue(position);
         builder.setCancelable(true);
         dialog = builder.create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#80030A25")));
         dialog.show();
     }
 
+    public abstract void SetUpOnClick(int position);
 
-    public abstract void showDialogue();
+    public abstract void showDialogue(int position);
 
 
     @Override

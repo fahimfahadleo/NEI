@@ -57,9 +57,9 @@ public class Functions {
     }
 
 
-    public static JSONObject map(String id,JSONObject jsonObject){
+    public static JSONObject map(String title,String id,JSONObject jsonObject){
         try {
-            jsonObject.put("table_id",id);
+            jsonObject.put(title,id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -200,7 +200,7 @@ public class Functions {
         MultipartBody.Builder builder = new MultipartBody.Builder();
         RequestBody body = null;
 
-        if (jsonObject != null) {
+        if (jsonObject.length()!=0) {
             Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
             while (iter.hasNext()) {
                 String key = iter.next();
@@ -208,16 +208,24 @@ public class Functions {
                     builder.addFormDataPart(key, jsonObject.getString(key));
                     builder.setType(MultipartBody.FORM);
                     body = builder.build();
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
+        }else {
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            body = RequestBody.create(JSON, "{}");
         }
-        Request request = new Request.Builder()
-                .url(Link)
-                .method(requestType, body)
-                .build();
+        Request request;
+        if(requestType == "GET"){
+            request = new Request.Builder().url(Link).method("GET",null).build();
+        }else {
+            request= new Request.Builder()
+                    .url(Link)
+                    .method(requestType, body)
+                    .build();
+        }
+
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -291,10 +299,6 @@ public class Functions {
         long expires = (Long.parseLong(Functions.getSharedPreference("expires_in", "0"))*1000)+Long.parseLong(Functions.getSharedPreference("login_time","0"));
 
 
-        Log.e("Expiry",String.valueOf(Long.parseLong(Functions.getSharedPreference("expires_in","0"))*(long)1000));
-        Log.e("Expiry",Functions.getSharedPreference("login_time","0"));
-        Log.e("Expiry",String.valueOf(expires));
-        Log.e("currenttime",String.valueOf(System.currentTimeMillis()));
 
         if (expires - (expires - 10 * 60 * 1000) < 10 * 60 * 1000) {
             SetPrivateToken();
@@ -310,7 +314,15 @@ public class Functions {
                 }
             }).build();
         } else if (System.currentTimeMillis() > expires) {
-            Log.e("expiry", "deri hoye geche");
+
+
+            Log.e("Expiry",String.valueOf(Long.parseLong(Functions.getSharedPreference("expires_in","0"))*(long)1000));
+            Log.e("Expiry",Functions.getSharedPreference("login_time","0"));
+            Log.e("Expiry",String.valueOf(expires));
+            Log.e("currenttime",String.valueOf(System.currentTimeMillis()));
+
+
+            Log.e("expiry1111111111", "deri hoye geche");
             context.startActivity(new Intent(context, LoginActivity.class));
             ((Activity) context).finish();
         } else {
@@ -393,7 +405,7 @@ public class Functions {
         String timea = (String)android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss", System.currentTimeMillis());
         return timea;
     }
-    public static void LoginRegisteredUser(ServerResponse serverResponse, String phone, String password,String devicetype,String devicename,String deviceip,String devicetime, int requestcode) {
+    public static void LoginRegisteredUser(ServerResponse serverResponse, String phone, String password,String link,String devicetype,String devicename,String deviceip,String devicetime, int requestcode) {
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
@@ -406,7 +418,7 @@ public class Functions {
                 .addFormDataPart("device_time",devicetime)
                 .build();
         Request request = new Request.Builder()
-                .url("http://10.0.2.2:8000/api/auth/login")
+                .url(link)
                 .method("POST", body)
                 .build();
         client.newCall(request).enqueue(new Callback() {

@@ -52,11 +52,8 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
      */
     static native void InitLinks();
     static native void CheckResponse(ServerResponse serverResponse,Context context, String response,int requestcode);
-    static native void StartActivity(Context context, String activity,String flag);
+    static native void StartActivity(Context context, String activity,String data);
     static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
-
-
-    LinearLayout toolbar;
 
     static AlertDialog profiledialogue;
     public static void showProfileDialogue(ServerResponse serverResponse,String name,String phone,String id,String pageid){
@@ -112,15 +109,14 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
                });
                 profiledialoguebuilder.setView(vi);
                profiledialogue = profiledialoguebuilder.create();
-
                profiledialogue.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#80030A25")));
-
                profiledialogue.show();
            }
        });
 
     }
-
+    ImageView backbutton;
+    ImageView menubutton;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -170,15 +166,11 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
         contactbutton = findViewById(R.id.contact);
         proceedbutton = findViewById(R.id.proceedbutton);
         text = findViewById(R.id.text);
-        TextView titletext;
-        ImageView backbutton;
-        ImageView menubutton;
-        toolbar = findViewById(R.id.toolbar);
-        titletext = toolbar.findViewById(R.id.title);
-        backbutton = toolbar.findViewById(R.id.backbutton);
-        menubutton = toolbar.findViewById(R.id.options);
 
-        titletext.setText("Search People");
+
+        backbutton = findViewById(R.id.backbutton);
+        menubutton = findViewById(R.id.menubutton);
+
         backbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

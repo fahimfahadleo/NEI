@@ -78,7 +78,7 @@ public class ServerRequest {
         });
     }
 
-    public static void ServerRequest(Context getcontext) {
+    public void ServerRequest(Context getcontext) {
         context = getcontext;
     }
 

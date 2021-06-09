@@ -153,7 +153,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_50sdp"
                         android:id="@+id/hiddenview1"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         android:orientation="vertical">
 
 

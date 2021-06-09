@@ -193,6 +193,10 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
 
                 if (TextUtils.isEmpty(referencestr)) {
                     referencestr = "";
+                }else {
+                    if(!referencestr.contains("+88")){
+                        referencestr = "+88"+referencestr;
+                    }
                 }
                 boolean isOk = false;
                 if (TextUtils.isEmpty(namestr)) {

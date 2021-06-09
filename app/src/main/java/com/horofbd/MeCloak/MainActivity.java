@@ -7,6 +7,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.transition.AutoTransition;
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 
     public native String tryencode(String message, String type, String password);
 
-    static native void StartActivity(Context context, String activity);
+    static native void StartActivity(Context context, String activity,String data);
 
     public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
 
@@ -77,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
     CardView logoutview, SettingsView;
     ImageView search;
     LinearLayout searchlayout;
+    static ServerResponse serverResponse;
+    SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -150,9 +154,23 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
     public static void closeActivtiy() {
         ((Activity) context).finish();
     }
+    ServerRequest serverRequest;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        recyclerView.setAdapter(null);
 
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("page_id",getLoginInfo("page_id"));
+            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,6 +191,37 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         recyclerView = findViewById(R.id.recyclerview);
         SettingsView = findViewById(R.id.settingsview);
         Settings = findViewById(R.id.settings);
+        serverRequest = new ServerRequest();
+        serverRequest.ServerRequest(this);
+        serverResponse = this;
+        swipeRefreshLayout = findViewById(R.id.swipelayout);
+
+
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        recyclerView.setAdapter(null);
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("page_id",getLoginInfo("page_id"));
+                            globalRequest(MainActivity.this, "POST", Important.getFriend_list(), jsonObject, 12);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }, 2000);
+            }
+        });
+
+
 
        // drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
@@ -182,13 +231,13 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         SettingsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this, "Settings");
+                StartActivity(MainActivity.this, "Settings","");
             }
         });
         Settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this, "Settings");
+                StartActivity(MainActivity.this, "Settings","");
             }
         });
 
@@ -216,21 +265,21 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         notification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this, "Notification");
+                StartActivity(MainActivity.this, "Notification","");
             }
         });
 
         logoutview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ServerRequest.LogOut(MainActivity.this, 8);
+                globalRequest(MainActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8);
             }
         });
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ServerRequest.LogOut(MainActivity.this, 8);
+                globalRequest(MainActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8);
             }
         });
 
@@ -250,14 +299,14 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 //                i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
 //                startActivityForResult(i, 2);
 
-                StartActivity(MainActivity.this, "AddFriend");
+                StartActivity(MainActivity.this, "AddFriend","");
             }
         });
 
         profileimage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this, "Profile");
+                StartActivity(MainActivity.this, "Profile","");
 
             }
         });

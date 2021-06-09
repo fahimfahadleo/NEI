@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:background="@color/background"
     android:orientation="vertical"
     tools:context=".TutorialActivity">
+
 
     <LinearLayout
         android:id="@+id/titlelayout"
@@ -42,11 +44,30 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:layout_marginBottom="@dimen/_4sdp"
+        android:gravity="center"
+        android:text="Intro"
+        android:textColor="@color/oceanblue"
+        android:textSize="@dimen/_25sdp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:text="MeCloak has robust video and text documentation. You can search by name and learn from our tutorial."
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="#000" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_16sdp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -57,39 +78,42 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/_8sdp"
-                android:gravity="center"
-                android:text="Select A Feature"
-                android:textColor="@color/oceanblue"
-                android:textSize="@dimen/_13sdp"
-                android:textStyle="bold" />
-
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_8sdp">
 
+
                 <EditText
                     android:id="@+id/features"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_32sdp"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/border"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:layout_marginBottom="@dimen/_8sdp"
+                    android:background="@drawable/edtshapewhite"
                     android:gravity="start|center"
-                    android:paddingStart="@dimen/_8sdp"
-                    android:paddingEnd="8dp"
-                    android:hint="Features"
+                    android:hint="Boundage"
+                    android:paddingStart="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="@dimen/_8sdp"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_12sdp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:background="@color/background"
+                    android:paddingStart="@dimen/_2sdp"
+                    android:paddingEnd="@dimen/_2sdp"
+                    android:text="Select A Feature"
+                    android:textColor="@color/oceanblue" />
+
                 <ImageView
                     android:id="@+id/dropdown"
-                    android:layout_width="@dimen/_20sdp"
-                    android:layout_height="@dimen/_20sdp"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="@dimen/_8sdp"
@@ -97,22 +121,113 @@
 
             </RelativeLayout>
         </LinearLayout>
+    </LinearLayout>
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/_24sdp"
+        android:layout_marginBottom="@dimen/_4sdp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-            android:id="@+id/idExoPlayerVIew"
-            android:layout_width="match_parent"
-            android:layout_marginStart="@dimen/_8sdp"
-            android:layout_marginEnd="@dimen/_8sdp"
-            android:layout_marginTop="@dimen/_8sdp"
-            android:layout_height="500dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Subject: "
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold" />
 
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/oceanblue"
+            android:textStyle="bold" />
 
     </LinearLayout>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/container"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        app:cardBackgroundColor="@color/cardbgcolor"
+        app:cardCornerRadius="@dimen/_5sdp"
+        app:cardElevation="@dimen/_8sdp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <FrameLayout
+                android:id="@+id/main_media_frame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.exoplayer2.ui.PlayerView
+                    android:id="@+id/playerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_200sdp"
+                    android:layout_margin="0dp"
+                    android:background="@color/black"
+                    android:padding="0dp"
+                    app:show_timeout="1000"
+                    app:resize_mode="fill"
+                    app:shutter_background_color="@color/black" />
+
+            </FrameLayout>
+
+            <ImageView
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="@dimen/_8sdp"
+                android:src="@drawable/fullscreen"
+                android:id="@+id/fullscreene"/>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:id="@+id/textcontainer"
+        android:visibility="gone"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:text="sometet"
+            android:maxLines="20"
+            android:layout_margin="@dimen/_8sdp"
+            android:textColor="@color/textcolor"/>
+    </ScrollView>
+
+
+
+
+
+    <TextView
+        android:id="@+id/copyrite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:gravity="center"
+        android:text="© 2021 MeCloak all rights reserved." />
+
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="2" />
+
+
 </LinearLayout>

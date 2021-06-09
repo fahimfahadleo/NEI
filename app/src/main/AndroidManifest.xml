@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".TutorialActivity"></activity>
+        <activity android:name=".TutorialActivity"
+            android:configChanges="orientation"/>
         <activity android:name=".Animation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

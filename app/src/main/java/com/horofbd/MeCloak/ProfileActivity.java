@@ -44,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
-    static native void StartActivity(Context context, String activity);
+    static native void StartActivity(Context context, String activity,String data);
 
     static native void InitLinks();
 
@@ -78,14 +78,14 @@ public class ProfileActivity extends AppCompatActivity {
         friendlistlayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(ProfileActivity.this,"FriendList");
+                StartActivity(ProfileActivity.this,"FriendList","");
             }
         });
 
         friendlist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(ProfileActivity.this,"FriendList");
+                StartActivity(ProfileActivity.this,"FriendList","");
             }
         });
 
