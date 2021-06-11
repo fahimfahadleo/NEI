@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +27,7 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
     static Context context;
 
     public static void closeActivtiy() {
+        Functions.dismissDialogue();
         ((Activity) context).finish();
     }
 
@@ -42,7 +44,7 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
 
     static native void InitLinks();
 
-    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
 
     static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
@@ -52,7 +54,7 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("page_id", getLoginInfo("page_id"));
-            globalRequest(serverResponse, "POST", Important.getFriend_list(), jsonObject, 13);
+            globalRequest(serverResponse, "POST", Important.getFriend_list(), jsonObject, 13,context);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -81,7 +83,13 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(FriendListActivity.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
     }
 
     public static void setUpData(ArrayList<JSONObject> listdata) {
@@ -290,7 +298,7 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("friend_id", id);
-            globalRequest(serverResponse, "POST", Important.getUnfriend_friend(), jsonObject, 14);
+            globalRequest(serverResponse, "POST", Important.getUnfriend_friend(), jsonObject, 14,context);
             friendlist.setAdapter(null);
             RequestFriendList();
 
@@ -303,7 +311,7 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("user_id", id);
-            globalRequest(serverResponse, "POST", Important.getBlock_friend(), jsonObject, 7);
+            globalRequest(serverResponse, "POST", Important.getBlock_friend(), jsonObject, 7,context);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -316,7 +324,7 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
             jsonObject.put("page_friend_id", pagefriendid);
 
             Log.e("pagefriendid", pagefriendid);
-            globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject, 15);
+            globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject, 15,context);
             friendlist.setAdapter(null);
             RequestFriendList();
         } catch (JSONException e) {

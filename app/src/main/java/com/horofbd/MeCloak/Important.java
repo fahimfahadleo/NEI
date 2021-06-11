@@ -60,6 +60,11 @@ public class Important {
 
     ///////////profile//////////////
     protected static String referrals;
+    protected static String viewprofilepicture;
+    protected static String changeprofilepicture;
+    protected static String changeprofilename;
+    protected static String changepagename;
+    protected static String changephonenumber;
 
     /////////transection/////////////
     protected static String reference_balance_withdraw;
@@ -79,6 +84,46 @@ public class Important {
     protected static String getNotification;
 
 
+
+    public static String getViewprofilepicture() {
+        return viewprofilepicture;
+    }
+
+    public static void setViewprofilepicture(String viewprofilepicture) {
+        Important.viewprofilepicture = viewprofilepicture;
+    }
+
+    public static String getChangeprofilepicture() {
+        return changeprofilepicture;
+    }
+
+    public static void setChangeprofilepicture(String changeprofilepicture) {
+        Important.changeprofilepicture = changeprofilepicture;
+    }
+
+    public static String getChangeprofilename() {
+        return changeprofilename;
+    }
+
+    public static void setChangeprofilename(String changeprofilename) {
+        Important.changeprofilename = changeprofilename;
+    }
+
+    public static String getChangepagename() {
+        return changepagename;
+    }
+
+    public static void setChangepagename(String changepagename) {
+        Important.changepagename = changepagename;
+    }
+
+    public static String getChangephonenumber() {
+        return changephonenumber;
+    }
+
+    public static void setChangephonenumber(String changephonenumber) {
+        Important.changephonenumber = changephonenumber;
+    }
     public static String getAccept_friend() {
         return accept_friend;
     }

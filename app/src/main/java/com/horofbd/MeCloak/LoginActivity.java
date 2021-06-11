@@ -96,6 +96,7 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
     static Context context;
 
     public static void closeActivtiy() {
+        Functions.dismissDialogue();
         ((Activity) context).finish();
     }
 
@@ -116,7 +117,7 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
             @Override
             public void run() {
                 Toast.makeText(LoginActivity.this, failresponse, Toast.LENGTH_SHORT).show();
-                Log.e("error",failresponse);
+                Functions.dismissDialogue();
             }
         });
     }

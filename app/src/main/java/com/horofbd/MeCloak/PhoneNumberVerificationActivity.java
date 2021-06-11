@@ -41,6 +41,7 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
     }
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
     }
 
@@ -113,7 +114,13 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-        Toast.makeText(this, failresponse, Toast.LENGTH_SHORT).show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(PhoneNumberVerificationActivity.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
     }
 
 

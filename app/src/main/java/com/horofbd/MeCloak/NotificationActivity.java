@@ -37,6 +37,7 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
     static Context context;
 
     public static void closeActivtiy() {
+        Functions.dismissDialogue();
         ((Activity) context).finish();
     }
 
@@ -52,7 +53,7 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
 
     static native void StartActivity(Context context, String activity,String data);
 
-    public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+    public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
 
     public static native String getLoginInfo(String key);
 
@@ -99,7 +100,13 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(NotificationActivity.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
     }
 
 

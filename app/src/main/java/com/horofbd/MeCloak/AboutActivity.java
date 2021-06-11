@@ -12,7 +12,9 @@ public class AboutActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
+
     }
 
     @Override

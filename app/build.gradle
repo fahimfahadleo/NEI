@@ -31,7 +31,7 @@ android {
             manifestPlaceholders = [usesCleartextTraffic:"false"]
 
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
         }
     }
 
@@ -71,6 +71,10 @@ dependencies {
     implementation 'com.squareup.okio:okio:2.8.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.8.3'
+
+
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+
 
 
 

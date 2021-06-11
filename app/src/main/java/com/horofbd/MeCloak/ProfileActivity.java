@@ -19,10 +19,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements ServerResponse {
 
     TextView premium, mainbalancetext, refbalance,accountcreationtime,accountupdatetime,friendlist;
     ImageView toggolmainstartopen, toggolmainopen, toggolrefstartopen, toggolrefopen;
@@ -36,6 +38,7 @@ public class ProfileActivity extends AppCompatActivity {
     static Context context;
 
     public static void closeActivtiy() {
+        Functions.dismissDialogue();
         ((Activity) context).finish();
     }
 
@@ -48,7 +51,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     static native void InitLinks();
 
-    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
 
     static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
@@ -376,4 +379,19 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onResponse(String response, int code, int requestcode) throws JSONException {
+        CheckResponse(this,this,response,requestcode);
+    }
+
+    @Override
+    public void onFailure(String failresponse) throws JSONException {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ProfileActivity.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
+    }
 }

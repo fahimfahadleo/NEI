@@ -38,7 +38,7 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
     }
 
 
-    static native void RegisterRequest(ServerResponse serverResponse, String phone, String name, String password, String confirmpassword, String reference, String termsandconditions, String policy, int requestcode);
+    static native void RegisterRequest(ServerResponse serverResponse, String phone, String name, String password, String confirmpassword, String reference, String termsandconditions, String policy, int requestcode,Context context);
 
     static native void CheckRegisterData(ServerResponse serverResponse, Context context, String response, int requestcode);
 
@@ -47,6 +47,7 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
     static Context context;
 
     public static void closeActivtiy() {
+        Functions.dismissDialogue();
         ((Activity) context).finish();
     }
 
@@ -240,7 +241,7 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
                 }
                 if (!isOk) {
 
-                    RegisterRequest(RegisterNewUser.this, phonestr, namestr, passwordstr, confirmpasswrodstr, referencestr, "1", "1", 0);
+                    RegisterRequest(RegisterNewUser.this, phonestr, namestr, passwordstr, confirmpasswrodstr, referencestr, "1", "1", 0,context);
                 }
             }
         });
@@ -257,9 +258,8 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.e("errpr", failresponse);
-                Toast.makeText(RegisterNewUser.this, "There was an error creating your account!", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(RegisterNewUser.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
             }
         });
     }

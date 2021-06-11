@@ -52,9 +52,22 @@ static jmethodID getInt;
 static jmethodID jsonarraylength;
 static jmethodID jsonarraygetjsonobject;
 static jmethodID jsonPut;
+static jmethodID showProgress;
+static jmethodID dismissProgress;
+static jmethodID UploadFile;
 
 
-static jmethodID MethodID , MethodID40 , MethodID49 , MethodID50 , MethodID33 , MethodID47 , MethodID48 , MethodID46 , MethodID45 , MethodID42 , MethodID44 , MethodID43 , MethodID41 , MethodID39 , MethodID38 , MethodID37 , MethodID36 , MethodID34 , MethodID35 , MethodID32 , MethodID31 , MethodID30 , MethodID29 , MethodID23 , MethodID28 , MethodID27 , MethodID26 , MethodID25 , MethodID24 , MethodID22 , MethodID19 , MethodID20 , MethodID21 , MethodID18 , MethodID1 , MethodID15 , MethodID17 , MethodID16 , MethodID5 , MethodID14 , MethodID13 , MethodID3 , MethodID12 , MethodID11 , MethodID7 , MethodID10 , MethodID9 , MethodID8 , MethodID4 , MethodID2 , MethodID6;
+static jmethodID MethodID , MethodID40 , MethodID49 ,
+        MethodID50 , MethodID33 , MethodID47 , MethodID48 ,
+        MethodID46 , MethodID45 , MethodID42 , MethodID44 , MethodID43 ,
+        MethodID41 , MethodID39 , MethodID38 , MethodID37 , MethodID36 ,
+        MethodID34 , MethodID35 , MethodID32 , MethodID31 , MethodID30 ,
+        MethodID29 , MethodID23 , MethodID28 , MethodID27 , MethodID26 ,
+        MethodID25 , MethodID24 , MethodID22 , MethodID19 , MethodID20 ,
+        MethodID21 , MethodID18 , MethodID1 , MethodID15 , MethodID17 , MethodID16 ,
+        MethodID5 , MethodID14 , MethodID13 , MethodID3 , MethodID12 , MethodID11 ,
+        MethodID7 , MethodID10 , MethodID9 , MethodID8 , MethodID4 , MethodID2 ,
+        MethodID51 , MethodID52 , MethodID53 , MethodID54 , MethodID55 , MethodID6;
 string host = "http://192.168.152.9:8000/api";
 
 ////////advertise/////////////
@@ -104,6 +117,11 @@ string activate_previous_premium = host + "/premium/activate";
 string buy_page = host + "/premium/buy-page";
 ///////////profile//////////////
 string referrals = host + "/profile/referrals";
+string chang_profile_name = host + "/profile/name-change";
+string chang_profile_picture = host + "/profile/picture-change";
+string chang_page_name = host + "/profile/page-name-change";
+string chang_phone_number = host + "/profile/number-change";
+string view_profile_picture = host + "/profile/picture";
 /////////transection/////////////
 string reference_balance_withdraw = host + "/transection/ref-withdraw";
 string recharge = host + "/transaction/recharge";
@@ -244,8 +262,18 @@ void initlinks(JNIEnv *env) {
     MethodID48 = env->GetStaticMethodID(Important , "setBuy_page" , "(Ljava/lang/String;)V");
     MethodID49 = env->GetStaticMethodID(Important , "setRetrive_request_list" ,
                                         "(Ljava/lang/String;)V");
-
     MethodID50 = env->GetStaticMethodID(Important , "setAccept_friend" , "(Ljava/lang/String;)V");
+
+    MethodID51 = env->GetStaticMethodID(Important , "setChangeprofilename" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID52 = env->GetStaticMethodID(Important , "setChangeprofilepicture" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID53 = env->GetStaticMethodID(Important , "setChangepagename" , "(Ljava/lang/String;)V");
+    MethodID54 = env->GetStaticMethodID(Important , "setChangephonenumber" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID55 = env->GetStaticMethodID(Important , "setViewprofilepicture" ,
+                                        "(Ljava/lang/String;)V");
+
 
 }
 
@@ -262,6 +290,13 @@ void initver(JNIEnv *env) {
     JSONObject = (jclass) env->NewGlobalRef(temp3);
     JSONArray = (jclass) env->NewGlobalRef(temp4);
 
+
+    UploadFile = env->GetStaticMethodID(Function , "UploadFile" ,
+                                        "(Lcom/horofbd/MeCloak/ServerResponse;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lorg/json/JSONObject;I)V");
+
+    showProgress = env->GetStaticMethodID(Function , "showProgress" ,
+                                          "(Landroid/content/Context;)V");
+    dismissProgress = env->GetStaticMethodID(Function , "dismissDialogue" , "()V");
 
     jsonPut = env->GetMethodID(JSONObject , "put" ,
                                "(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;");
@@ -311,6 +346,15 @@ void initver(JNIEnv *env) {
 
     initlinks(env);
 
+}
+
+
+void showProgressBar(JNIEnv *env , jobject context) {
+    env->CallStaticVoidMethod(Function , showProgress , context);
+}
+
+void dismissProgressBar(JNIEnv *env) {
+    env->CallStaticVoidMethod(Function , dismissProgress);
 }
 
 
@@ -534,6 +578,17 @@ void SetUpLinks(JNIEnv *env) {
                               env->NewStringUTF(retrive_friend_request.c_str()));
     env->CallStaticVoidMethod(Important , MethodID50 ,
                               env->NewStringUTF(accept_friend.c_str()));
+
+    env->CallStaticVoidMethod(Important , MethodID51 ,
+                              env->NewStringUTF(chang_profile_name.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID52 ,
+                              env->NewStringUTF(chang_profile_picture.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID53 ,
+                              env->NewStringUTF(chang_page_name.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID54 ,
+                              env->NewStringUTF(chang_phone_number.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID55 ,
+                              env->NewStringUTF(view_profile_picture.c_str()));
 }
 
 static void setSharedPreference(JNIEnv *env , jstring key , jstring value) {
@@ -576,9 +631,25 @@ static jstring calculateMD5(JNIEnv *env , jobject string) {
 
 static void request(JNIEnv *env , jobject serverResponse , jstring requestType , jstring Link ,
                     jobject jsonObject ,
-                    jint requestcode) {
+                    jint requestcode , jobject context) {
+
+    showProgressBar(env , context);
+
+
     env->CallStaticVoidMethod(Function , Request , serverResponse , requestType , Link ,
                               jsonObject , requestcode);
+}
+
+
+static void request(JNIEnv *env , jobject serverResponse , jstring requestType , jstring Link ,
+                    jobject file , jobject jsonObject ,
+                    jint requestcode , jobject context) {
+
+    showProgressBar(env , context);
+
+
+    env->CallStaticVoidMethod(Function , UploadFile , serverResponse , requestType , Link ,
+                              file , jsonObject , requestcode);
 }
 
 void printlogcat(JNIEnv *env , string tag , string message) {
@@ -722,6 +793,10 @@ jstring GetDeviceName(JNIEnv *env) {
 
 void LoginRequest(JNIEnv *env , jobject context , jobject serverresponse , jstring phone ,
                   jstring password , jint requestcode) {
+
+    showProgressBar(env , context);
+
+
     jmethodID jmethodId = env->GetStaticMethodID(Function , "LoginRegisteredUser" ,
                                                  "(Lcom/horofbd/MeCloak/ServerResponse;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
     env->CallStaticVoidMethod(Function , jmethodId , serverresponse , phone , password ,
@@ -878,6 +953,8 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
 
 void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstring response ,
                    jint requestcode) {
+
+    dismissProgressBar(env);
 
     printlogcat(env , "response" , jstring2string(env , response));
     if (isJsonValid(env , response)) {
@@ -1397,31 +1474,51 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 jobject list = env->NewObject(arrayListClass , arrayListConstructor);
 
 
-                for(int i = 0;i<length;i++){
-                    jobject object = env->CallObjectMethod(tempobject,jsonarraygetjsonobject,i);
+                for (int i = 0; i < length; i++) {
+                    jobject object = env->CallObjectMethod(tempobject , jsonarraygetjsonobject , i);
                     env->CallBooleanMethod(list , addMethod , object);
                 }
 
                 jclass TutorialActivity = env->FindClass("com/horofbd/MeCloak/TutorialActivity");
-                jmethodID setUpdata = env->GetStaticMethodID(TutorialActivity,"setUpData", "(Ljava/util/ArrayList;)V");
+                jmethodID setUpdata = env->GetStaticMethodID(TutorialActivity , "setUpData" ,
+                                                             "(Ljava/util/ArrayList;)V");
 
-                env->CallStaticVoidMethod(TutorialActivity,setUpdata,list);
-
-
-                break;
-            }case 17:{
-
+                env->CallStaticVoidMethod(TutorialActivity , setUpdata , list);
 
 
                 break;
+            }
+            case 17: {
+                jstring result = (jstring) env->CallObjectMethod(jsonobject , getString ,
+                                                                 env->NewStringUTF("response"));
+                if (jstring2string(env , result) == "Successfully changed") {
+                    jclass UserVerificationactivity = env->FindClass("com/horofbd/MeCloak/UserVerificationActivity");
+                    jmethodID setText = env->GetStaticMethodID(UserVerificationactivity,"setNewName","()V");
+                    env->CallStaticVoidMethod(UserVerificationactivity,setText);
+                } else{
+                    showToast(env,context,env->NewStringUTF("Name Change Failed!"));
+                }
 
-
+                break;
+            }
+            case 18: {
+                jstring result = (jstring) env->CallObjectMethod(jsonobject , getString ,
+                                                                 env->NewStringUTF("response"));
+                if (jstring2string(env , result) == "Successfully Updated") {
+                    jclass UserVerificationactivity = env->FindClass("com/horofbd/MeCloak/UserVerificationActivity");
+                    jmethodID setText = env->GetStaticMethodID(UserVerificationactivity,"setProfilePicture","()V");
+                    env->CallStaticVoidMethod(UserVerificationactivity,setText);
+                } else{
+                    showToast(env,context,env->NewStringUTF("Iamge Upload or Change Failed!"));
+                }
+                break;
             }
         }
-    }else if(requestcode == 16){
-                jclass Tutorial = env->FindClass("com/horofbd/MeCloak/TutorialActivity");
-                jmethodID setUpText = env->GetStaticMethodID(Tutorial,"setTextData", "(Ljava/lang/String;)V");
-                env->CallStaticVoidMethod(Tutorial,setUpText,response);
+    } else if (requestcode == 16) {
+        jclass Tutorial = env->FindClass("com/horofbd/MeCloak/TutorialActivity");
+        jmethodID setUpText = env->GetStaticMethodID(Tutorial , "setTextData" ,
+                                                     "(Ljava/lang/String;)V");
+        env->CallStaticVoidMethod(Tutorial , setUpText , response);
     }
 
 }
@@ -1458,8 +1555,8 @@ Java_com_horofbd_MeCloak_MainActivity_globalRequest(JNIEnv *env , jclass clazz ,
                                                     jobject serverresponse ,
                                                     jstring requesttype ,
                                                     jstring link , jobject jsonobject ,
-                                                    jint requestcode) {
-    request(env , serverresponse , requesttype , link , jsonobject , requestcode);
+                                                    jint requestcode , jobject context) {
+    request(env , serverresponse , requesttype , link , jsonobject , requestcode , context);
 }
 
 
@@ -1517,9 +1614,11 @@ Java_com_horofbd_MeCloak_RegisterNewUser_RegisterRequest(JNIEnv *env , jclass cl
                                                          jstring reference ,
                                                          jstring termsandconditions ,
                                                          jstring policy ,
-                                                         jint requestcode) {
+                                                         jint requestcode , jobject context) {
     initver(env);
 
+
+    showProgressBar(env , context);
     jmethodID jmethodId = env->GetStaticMethodID(Function , "RequestForProfileRegistration" ,
                                                  "(Lcom/horofbd/MeCloak/ServerResponse;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
 
@@ -1623,9 +1722,9 @@ Java_com_horofbd_MeCloak_PhoneNumberVerificationActivity_RequestPhoneverificatio
                                                                                   jstring requesttype ,
                                                                                   jstring link ,
                                                                                   jobject jsonobject ,
-                                                                                  jint requestcode) {
-
-    request(env , serverresponse , requesttype , link , jsonobject , requestcode);
+                                                                                  jint requestcode ,
+                                                                                  jobject context) {
+    request(env , serverresponse , requesttype , link , jsonobject , requestcode , context);
 
 }
 
@@ -1645,8 +1744,8 @@ Java_com_horofbd_MeCloak_RegisterVerifiedUser_globalRequest(JNIEnv *env , jclass
                                                             jobject server_response ,
                                                             jstring requesttype , jstring link ,
                                                             jobject json_object ,
-                                                            jint requestcode) {
-    request(env , server_response , requesttype , link , json_object , requestcode);
+                                                            jint requestcode , jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
 
 }
 
@@ -1680,8 +1779,9 @@ Java_com_horofbd_MeCloak_UserVerificationActivity_globalRequest(JNIEnv *env , jc
                                                                 jobject server_response ,
                                                                 jstring requesttype , jstring link ,
                                                                 jobject json_object ,
-                                                                jint requestcode) {
-    request(env , server_response , requesttype , link , json_object , requestcode);
+                                                                jint requestcode ,
+                                                                jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
 }
 
 extern "C"
@@ -1720,8 +1820,9 @@ JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_AddFriend_globalRequest(JNIEnv *env , jclass clazz ,
                                                  jobject server_response ,
                                                  jstring requesttype , jstring link ,
-                                                 jobject json_object , jint requestcode) {
-    request(env , server_response , requesttype , link , json_object , requestcode);
+                                                 jobject json_object , jint requestcode ,
+                                                 jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
 }
 extern "C"
 JNIEXPORT void JNICALL
@@ -1750,8 +1851,8 @@ Java_com_horofbd_MeCloak_NotificationActivity_globalRequest(JNIEnv *env , jclass
                                                             jobject server_response ,
                                                             jstring requesttype , jstring link ,
                                                             jobject json_object ,
-                                                            jint requestcode) {
-    request(env , server_response , requesttype , link , json_object , requestcode);
+                                                            jint requestcode , jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
 }extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_horofbd_MeCloak_NotificationActivity_getLoginInfo(JNIEnv *env , jclass clazz ,
@@ -1788,8 +1889,9 @@ JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_ProfileActivity_globalRequest(JNIEnv *env , jclass clazz ,
                                                        jobject server_response ,
                                                        jstring requesttype , jstring link ,
-                                                       jobject json_object , jint requestcode) {
-    request(env , server_response , requesttype , link , json_object , requestcode);
+                                                       jobject json_object , jint requestcode ,
+                                                       jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_ProfileActivity_CheckResponse(JNIEnv *env , jclass clazz ,
@@ -1817,8 +1919,9 @@ JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_FriendListActivity_globalRequest(JNIEnv *env , jclass clazz ,
                                                           jobject server_response ,
                                                           jstring requesttype , jstring link ,
-                                                          jobject json_object , jint requestcode) {
-    request(env , server_response , requesttype , link , json_object , requestcode);
+                                                          jobject json_object , jint requestcode ,
+                                                          jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_FriendListActivity_CheckResponse(JNIEnv *env , jclass clazz ,
@@ -1846,8 +1949,9 @@ JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_TutorialActivity_globalRequest(JNIEnv *env , jclass clazz ,
                                                         jobject server_response ,
                                                         jstring requesttype , jstring link ,
-                                                        jobject json_object , jint requestcode) {
-    request(env , server_response , requesttype , link , json_object , requestcode);
+                                                        jobject json_object , jint requestcode ,
+                                                        jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_TutorialActivity_CheckResponse(JNIEnv *env , jclass clazz ,
@@ -1858,4 +1962,26 @@ Java_com_horofbd_MeCloak_TutorialActivity_CheckResponse(JNIEnv *env , jclass cla
 JNIEXPORT jstring JNICALL
 Java_com_horofbd_MeCloak_TutorialActivity_getLoginInfo(JNIEnv *env , jclass clazz , jstring key) {
     return getSharedPreference(env , key);
+}extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_horofbd_MeCloak_UserVerificationActivity_getLoginInfo(JNIEnv *env , jclass clazz ,
+                                                               jstring key) {
+    return getSharedPreference(env , key);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_UserVerificationActivity_UploadFile(JNIEnv *env , jclass clazz ,
+                                                             jobject server_response ,
+                                                             jstring requesttype , jstring link ,
+                                                             jobject file , jobject json_object ,
+                                                             jint requestcode , jobject context) {
+    request(env , server_response , requesttype , link , file , json_object , requestcode ,
+            context);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_UserVerificationActivity_ImageRequest(JNIEnv *env , jclass clazz ,
+                                                               jobject image_response ,
+                                                               jstring request_type , jstring link ,
+                                                               jobject json_object,jint requestcode) {
+    jmethodID ImageRequest = env->GetStaticMethodID(Function,"ImageRequest", "(Lcom/horofbd/MeCloak/ImageResponse;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
+    env->CallStaticVoidMethod(Function,ImageRequest,image_response,request_type,link,json_object,requestcode);
 }

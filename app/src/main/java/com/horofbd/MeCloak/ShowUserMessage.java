@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -15,6 +16,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
     }
 
@@ -37,6 +39,12 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ShowUserMessage.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
     }
 }

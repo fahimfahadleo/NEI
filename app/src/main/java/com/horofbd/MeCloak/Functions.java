@@ -1,15 +1,19 @@
 package com.horofbd.MeCloak;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,8 +31,6 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,6 +45,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.WIFI_SERVICE;
 
@@ -54,6 +57,25 @@ public class Functions {
     public Functions(Context context) {
         Functions.context = context;
         preferences = context.getSharedPreferences("MessagePreference", MODE_PRIVATE);
+    }
+
+    static Dialog dialog;
+
+    public static void showProgress(Context context){
+        dialog = new Dialog(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View vi = inflater.inflate(R.layout.progressbar,null,false);
+        dialog.setContentView(vi);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+        dialog.setCancelable(false);
+        Log.e("context",context.toString());
+        dialog.show();
+    }
+
+    public static void dismissDialogue(){
+        if(dialog!=null && dialog.isShowing()){
+            dialog.dismiss();
+        }
     }
 
 
@@ -240,6 +262,7 @@ public class Functions {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
                     serverResponse.onResponse(response.body().string(), response.code(), requestcode);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -471,6 +494,120 @@ public class Functions {
     public static String getCurrentTimeInMilliseconds(){
         return String.valueOf(System.currentTimeMillis());
     }
+
+
+
+
+    public static void UploadFile(ServerResponse serverResponse, String requestType, String Link, File file,JSONObject jsonObject, int requestcode){
+        OkHttpClient client = getClient();
+
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        RequestBody body = null;
+
+        if (jsonObject.length()!=0) {
+            Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
+            while (iter.hasNext()) {
+                String key = iter.next();
+                try {
+                    builder.addFormDataPart(key, jsonObject.getString(key));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            builder.setType(MultipartBody.FORM);
+            builder.addFormDataPart("avatar",file.getName(),
+                    RequestBody.create(MediaType.parse("application/octet-stream"),
+                            file));
+            body = builder.build();
+        }else {
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            body = RequestBody.create(JSON, "{}");
+        }
+        Request request;
+        if(requestType.equals("GET")){
+            request = new Request.Builder().url(Link).method("GET",null).build();
+        }else {
+            request= new Request.Builder()
+                    .url(Link)
+                    .method(requestType, body)
+                    .build();
+        }
+
+       client.newCall(request).enqueue(new Callback() {
+           @Override
+           public void onFailure(@NotNull Call call, @NotNull IOException e) {
+               try {
+                   serverResponse.onFailure(e.getMessage());
+               } catch (JSONException jsonException) {
+                   jsonException.printStackTrace();
+               }
+           }
+
+           @Override
+           public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+               try {
+                   serverResponse.onResponse(response.body().string(),response.code(),requestcode);
+               } catch (JSONException e) {
+                   e.printStackTrace();
+               }
+           }
+       });
+    }
+
+
+    public static void ImageRequest(ImageResponse imageResponse, String requestType, String Link, JSONObject jsonObject,int requestcode){
+        OkHttpClient client = getClient();
+
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        RequestBody body = null;
+
+        if (jsonObject.length()!=0) {
+            Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
+            while (iter.hasNext()) {
+                String key = iter.next();
+                try {
+                    builder.addFormDataPart(key, jsonObject.getString(key));
+                    builder.setType(MultipartBody.FORM);
+                    body = builder.build();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }else {
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            body = RequestBody.create(JSON, "{}");
+        }
+        Request request;
+        if(requestType.equals("GET")){
+            request = new Request.Builder().url(Link).method("GET",null).build();
+        }else {
+            request= new Request.Builder()
+                    .url(Link)
+                    .method(requestType, body)
+                    .build();
+        }
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                try {
+                    imageResponse.onImageFailure(e.getMessage());
+                } catch (JSONException jsonException) {
+                    jsonException.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try {
+                    imageResponse.onImageResponse(response, response.code(),requestcode);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
 
 
 }

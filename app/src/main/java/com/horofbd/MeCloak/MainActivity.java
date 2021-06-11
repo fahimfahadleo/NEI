@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import org.json.JSONException;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 
     static native void StartActivity(Context context, String activity,String data);
 
-    public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+    public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
 
     static native void InitLinks();
     static native void CheckResponse(ServerResponse serverResponse,Context context, String response,int requestcode);
@@ -152,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
     static Context context;
 
     public static void closeActivtiy() {
+        Functions.dismissDialogue();
         ((Activity) context).finish();
     }
     ServerRequest serverRequest;
@@ -165,7 +167,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("page_id",getLoginInfo("page_id"));
-            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12);
+            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12,context);
+            Log.e("onResume","Called");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -209,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
                         JSONObject jsonObject = new JSONObject();
                         try {
                             jsonObject.put("page_id",getLoginInfo("page_id"));
-                            globalRequest(MainActivity.this, "POST", Important.getFriend_list(), jsonObject, 12);
+                            globalRequest(MainActivity.this, "POST", Important.getFriend_list(), jsonObject, 12,context);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -272,14 +275,14 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         logoutview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(MainActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8);
+                globalRequest(MainActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8,context);
             }
         });
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(MainActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8);
+                globalRequest(MainActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8,context);
             }
         });
 
@@ -320,14 +323,14 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
                                 .MODE_NIGHT_NO);
 
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("page_id",getLoginInfo("page_id"));
-            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        JSONObject jsonObject = new JSONObject();
+//        try {
+//            jsonObject.put("page_id",getLoginInfo("page_id"));
+//            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12,context);
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
 
         Intent intent = new Intent();
@@ -344,11 +347,18 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
     public void onResponse(String response, int code, int requestcode) throws JSONException {
         Log.e("MainResponse",response);
         CheckResponse(this,this,response,requestcode);
+
     }
 
     @Override
     public void onFailure(String failresponse) {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
     }
     public static void setUpData(ArrayList<JSONObject> listdata) {
         Log.e("mainlist",listdata.toString());

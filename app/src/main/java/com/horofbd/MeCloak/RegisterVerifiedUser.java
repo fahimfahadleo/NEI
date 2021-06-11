@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,12 +23,13 @@ public class RegisterVerifiedUser extends AppCompatActivity implements ServerRes
          System.loadLibrary("native-lib");
      }
     static native void StartActivity(Context context, String activity);
-    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
     static native void CheckResponse(ServerResponse serverResponse,Context context, String response,int requestcode);
     static native void InitLinks();
 
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
     }
 
@@ -65,7 +67,7 @@ public class RegisterVerifiedUser extends AppCompatActivity implements ServerRes
                         jsonObject.put("password_confirmation",confirmpass);
 
                         Log.e("link",Important.getPage_register());
-                        globalRequest(RegisterVerifiedUser.this,"POST",Important.getPage_register(),jsonObject,3);
+                        globalRequest(RegisterVerifiedUser.this,"POST",Important.getPage_register(),jsonObject,3,context);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -87,7 +89,13 @@ public class RegisterVerifiedUser extends AppCompatActivity implements ServerRes
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-        Log.e("response", failresponse);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(RegisterVerifiedUser.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
 
     }
 

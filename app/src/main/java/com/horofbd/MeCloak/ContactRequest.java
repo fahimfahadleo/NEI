@@ -36,7 +36,7 @@ public class ContactRequest extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View vi = inflater.inflate(R.layout.fragment_contact_request, container, false);
         recyclerView = vi.findViewById(R.id.recyclerview);
-        NotificationActivity.globalRequest(serverResponse, "GET", Important.getRetrive_request_list(), new JSONObject(), 9);
+        NotificationActivity.globalRequest(serverResponse, "GET", Important.getRetrive_request_list(), new JSONObject(), 9,context);
         return vi;
     }
 
@@ -73,7 +73,7 @@ public class ContactRequest extends Fragment {
                         jsonObject.put("page_id", NotificationActivity.getLoginInfo("page_id"));
                         jsonObject.put("friend_id", mylistdata.getString("table_id"));
                         Log.e("data", jsonObject.toString());
-                        NotificationActivity.globalRequest(serverResponse, "POST", Important.getAccept_friend(), jsonObject, 10);
+                        NotificationActivity.globalRequest(serverResponse, "POST", Important.getAccept_friend(), jsonObject, 10,context);
                         listdata.remove(mylistdata);
                         notifyDataSetChanged();
                         dialog.dismiss();
@@ -91,7 +91,7 @@ public class ContactRequest extends Fragment {
                     try {
                         jsonObject.put("page_id", NotificationActivity.getLoginInfo("page_id"));
                         jsonObject.put("friend_id", mylistdata.getString("table_id"));
-                        NotificationActivity.globalRequest(serverResponse, "POST", Important.getCancel_friend_request(), jsonObject, 11);
+                        NotificationActivity.globalRequest(serverResponse, "POST", Important.getCancel_friend_request(), jsonObject, 11,context);
                         listdata.remove(mylistdata);
                         notifyDataSetChanged();
                         dialog.dismiss();

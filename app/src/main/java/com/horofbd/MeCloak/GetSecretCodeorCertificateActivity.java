@@ -9,6 +9,7 @@ import android.os.Bundle;
 public class GetSecretCodeorCertificateActivity extends AppCompatActivity {
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
     }
     @Override

@@ -10,6 +10,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
     }
 

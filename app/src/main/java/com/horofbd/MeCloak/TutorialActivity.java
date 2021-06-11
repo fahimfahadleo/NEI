@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -82,7 +83,7 @@ public class TutorialActivity extends AppCompatActivity implements ServerRespons
 
     static native void InitLinks();
 
-    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
 
     static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
@@ -123,6 +124,13 @@ public class TutorialActivity extends AppCompatActivity implements ServerRespons
                 init();
             }
         });
+    }
+
+
+
+    public static void closeActivtiy(){
+        Functions.dismissDialogue();
+        ((Activity)context).finish();
     }
 
 
@@ -185,7 +193,7 @@ public class TutorialActivity extends AppCompatActivity implements ServerRespons
 
 
         } else {
-            globalRequest(this, "GET", Important.getTutorial_list(), new JSONObject(), 15);
+            globalRequest(this, "GET", Important.getTutorial_list(), new JSONObject(), 15,context);
 
         }
 
@@ -423,7 +431,7 @@ public class TutorialActivity extends AppCompatActivity implements ServerRespons
                         copyrite.setVisibility(View.GONE);
 
 
-                        globalRequest(serverResponse, "GET", Important.getWatch_tutorial() + "?checksum=" + myListData.checksum, new JSONObject(), 16);
+                        globalRequest(serverResponse, "GET", Important.getWatch_tutorial() + "?checksum=" + myListData.checksum, new JSONObject(), 16,context);
 
 
                     }
@@ -500,7 +508,13 @@ public class TutorialActivity extends AppCompatActivity implements ServerRespons
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(TutorialActivity.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
     }
 
 

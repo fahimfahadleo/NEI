@@ -21,9 +21,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.function.Function;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -41,6 +44,8 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
     @SuppressLint("StaticFieldLeak")
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
+
         ((Activity)context).finish();
     }
 
@@ -222,6 +227,12 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(AddFriend.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
     }
 }

@@ -9,7 +9,9 @@ import android.os.Bundle;
 public class AutoBotActivity extends AppCompatActivity {
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
+
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {

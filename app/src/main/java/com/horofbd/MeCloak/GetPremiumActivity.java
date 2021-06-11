@@ -21,6 +21,7 @@ public class GetPremiumActivity extends AppCompatActivity {
 //    CircleImageView wv,ref;
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
     }
 //

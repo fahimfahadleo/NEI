@@ -1,7 +1,5 @@
 package com.horofbd.MeCloak;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -11,19 +9,25 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.json.JSONException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RechargeActivity extends AppCompatActivity implements ServerResponse {
-EditText amount;
-TextView submit;
-CircleImageView month1,month2,month6;
+    EditText amount;
+    TextView submit;
+    CircleImageView month1, month2, month6;
     static Context context;
-    public static void closeActivtiy(){
-        ((Activity)context).finish();
+
+    public static void closeActivtiy() {
+        Functions.dismissDialogue();
+        ((Activity) context).finish();
     }
+
     String amountstr;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,21 +37,20 @@ CircleImageView month1,month2,month6;
         month1 = findViewById(R.id.month1);
         month2 = findViewById(R.id.month2);
         month6 = findViewById(R.id.month6);
-context = this;
-
+        context = this;
 
 
         month1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ServerRequest.BuyPremiumfromRecharge(RechargeActivity.this,"30","recharge",1);
+                ServerRequest.BuyPremiumfromRecharge(RechargeActivity.this, "30", "recharge", 1);
             }
         });
 
         month2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ServerRequest.BuyPremiumfromRecharge(RechargeActivity.this,"60","recharge",2);
+                ServerRequest.BuyPremiumfromRecharge(RechargeActivity.this, "60", "recharge", 2);
 
             }
         });
@@ -55,7 +58,7 @@ context = this;
         month6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ServerRequest.BuyPremiumfromRecharge(RechargeActivity.this,"180","recharge",3);
+                ServerRequest.BuyPremiumfromRecharge(RechargeActivity.this, "180", "recharge", 3);
 
             }
         });
@@ -63,16 +66,16 @@ context = this;
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 amountstr = amount.getText().toString();
-                ServerRequest.Recharge(RechargeActivity.this,amountstr,4);
+                amountstr = amount.getText().toString();
+                ServerRequest.Recharge(RechargeActivity.this, amountstr, 4);
             }
         });
     }
 
     @Override
-    public void onResponse(String response, int code,int requestcode) throws JSONException {
-        Log.e("recharge",response);
-        if(requestcode == 1){
+    public void onResponse(String response, int code, int requestcode) throws JSONException {
+        Log.e("recharge", response);
+        if (requestcode == 1) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -80,8 +83,8 @@ context = this;
                 }
             });
         }
-        if(requestcode ==2){
-            if(requestcode == 1){
+        if (requestcode == 2) {
+            if (requestcode == 1) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -90,8 +93,8 @@ context = this;
                 });
             }
         }
-        if(requestcode == 3){
-            if(requestcode == 1){
+        if (requestcode == 3) {
+            if (requestcode == 1) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -101,12 +104,12 @@ context = this;
             }
         }
 
-        if(requestcode == 4){
-            if(requestcode == 1){
+        if (requestcode == 4) {
+            if (requestcode == 1) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(RechargeActivity.this, "Recharged Taka "+amountstr+" successfully!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RechargeActivity.this, "Recharged Taka " + amountstr + " successfully!", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -115,6 +118,12 @@ context = this;
 
     @Override
     public void onFailure(String failresponse) throws JSONException {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(RechargeActivity.this, failresponse, Toast.LENGTH_SHORT).show();
+                Functions.dismissDialogue();
+            }
+        });
     }
 }

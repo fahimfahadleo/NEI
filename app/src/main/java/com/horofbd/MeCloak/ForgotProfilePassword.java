@@ -18,6 +18,7 @@ public class ForgotProfilePassword extends AppCompatActivity {
     TextView titleview;
     static Context context;
     public static void closeActivtiy(){
+        Functions.dismissDialogue();
         ((Activity)context).finish();
     }
 
