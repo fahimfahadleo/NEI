@@ -10,21 +10,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,17 +37,20 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.xml.transform.Source;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements ServerResponse {
+public class MainActivity extends AppCompatActivity implements ServerResponse, ImageResponse {
 
     static {
         System.loadLibrary("native-lib");
@@ -57,14 +64,17 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 
     public native String tryencode(String message, String type, String password);
 
-    static native void StartActivity(Context context, String activity,String data);
+    static native void StartActivity(Context context, String activity, String data);
 
-    public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
+    public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
 
     static native void InitLinks();
-    static native void CheckResponse(ServerResponse serverResponse,Context context, String response,int requestcode);
+
+    static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
     public static native String getLoginInfo(String key);
+
+    static native void ImageRequest(ImageResponse imageResponse,CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
 
 
     CircleImageView profileimage, newmessage;
@@ -82,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
     LinearLayout searchlayout;
     static ServerResponse serverResponse;
     SwipeRefreshLayout swipeRefreshLayout;
-
 
 
     @Override
@@ -152,28 +161,9 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 
     static Context context;
 
-    public static void closeActivtiy() {
-        Functions.dismissDialogue();
-        ((Activity) context).finish();
-    }
+
     ServerRequest serverRequest;
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        recyclerView.setAdapter(null);
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("page_id",getLoginInfo("page_id"));
-            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12,context);
-            Log.e("onResume","Called");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +188,9 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         serverRequest.ServerRequest(this);
         serverResponse = this;
         swipeRefreshLayout = findViewById(R.id.swipelayout);
+        InitLinks();
 
+        ImageRequest(this, profileimage,"GET", Important.getViewprofilepicture(), new JSONObject(), 1);
 
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -211,8 +203,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
                         recyclerView.setAdapter(null);
                         JSONObject jsonObject = new JSONObject();
                         try {
-                            jsonObject.put("page_id",getLoginInfo("page_id"));
-                            globalRequest(MainActivity.this, "POST", Important.getFriend_list(), jsonObject, 12,context);
+                            jsonObject.put("page_id", getLoginInfo("page_id"));
+                            globalRequest(MainActivity.this, "POST", Important.getFriend_list(), jsonObject, 12, context);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -225,22 +217,28 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         });
 
 
+        // drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-       // drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-        InitLinks();
-
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("page_id", getLoginInfo("page_id"));
+            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12, context);
+            Log.e("onResume", "Called");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         SettingsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this, "Settings","");
+                StartActivity(MainActivity.this, "Settings", "");
             }
         });
         Settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this, "Settings","");
+                StartActivity(MainActivity.this, "Settings", "");
             }
         });
 
@@ -268,21 +266,21 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
         notification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this, "Notification","");
+                StartActivity(MainActivity.this, "Notification", "");
             }
         });
 
         logoutview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(MainActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8,context);
+                globalRequest(MainActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
             }
         });
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(MainActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8,context);
+                globalRequest(MainActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
             }
         });
 
@@ -302,14 +300,14 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 //                i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
 //                startActivityForResult(i, 2);
 
-                StartActivity(MainActivity.this, "AddFriend","");
+                StartActivity(MainActivity.this, "AddFriend", "");
             }
         });
 
         profileimage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartActivity(MainActivity.this, "Profile","");
+                StartActivity(MainActivity.this, "Profile", "");
 
             }
         });
@@ -323,30 +321,14 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
                                 .MODE_NIGHT_NO);
 
 
-//        JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put("page_id",getLoginInfo("page_id"));
-//            globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12,context);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-
-
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        // startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-
-
     }
 
     static ListviewAdapter adapter;
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
-        Log.e("MainResponse",response);
-        CheckResponse(this,this,response,requestcode);
+        Log.e("MainResponse", response);
+        CheckResponse(this, this, response, requestcode);
 
     }
 
@@ -360,18 +342,30 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
             }
         });
     }
+
     public static void setUpData(ArrayList<JSONObject> listdata) {
-        Log.e("mainlist",listdata.toString());
+        Log.e("mainlist", listdata.toString());
         ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Log.e("listviewdata", listdata.toString());
-                adapter = new ListviewAdapter(listdata, context,R.layout.singlefriend);
+                adapter = new ListviewAdapter(listdata, context, R.layout.singlefriend);
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
                 recyclerView.setAdapter(adapter);
             }
         });
+
+    }
+
+    public static void blockRequest(String id) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("user_id", id);
+            globalRequest(serverResponse, "POST", Important.getBlock_friend(), jsonObject, 7,context);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -383,23 +377,301 @@ public class MainActivity extends AppCompatActivity implements ServerResponse {
 //        Log.e("Imei",id);
 //    }
 
-    public static void setData(JSONObject jsonObject){
-        Log.e("longpress",jsonObject.toString());
+    public static void setData(JSONObject jsonObject) {
+        Log.e("longpress", jsonObject.toString());
+    }
+
+    @Override
+    public void onImageResponse(Response response, int code, int requestcode,CircleImageView imageView) throws JSONException {
+        InputStream inputStream = response.body().byteStream();
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (bitmap != null) {
+                    Log.e("bitmap", "notnull");
+                    setImage(imageView, bitmap);
+
+                } else {
+                    Log.e("bitmap", "null");
+                    setImage(imageView, BitmapFactory.decodeResource(getResources(),
+                            R.drawable.person));
+
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onImageFailure(String failresponse) throws JSONException {
+
     }
 
 
+    static class ListviewAdapter extends ListViewAdapter implements ImageResponse {
 
-    static class ListviewAdapter extends ListViewAdapter {
         public ListviewAdapter(ArrayList<JSONObject> listdata, Context context, int view) {
             super(listdata, context, view);
 
         }
-        @Override
-        public void showDialogue() {
 
+        @Override
+        protected void imageViewSetUp(String id,CircleImageView imageView) {
+            if(!id.equals("id")){
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("friend",id);
+                    ImageRequest(this, imageView,"GET", Important.getViewprofilepicture(), jsonObject, 1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        @Override
+        protected void longPressOptions(JSONObject jsonObject) {
+
+            Log.e("jsonobject",jsonObject.toString());
+
+            mutenotificationview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+            mutenotification.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+            markasunread.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+            markasunreadview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+
+            ignoremessage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+            ignoremessageview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+            seal.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Dialog dialog = new Dialog(context);
+                    View view1 = ((LayoutInflater)context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.requireprofilepassword,null,false);
+                    TextView canclebutton = view1.findViewById(R.id.cancelbutton);
+                    TextView sealbutton = view1.findViewById(R.id.sealbutton);
+                    EditText profilepassword = view1.findViewById(R.id.password);
+
+                    try {
+                        String s = jsonObject.getString("status");
+                        if(s.equals("8")){
+                            sealbutton.setText("Unseal");
+                        }else {
+                            Log.e("false",s);
+                            sealbutton.setText("Seal");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    canclebutton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(dialog.isShowing()){
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                    sealbutton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            String userpassword = profilepassword.getText().toString();
+                            if(!TextUtils.isEmpty(userpassword)){
+                                JSONObject jsonObject1 = new JSONObject();
+                                try {
+                                    jsonObject1.put("page_friend_id",jsonObject.getString("page_friend_id"));
+                                    jsonObject1.put("password_confirmation",userpassword);
+                                    if(jsonObject.getString("status").equals("8")){
+                                        jsonObject1.put("unseal","1");
+                                    }else {
+                                        jsonObject1.put("seal","1");
+                                    }
+
+                                    globalRequest(serverResponse,"POST",Important.getIgnore_friend(),jsonObject1,19,context);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }else {
+                                profilepassword.setError("Field can not be empty!");
+                                profilepassword.requestFocus();
+                            }
+                        }
+                    });
+
+                    dialog.setContentView(view1);
+                    dialog.show();
+
+                }
+            });
+
+            sealview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Dialog dialog = new Dialog(context);
+                    View view1 = ((LayoutInflater)context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.requireprofilepassword,null,false);
+                    TextView canclebutton = view1.findViewById(R.id.cancelbutton);
+                    TextView sealbutton = view1.findViewById(R.id.sealbutton);
+                    EditText profilepassword = view1.findViewById(R.id.password);
+
+                    try {
+                        String s = jsonObject.getString("status");
+                        if(s.equals("8")){
+                            sealbutton.setText("Unseal");
+                        }else {
+                            Log.e("false",s);
+                            sealbutton.setText("Seal");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    canclebutton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(dialog.isShowing()){
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                    sealbutton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            String userpassword = profilepassword.getText().toString();
+                            if(!TextUtils.isEmpty(userpassword)){
+                                JSONObject jsonObject1 = new JSONObject();
+                                try {
+                                    jsonObject1.put("page_friend_id",jsonObject.getString("page_friend_id"));
+                                    jsonObject1.put("password_confirmation",userpassword);
+                                    if(jsonObject.getString("status").equals("8")){
+                                        jsonObject1.put("unseal","1");
+                                    }else {
+                                        jsonObject1.put("seal","1");
+                                    }
+
+                                    globalRequest(serverResponse,"POST",Important.getIgnore_friend(),jsonObject1,19,context);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }else {
+                                profilepassword.setError("Field can not be empty!");
+                                profilepassword.requestFocus();
+                            }
+                        }
+                    });
+
+                    dialog.setContentView(view1);
+                    dialog.show();
+                }
+            });
+
+            block.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        blockRequest(jsonObject.getString("id"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            blockview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        blockRequest(jsonObject.getString("id"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+            deleteview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+        }
+
+        @Override
+        public void showDialogue() {}
+
+
+
+        @Override
+        public void onImageResponse(Response response, int code, int requestcode,CircleImageView imageView) throws JSONException {
+
+            InputStream inputStream = response.body().byteStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            ((Activity)context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+
+
+
+
+                    if (bitmap != null) {
+                        Log.e("bitmap", "notnull");
+                        Log.e("bitmap", bitmap.toString());
+                        imageView.setImageBitmap(bitmap);
+
+                    }else {
+                        Log.e("bitmap","null");
+                    }
+                }
+            });
+
+
+
+        }
+
+        @Override
+        public void onImageFailure(String failresponse) throws JSONException {
 
         }
     }
 
-
+    void setImage(ImageView imageView, Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
+    }
 }

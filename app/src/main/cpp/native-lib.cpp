@@ -55,6 +55,7 @@ static jmethodID jsonPut;
 static jmethodID showProgress;
 static jmethodID dismissProgress;
 static jmethodID UploadFile;
+static jmethodID closeActivity;
 
 
 static jmethodID MethodID , MethodID40 , MethodID49 ,
@@ -278,6 +279,10 @@ void initlinks(JNIEnv *env) {
 }
 
 
+void CloseActivity(JNIEnv *env,jobject context){
+    env->CallStaticVoidMethod(Function,closeActivity,context);
+}
+
 void initver(JNIEnv *env) {
 
     jclass temp1 = env->FindClass("com/horofbd/MeCloak/Functions");
@@ -290,6 +295,7 @@ void initver(JNIEnv *env) {
     JSONObject = (jclass) env->NewGlobalRef(temp3);
     JSONArray = (jclass) env->NewGlobalRef(temp4);
 
+    closeActivity = env->GetStaticMethodID(Function,"CloseActivity","(Landroid/content/Context;)V");
 
     UploadFile = env->GetStaticMethodID(Function , "UploadFile" ,
                                         "(Lcom/horofbd/MeCloak/ServerResponse;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lorg/json/JSONObject;I)V");
@@ -920,18 +926,12 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                                                                             env->NewStringUTF(
                                                                                     "code")));
                         startActivity(env , context , "PhoneNumberVerification" , "");
-                        jclass LoginActivity = env->FindClass("com/horofbd/MeCloak/LoginActivity");
-                        jmethodID closeActivity = env->GetStaticMethodID(LoginActivity ,
-                                                                         "closeActivtiy" , "()V");
-                        env->CallStaticVoidMethod(LoginActivity , closeActivity);
+
+                        CloseActivity(env,context);
 
                     } else {
-                        printlogcat(env , "sometag" , "noerror");
                         startActivity(env , context , "UserVerification" , "");
-                        jclass LoginActivity = env->FindClass("com/horofbd/MeCloak/LoginActivity");
-                        jmethodID closeActivity = env->GetStaticMethodID(LoginActivity ,
-                                                                         "closeActivtiy" , "()V");
-                        env->CallStaticVoidMethod(LoginActivity , closeActivity);
+                        CloseActivity(env,context);
 
                     }
 
@@ -968,10 +968,8 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                  getSharedPreference(env , env->NewStringUTF("phone_no")) ,
                                  getSharedPreference(env , env->NewStringUTF("password")) ,
                                  1);
-                    jclass LoginActivity = env->FindClass("com/horofbd/MeCloak/RegisterNewUser");
-                    jmethodID closeActivity = env->GetStaticMethodID(LoginActivity ,
-                                                                     "closeActivtiy" , "()V");
-                    env->CallStaticVoidMethod(LoginActivity , closeActivity);
+
+                    CloseActivity(env,context);
                 } else {
                     showToast(env , context , env->NewStringUTF("Phone Number Already Taken!"));
                 }
@@ -1002,22 +1000,14 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
                     clearSharedPreference(env);
                     startActivity(env , context , "Login" , "");
-                    jclass LoginActivity = env->FindClass(
-                            "com/horofbd/MeCloak/PhoneNumberVerificationActivity");
-                    jmethodID closeActivity = env->GetStaticMethodID(LoginActivity ,
-                                                                     "closeActivtiy" , "()V");
-                    env->CallStaticVoidMethod(LoginActivity , closeActivity);
+                    CloseActivity(env,context);
                 }
                 break;
             }
             case 3: {
                 if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
                     startActivity(env , context , "UserVerification" , "");
-                    jclass LoginActivity = env->FindClass(
-                            "com/horofbd/MeCloak/RegisterVerifiedUser");
-                    jmethodID closeActivity = env->GetStaticMethodID(LoginActivity ,
-                                                                     "closeActivtiy" , "()V");
-                    env->CallStaticVoidMethod(LoginActivity , closeActivity);
+                    CloseActivity(env,context);
                 } else {
                     showToast(env , context , response);
                 }
@@ -1062,11 +1052,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                                                 "updated_at")));
 
                     startActivity(env , context , "Main" , "");
-                    jclass LoginActivity = env->FindClass(
-                            "com/horofbd/MeCloak/UserVerificationActivity");
-                    jmethodID closeActivity = env->GetStaticMethodID(LoginActivity ,
-                                                                     "closeActivtiy" , "()V");
-                    env->CallStaticVoidMethod(LoginActivity , closeActivity);
+                    CloseActivity(env,context);
                 } else {
                     showToast(env , context , response);
                 }
@@ -1126,11 +1112,10 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 //logout
 
                 clearSharedPreference(env);
-                startActivity(env , context , "Login" , "");
-                jclass LoginActivity = env->FindClass("com/horofbd/MeCloak/MainActivity");
-                jmethodID closeActivity = env->GetStaticMethodID(LoginActivity , "closeActivtiy" ,
-                                                                 "()V");
-                env->CallStaticVoidMethod(LoginActivity , closeActivity);
+                startActivity(env,context,"Login","");
+                env->CallStaticVoidMethod(Function,closeActivity,context);
+
+
                 break;
             }
             case 9: {
@@ -1223,6 +1208,16 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 if (total == 0) {
                     showToast(env , context , env->NewStringUTF("Friend List Empty!"));
                 } else {
+
+                    jstring nextlink;
+                    if(!env->CallBooleanMethod(jsonobject,isNull,env->NewStringUTF("next_page_url"))){
+                        nextlink = (jstring)env->CallObjectMethod(jsonobject,getString,env->NewStringUTF("next_page_url"));
+                    } else{
+                        nextlink = env->NewStringUTF(" ");
+                    }
+
+
+
                     jobject jsonArray = env->CallObjectMethod(jsonobject , getJSONArray ,
                                                               env->NewStringUTF("data"));
                     jint length = (jint) env->CallIntMethod(jsonArray , jsonarraylength);
@@ -1249,8 +1244,8 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                                          env->NewStringUTF(
                                                                                  "friend"));
 
-                            jstring friendtableid = (jstring) env->CallObjectMethod(friendobject ,
-                                                                                    getString ,
+                            jint friendtableid = (jint) env->CallIntMethod(friendobject ,
+                                                                                    getInt ,
                                                                                     env->NewStringUTF(
                                                                                             "id"));
 
@@ -1266,6 +1261,16 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
 
                             jobject touser = env->CallObjectMethod(friendobject , getJsonObject ,
                                                                    env->NewStringUTF("to_user"));
+
+
+
+                            jstring to_status = (jstring)env->CallObjectMethod(tempjsonobject,getString,env->NewStringUTF("to_status"));
+                            jstring from_status = (jstring)env->CallObjectMethod(tempjsonobject,getString,env->NewStringUTF("from_status"));
+
+
+                            printlogcat(env,"tostatus",jstring2string(env,to_status));
+                            printlogcat(env,"fromstatus",jstring2string(env,from_status));
+
                             jmethodID map = env->GetStaticMethodID(Function , "map" ,
                                                                    "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;)Lorg/json/JSONObject;");
 
@@ -1280,7 +1285,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listadd = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "table_id") ,
-                                                                              friendtableid ,
+                                                                              env->NewStringUTF(to_string(friendtableid).c_str()) ,
                                                                               touser);
                                 jobject listadd1 = env->CallStaticObjectMethod(Function , map ,
                                                                                env->NewStringUTF(
@@ -1291,7 +1296,13 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                                                listadd);
 
 
-                                env->CallBooleanMethod(list , addMethod , listadd1);
+                                jobject listdd2 = env->CallStaticObjectMethod(Function , map ,
+                                                                              env->NewStringUTF(
+                                                                                      "status") ,
+                                                                              from_status ,listadd1);
+
+
+                                env->CallBooleanMethod(list , addMethod , listdd2);
 
 
                             } else {
@@ -1299,20 +1310,20 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listadd = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "table_id") ,
-                                                                              friendtableid ,
+                                                                             env->NewStringUTF(to_string(friendtableid).c_str())  ,
                                                                               fromuser);
                                 jobject listadd1 = env->CallStaticObjectMethod(Function , map ,
                                                                                env->NewStringUTF(
                                                                                        "page_friend_id") ,
                                                                                env->NewStringUTF(
-                                                                                       to_string(
-                                                                                               pagefriendtableid).c_str()) ,
-                                                                               listadd);
+                                                                                       to_string(pagefriendtableid).c_str()) ,listadd);
 
+                                jobject listdd2 = env->CallStaticObjectMethod(Function , map ,
+                                                                              env->NewStringUTF(
+                                                                                      "status") ,
+                                                                                     to_status ,listadd1);
 
-                                env->CallBooleanMethod(list , addMethod , listadd1);
-
-
+                                env->CallBooleanMethod(list , addMethod , listdd2);
                             }
 
                             if (i == length - 1) {
@@ -1368,8 +1379,8 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                         if (!env->CallBooleanMethod(tempjsonobject , isNull ,
                                                     env->NewStringUTF("friend"))) {
 
-                            jstring friendtableid = (jstring) env->CallObjectMethod(friendobject ,
-                                                                                    getString ,
+                            jint friendtableid = (jint) env->CallIntMethod(friendobject ,
+                                                                                    getInt ,
                                                                                     env->NewStringUTF(
                                                                                             "id"));
 
@@ -1402,7 +1413,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listadd = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "table_id") ,
-                                                                              friendtableid ,
+                                                                             env->NewStringUTF( to_string(friendtableid).c_str() ),
                                                                               touser);
                                 jobject listadd1 = env->CallStaticObjectMethod(Function , map ,
                                                                                env->NewStringUTF(
@@ -1421,7 +1432,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listadd = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "table_id") ,
-                                                                              friendtableid ,
+                                                                              env->NewStringUTF(to_string(friendtableid).c_str()) ,
                                                                               fromuser);
                                 jobject listadd1 = env->CallStaticObjectMethod(Function , map ,
                                                                                env->NewStringUTF(
@@ -1502,14 +1513,26 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 break;
             }
             case 18: {
-                jstring result = (jstring) env->CallObjectMethod(jsonobject , getString ,
-                                                                 env->NewStringUTF("response"));
-                if (jstring2string(env , result) == "Successfully Updated") {
-                    jclass UserVerificationactivity = env->FindClass("com/horofbd/MeCloak/UserVerificationActivity");
-                    jmethodID setText = env->GetStaticMethodID(UserVerificationactivity,"setProfilePicture","()V");
-                    env->CallStaticVoidMethod(UserVerificationactivity,setText);
+                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
+                    jstring result = (jstring) env->CallObjectMethod(jsonobject , getString ,
+                                                                     env->NewStringUTF("response"));
+                    if (jstring2string(env , result) == "Successfully Updated") {
+                        jclass UserVerificationactivity = env->FindClass("com/horofbd/MeCloak/UserVerificationActivity");
+                        jmethodID setText = env->GetStaticMethodID(UserVerificationactivity,"setProfilePicture","()V");
+                        env->CallStaticVoidMethod(UserVerificationactivity,setText);
+                    } else{
+                        showToast(env,context,env->NewStringUTF("Iamge Upload or Change Failed!"));
+                    }
                 } else{
                     showToast(env,context,env->NewStringUTF("Iamge Upload or Change Failed!"));
+                }
+
+                break;
+            }case 19:{
+                if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
+                    showToast(env , context , env->NewStringUTF("Seal Successfull!"));
+                } else {
+                    showToast(env , context , env->NewStringUTF("Error occured!"));
                 }
                 break;
             }
@@ -1979,9 +2002,17 @@ Java_com_horofbd_MeCloak_UserVerificationActivity_UploadFile(JNIEnv *env , jclas
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_UserVerificationActivity_ImageRequest(JNIEnv *env , jclass clazz ,
-                                                               jobject image_response ,
+                                                               jobject image_response ,jobject imageview,
                                                                jstring request_type , jstring link ,
                                                                jobject json_object,jint requestcode) {
-    jmethodID ImageRequest = env->GetStaticMethodID(Function,"ImageRequest", "(Lcom/horofbd/MeCloak/ImageResponse;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
-    env->CallStaticVoidMethod(Function,ImageRequest,image_response,request_type,link,json_object,requestcode);
+    jmethodID ImageRequest = env->GetStaticMethodID(Function,"ImageRequest", "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
+    env->CallStaticVoidMethod(Function,ImageRequest,image_response,imageview,request_type,link,json_object,requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_MainActivity_ImageRequest(JNIEnv *env , jclass clazz ,
+                                                   jobject image_response,jobject imageview, jstring request_type ,
+                                                   jstring link , jobject json_object ,
+                                                   jint requestcode) {
+    jmethodID ImageRequest = env->GetStaticMethodID(Function,"ImageRequest", "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
+    env->CallStaticVoidMethod(Function,ImageRequest,image_response,imageview,request_type,link,json_object,requestcode);
 }

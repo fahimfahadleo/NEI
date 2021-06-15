@@ -18,6 +18,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class ContactRequest extends Fragment {
     static Context context;
@@ -62,6 +64,13 @@ public class ContactRequest extends Fragment {
         }
 
 
+        @Override
+        protected void imageViewSetUp(String id, CircleImageView imageView) {
+
+        }
+
+        @Override
+        protected void longPressOptions(JSONObject jsonObject) {}
 
         @Override
         public void showDialogue() {

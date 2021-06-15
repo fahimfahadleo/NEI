@@ -14,6 +14,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,11 +33,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -58,6 +62,12 @@ public class Functions {
         Functions.context = context;
         preferences = context.getSharedPreferences("MessagePreference", MODE_PRIVATE);
     }
+
+
+    public static void CloseActivity(Context context){
+        ((Activity)context).finish();
+    }
+
 
     static Dialog dialog;
 
@@ -555,37 +565,22 @@ public class Functions {
     }
 
 
-    public static void ImageRequest(ImageResponse imageResponse, String requestType, String Link, JSONObject jsonObject,int requestcode){
+    public static void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode){
         OkHttpClient client = getClient();
-
-        MultipartBody.Builder builder = new MultipartBody.Builder();
-        RequestBody body = null;
-
-        if (jsonObject.length()!=0) {
-            Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
-            while (iter.hasNext()) {
-                String key = iter.next();
-                try {
-                    builder.addFormDataPart(key, jsonObject.getString(key));
-                    builder.setType(MultipartBody.FORM);
-                    body = builder.build();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        Request request;
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(Link).newBuilder();
+            if (jsonObject.length()!=0) {
+                Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
+                while (iter.hasNext()) {
+                    String key = iter.next();
+                    try {
+                        httpBuilder.addQueryParameter(key,jsonObject.getString(key));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }else {
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-            body = RequestBody.create(JSON, "{}");
-        }
-        Request request;
-        if(requestType.equals("GET")){
-            request = new Request.Builder().url(Link).method("GET",null).build();
-        }else {
-            request= new Request.Builder()
-                    .url(Link)
-                    .method(requestType, body)
-                    .build();
-        }
+            request = new Request.Builder().url(httpBuilder.build()).method("GET",null).build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -600,14 +595,13 @@ public class Functions {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    imageResponse.onImageResponse(response, response.code(),requestcode);
+                    imageResponse.onImageResponse(response, response.code(),requestcode,imageView);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
     }
-
 
 
 }

@@ -7,13 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.ColorDrawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,8 +26,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
-
 
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -34,12 +38,12 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Response;
-
 
 
 public class UserVerificationActivity extends AppCompatActivity implements ServerResponse, ImageResponse {
@@ -53,11 +57,26 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     LinearLayout passwordfieldlayout;
     TextView initialize;
     static CircleImageView profilepicture;
-    ImageView nameedit;
     static TextView username;
     CardView view;
     static PopupWindow popupWindow;
-    static AlertDialog dialog;
+    CardView changeprofilepictureview, logoutview, changeavatarview, changenameveiw, changephonenumberview;
+    TextView changeprofilepicture, logout, changeavatar, changename, changephonenumber;
+
+
+    String pass;
+    static Context context;
+    ImageView imageView;
+    int point = 0;
+    int count = 0;
+    static Uri resultUri;
+    Dialog avatardialog;
+    Dialog dialog2;
+    ImageView pro;
+
+    static String newnam;
+    DrawerLayout drawerLayout;
+
 
     static {
         System.loadLibrary("native-lib");
@@ -75,11 +94,8 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
 
     static native String getLoginInfo(String key);
 
-    static native void ImageRequest(ImageResponse imageResponse, String requestType, String Link, JSONObject jsonObject,int requestcode);
+    static native void ImageRequest(ImageResponse imageResponse,CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
 
-
-    int point = 0;
-    static Uri resultUri;
 
 
     @Override
@@ -89,12 +105,9 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 resultUri = result.getUri();
-                Log.e("CropResult", "result successfull");
                 File file = new File(resultUri.getPath());
-
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
-
 //Returns null, sizes are in the options variable
                 BitmapFactory.decodeFile(resultUri.getPath(), options);
                 int width = options.outWidth;
@@ -102,21 +115,15 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
 //If you want, the MIME type will also be decoded (if possible)
                 String type = options.outMimeType;
 
-
+                Log.e("mimetype",type);
                 JSONObject jsonObject = new JSONObject();
                 try {
-
                     jsonObject.put("width", width);
                     jsonObject.put("height", height);
-
                     UploadFile(this, "POST", Important.getChangeprofilepicture(), file, jsonObject, 18, context);
-
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
@@ -136,135 +143,13 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
 
     }
 
-    Dialog avatardialog;
-
-    void showAvatarDialog() {
-        View view = getLayoutInflater().inflate(R.layout.showavatardialog, null, false);
+    public static void showAvatarDialog() {
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.showavatardialog, null, false);
         RecyclerView recyclerView = view.findViewById(R.id.avaratrecyclerview);
 
 
     }
-
-    Dialog dialog2;
-    ImageView pro;
-
-    private void initDialogue() {
-
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View VI = inflater.inflate(R.layout.nameeditmenu, null, false);
-        CardView viewprofileview = VI.findViewById(R.id.viewprofileview);
-        TextView viewprofile = VI.findViewById(R.id.viewprofile);
-        CardView changeprofileview = VI.findViewById(R.id.changeprofileview);
-        TextView changeprofile = VI.findViewById(R.id.changeprofile);
-        CardView changeavatarview = VI.findViewById(R.id.changeavatarview);
-        TextView changeavatar = VI.findViewById(R.id.changeavatar);
-
-        // create the popup window
-
-
-        changeavatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-
-        changeprofile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .setMultiTouchEnabled(true)
-                        .setAllowFlipping(false)
-                        .setAspectRatio(1, 1)
-//                        .setMinCropResultSize(128, 128)
-//                        .setMaxCropResultSize(128, 128)
-                        .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
-                        .setOutputCompressQuality(90)
-                        .start(UserVerificationActivity.this);
-            }
-        });
-
-        changeprofileview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .setMultiTouchEnabled(true)
-                        .setAllowFlipping(false)
-                        .setAspectRatio(1, 1)
-                        .setMinCropResultSize(128, 128)
-                        .setMaxCropResultSize(128, 128)
-                        .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
-                        .setOutputCompressQuality(90)
-                        .start(UserVerificationActivity.this);
-            }
-        });
-
-
-        viewprofileview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog2 = null;
-                dialog2 = new Dialog(UserVerificationActivity.this){
-                    @Override
-                    public void onBackPressed() {
-                        if(dialog2!=null && dialog2.isShowing()){
-                            dialog2.dismiss();
-                        }
-                        super.onBackPressed();
-                    }
-                };
-                View vi = getLayoutInflater().inflate(R.layout.viewprofilepicture,null,false);
-                pro = vi.findViewById(R.id.profilepicture);
-
-                ImageRequest(UserVerificationActivity.this, "GET", Important.getViewprofilepicture(), new JSONObject(),2);
-
-                dialog.setContentView(vi);
-                dialog.show();
-            }
-        });
-
-        viewprofile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                dialog2 = null;
-
-                dialog2 = new Dialog(UserVerificationActivity.this){
-                    @Override
-                    public void onBackPressed() {
-                        if(dialog2!=null && dialog2.isShowing()){
-                            dialog2.dismiss();
-                        }
-
-                        super.onBackPressed();
-                    }
-                };
-                View vi = getLayoutInflater().inflate(R.layout.viewprofilepicture,null,false);
-                pro = vi.findViewById(R.id.profilepicture);
-
-
-                ImageRequest(UserVerificationActivity.this, "GET", Important.getViewprofilepicture(), new JSONObject(),2);
-
-                dialog.setContentView(vi);
-                dialog.show();
-            }
-        });
-
-        builder.setView(VI);
-        builder.setCancelable(true);
-        dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-        dialog.show();
-
-
-    }
-
 
     private void ChangeName() {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -290,18 +175,12 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
                 }
             }
         });
-        // create the popup window
         int width = LinearLayout.LayoutParams.MATCH_PARENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
+        boolean focusable = true;
         popupWindow = new PopupWindow(VI, width, height, focusable);
-        // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
         popupWindow.showAsDropDown(username);
-
     }
-
-    static String newnam;
 
     public static void setNewName() {
         ((Activity) context).runOnUiThread(new Runnable() {
@@ -320,10 +199,12 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
             @Override
             public void run() {
                 profilepicture.setImageURI(resultUri);
-                if (dialog.isShowing())
-                    dialog.dismiss();
             }
         });
+
+    }
+
+    void changeNumber() {
 
     }
 
@@ -340,99 +221,197 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         passwordfieldlayout = findViewById(R.id.passwordfieldlayout);
         initialize = findViewById(R.id.initialize);
         profilepicture = findViewById(R.id.profile_image);
-        nameedit = findViewById(R.id.nameedit);
+
         username = findViewById(R.id.username);
         view = findViewById(R.id.view);
+        changename = findViewById(R.id.changename);
+        changenameveiw = findViewById(R.id.changenameview);
+        changeprofilepicture = findViewById(R.id.changeprifilepicture);
+        changeprofilepictureview = findViewById(R.id.profilepictrechangeview);
+        changeavatar = findViewById(R.id.changeavatar);
+        changeavatarview = findViewById(R.id.changeavatarview);
+        logout = findViewById(R.id.logout);
+        logoutview = findViewById(R.id.logoutview);
+        drawerLayout = findViewById(R.id.drawer);
+        changephonenumber = findViewById(R.id.changenumber);
+        changephonenumberview = findViewById(R.id.changenumberview);
+        context = this;
         InitLinks();
         new Functions(this);
 
 
-        nameedit.setOnClickListener(new View.OnClickListener() {
+        logoutview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChangeName();
+                globalRequest(UserVerificationActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8,context);
+
             }
         });
 
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                globalRequest(UserVerificationActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8,context);
+
+            }
+        });
+        changephonenumberview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeNumber();
+            }
+        });
+        changephonenumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeNumber();
+            }
+        });
+
+
+        changename.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangeName();
+                drawerLayout.closeDrawer(GravityCompat.END);
+            }
+        });
+
+        changenameveiw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangeName();
+                drawerLayout.closeDrawer(GravityCompat.END);
+            }
+        });
+
+
+        changeprofilepictureview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setMultiTouchEnabled(true)
+                        .setAllowFlipping(false)
+                        .setAspectRatio(1, 1)
+
+                        .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
+                        .setOutputCompressQuality(90)
+                        .start(UserVerificationActivity.this);
+            }
+        });
+        changeprofilepicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setMultiTouchEnabled(true)
+                        .setAllowFlipping(false)
+                        .setAspectRatio(1, 1)
+
+                        .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
+                        .setOutputCompressQuality(90)
+                        .start(UserVerificationActivity.this);
+            }
+        });
 
         profilepicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initDialogue();
+                dialog2 = null;
+                dialog2 = new Dialog(UserVerificationActivity.this) {
+                    @Override
+                    public void onBackPressed() {
+                        if (dialog2 != null && dialog2.isShowing()) {
+                            dialog2.dismiss();
+                        }
+                        super.onBackPressed();
+                    }
+                };
+                View vi = getLayoutInflater().inflate(R.layout.viewprofilepicture, null, false);
+                pro = vi.findViewById(R.id.profilepicture);
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int height = displayMetrics.heightPixels;
+                int width = displayMetrics.widthPixels;
+                pro.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                pro.getLayoutParams().width = width;
+                pro.requestLayout();
+                pro.setImageBitmap(bitmap);
+                dialog2.setContentView(vi);
+                dialog2.show();
             }
         });
-
-
         username.setText(getLoginInfo("user_name"));
-        ImageRequest(this, "GET", Important.getViewprofilepicture(), new JSONObject(),1);
+        ImageRequest(this,profilepicture, "GET", Important.getViewprofilepicture(), new JSONObject(), 1);
 
 
-//        String s = "~+8801914616453@MeCloak> auth status\n" +
-//                "~+8801914616453@MeCloak> connected to Fahim Fahad Leon\n" +
-//                "~+8801914616453@MeCloak> requesting session\n" +
-//                "~+8801914616453@MeCloak> accepted with (" + getSaltString() + ")\n" +
-//                "~+8801914616453@MeCloak> generating request id\n" +
-//                "~+8801914616453@MeCloak> successful!!\n" +
-//                "~+8801914616453@MeCloak> loading horoftech crypto\n" +
-//                "~+8801914616453@MeCloak> ... ok\n" +
-//                "~+8801914616453@MeCloak> loading MeCloak premium icon\n" +
-//                "~+8801914616453@MeCloak> failed/... ok\n" +
-//                "~+8801914616453@MeCloak> loading boundage policy\n" +
-//                "~+8801914616453@MeCloak> ... ok\n" +
-//                "~+8801914616453@MeCloak> loading modules\n" +
-//                "~+8801914616453@MeCloak> https ... ok\n" +
-//                "~+8801914616453@MeCloak> wss ... ok\n" +
-//                "~+8801914616453@MeCloak> LDAP ... ok\n" +
-//                "~+8801914616453@MeCloak> SqLite ... ok\n" +
-//                "~+8801914616453@MeCloak> XML ... ok\n" +
-//                "~+8801914616453@MeCloak> bash ... ok\n" +
-//                "~+8801914616453@MeCloak> loading certificates ... ok\n" +
-//                "~+8801914616453@MeCloak> establishing cryptographic structure ... ok\n" +
-//                "~+8801914616453@MeCloak> starting MeCloak\n";
-//        String[] chararray = s.split("\n");
-//
-//
-//        int length = chararray.length - 1;
-//
-//
-//        Timer t = new Timer();
-//        t.scheduleAtFixedRate(
-//                new TimerTask() {
-//                    public void run() {
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//
-//                                autotext.setCursorVisible(true);
-//                                autotext.setText(autotext.getText().toString() + "\n" + chararray[point]);
-//                                autotext.setSelection(autotext.getText().length());
-//
-//                                if (point == length) {
-//                                    t.cancel();
-//                                    new Handler().postDelayed(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//                                            runOnUiThread(new Runnable() {
-//                                                @Override
-//                                                public void run() {
-//                                                    autotext.setVisibility(View.GONE);
-//                                                    passwordfieldlayout.setVisibility(View.VISIBLE);
-//                                                    initialize.setText("Page Login");
-//                                                }
-//                                            });
-//                                        }
-//                                    }, 1000);
-//                                }
-//                                point++;
-//                            }
-//                        });
-//                    }
-//                },
-//                0,      // run first occurrence immediatetly
-//                150); // run every two seconds
+        String s = "~+8801914616453@MeCloak> auth status\n" +
+                "~+8801914616453@MeCloak> connected to Fahim Fahad Leon\n" +
+                "~+8801914616453@MeCloak> requesting session\n" +
+                "~+8801914616453@MeCloak> accepted with (" + getSaltString() + ")\n" +
+                "~+8801914616453@MeCloak> generating request id\n" +
+                "~+8801914616453@MeCloak> successful!!\n" +
+                "~+8801914616453@MeCloak> loading horoftech crypto\n" +
+                "~+8801914616453@MeCloak> ... ok\n" +
+                "~+8801914616453@MeCloak> loading MeCloak premium icon\n" +
+                "~+8801914616453@MeCloak> failed/... ok\n" +
+                "~+8801914616453@MeCloak> loading boundage policy\n" +
+                "~+8801914616453@MeCloak> ... ok\n" +
+                "~+8801914616453@MeCloak> loading modules\n" +
+                "~+8801914616453@MeCloak> https ... ok\n" +
+                "~+8801914616453@MeCloak> wss ... ok\n" +
+                "~+8801914616453@MeCloak> LDAP ... ok\n" +
+                "~+8801914616453@MeCloak> SqLite ... ok\n" +
+                "~+8801914616453@MeCloak> XML ... ok\n" +
+                "~+8801914616453@MeCloak> bash ... ok\n" +
+                "~+8801914616453@MeCloak> loading certificates ... ok\n" +
+                "~+8801914616453@MeCloak> establishing cryptographic structure ... ok\n" +
+                "~+8801914616453@MeCloak> starting MeCloak\n";
+        String[] chararray = s.split("\n");
 
-        autotext.setVisibility(View.GONE);
-        passwordfieldlayout.setVisibility(View.VISIBLE);
+
+        int length = chararray.length - 1;
+
+
+        Timer t = new Timer();
+        t.scheduleAtFixedRate(
+                new TimerTask() {
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                autotext.setCursorVisible(true);
+                                autotext.setText(autotext.getText().toString() + "\n" + chararray[point]);
+                                autotext.setSelection(autotext.getText().length());
+
+                                if (point == length) {
+                                    t.cancel();
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    autotext.setVisibility(View.GONE);
+                                                    passwordfieldlayout.setVisibility(View.VISIBLE);
+                                                    initialize.setText("Page Login");
+                                                }
+                                            });
+                                        }
+                                    }, 1000);
+                                }
+                                point++;
+                            }
+                        });
+                    }
+                },
+                0,      // run first occurrence immediatetly
+                150); // run every two seconds
+
+//        autotext.setVisibility(View.GONE);
+//        passwordfieldlayout.setVisibility(View.VISIBLE);
 
 
         registernewpage = findViewById(R.id.registernewpage);
@@ -454,15 +433,18 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
             public void onClick(View view) {
                 pass = code.getText().toString();
 
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("password", pass);
-                    globalRequest(UserVerificationActivity.this, "POST", Important.getPage_login(), jsonObject, 4, context);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (TextUtils.isEmpty(pass)) {
+                    code.setError("Password Must Be Filled!");
+                    code.requestFocus();
+                } else {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("password", pass);
+                        globalRequest(UserVerificationActivity.this, "POST", Important.getPage_login(), jsonObject, 4, context);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-
 //                if(pass.equals(userpass)){
 //                    ServerRequest.PageLogin(UserVerificationActivity.this,pass,1);
 //                }
@@ -470,16 +452,10 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         });
         //  c.close();
 
-        context = this;
+
     }
 
-    String pass;
-    static Context context;
 
-    public static void closeActivtiy() {
-        Functions.dismissDialogue();
-        ((Activity) context).finish();
-    }
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
@@ -497,32 +473,22 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
             }
         });
     }
-    ImageView imageView;
+
     @Override
-    public void onImageResponse(Response response, int code,int requestcode) throws JSONException {
-
-        InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
+    public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) throws JSONException {
+        InputStream inputStream = response.body().byteStream();
         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(requestcode == 1){
-                    imageView = profilepicture;
-                }else if(requestcode == 2){
-                    imageView = pro;
-                }
                 if (bitmap != null) {
-                    setImage(imageView,bitmap);
-                } else {
-                    setImage(imageView,BitmapFactory.decodeResource(getResources(),
-                            R.drawable.person));
+                    Log.e("bitmap", "notnull");
+                    setImage(imageView, bitmap);
+                }else {
+                    Log.e("bitmap", "null");
                 }
             }
         });
-
-
     }
 
     @Override
@@ -530,10 +496,10 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         Log.e("failed", failresponse);
     }
 
-
-    void setImage(ImageView imageView,Bitmap bitmap) {
-
+    void setImage(ImageView imageView, Bitmap bitmap) {
+        this.bitmap = bitmap;
         imageView.setImageBitmap(bitmap);
-
     }
+
+Bitmap bitmap;
 }

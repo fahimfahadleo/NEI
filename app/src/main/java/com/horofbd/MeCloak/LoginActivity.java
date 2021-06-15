@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import org.json.JSONException;
 
+import java.util.function.Function;
+
 public class LoginActivity extends AppCompatActivity implements ServerResponse {
 
 
@@ -34,6 +36,12 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
 
     static native void StartActivity(Context context, String classname);
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Functions.dismissDialogue();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

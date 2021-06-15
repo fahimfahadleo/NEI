@@ -17,6 +17,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,11 +33,13 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
     protected AlertDialog dialog;
     protected TextView accept;
     protected TextView decline;
+    protected CardView mutenotificationview, markasunreadview, ignoremessageview, sealview, blockview, deleteview;
+    protected TextView mutenotification, markasunread, ignoremessage, seal, block, delete;
 
     Context context;
     int vi;
 
-    public ListViewAdapter(ArrayList<JSONObject> listdata, Context context,int view) {
+    public ListViewAdapter(ArrayList<JSONObject> listdata, Context context, int view) {
         Log.e("listview", listdata.toString());
         this.listdata = listdata;
         this.context = context;
@@ -50,74 +53,105 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
         return new ListViewAdapter.ViewHolder(listItem);
     }
 
+
     @Override
-    public void onBindViewHolder(ListViewAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NotNull ListViewAdapter.ViewHolder holder, int position) {
         final JSONObject myListData = listdata.get(position);
         try {
-            if(vi==R.layout.showsinglefriendrequest){
+            if (vi == R.layout.showsinglefriendrequest) {
                 holder.textView.setText(myListData.getString("name") + "(" + myListData.getString("phone_no") + ")");
-            }else if(vi == R.layout.singlefriend){
-                holder.textView.setText(myListData.getString("name"));
-                holder.phonenumber.setText("Last Contact at");
+
+                holder.cardView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        initDialogue(listdata.get(position));
+                    }
+                });
+
+            } else if (vi == R.layout.singlefriend) {
+                if (myListData.getString("status").equals("2")) {
+                    holder.textView.setText(myListData.getString("name"));
+                    holder.phonenumber.setText("Last Contact at");
+
+                    holder.cardView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            Intent i = new Intent(context, ShowUserMessage.class);
+                            i.putExtra("data", listdata.get(position).toString());
+                            ((Activity) context).startActivity(i);
+
+
+                        }
+                    });
+                    imageViewSetUp(myListData.getString("id"), holder.imageView);
+
+                } else if (myListData.getString("status").equals("8")) {
+                    holder.textView.setText("MeCloak User");
+                    holder.phonenumber.setText("Sealed");
+
+                    imageViewSetUp("id", holder.imageView);
+                }
+                holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        AlertDialog dialog;
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View view1 = inflater.inflate(R.layout.friendlongpressoption, null, false);
+                        mutenotificationview = view1.findViewById(R.id.mutenotificationview);
+                        mutenotification = view1.findViewById(R.id.mutenotification);
+                        markasunreadview = view1.findViewById(R.id.markasunreadview);
+                        markasunread = view1.findViewById(R.id.markasunread);
+                        ignoremessageview = view1.findViewById(R.id.ignoremessageview);
+                        ignoremessage = view1.findViewById(R.id.ignoremessage);
+                        sealview = view1.findViewById(R.id.sealview);
+                        seal = view1.findViewById(R.id.seal);
+                        blockview = view1.findViewById(R.id.blockview);
+                        block = view1.findViewById(R.id.block);
+                        deleteview = view1.findViewById(R.id.deleteview);
+                        delete = view1.findViewById(R.id.delete);
+
+                        try {
+                            String status = myListData.getString("status");
+                            if(status.equals("8")){
+                                seal.setText("Unseal");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        longPressOptions(myListData);
+                        builder.setView(view1);
+                        builder.setCancelable(true);
+                        dialog = builder.create();
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                        dialog.show();
+
+                        return true;
+                    }
+                });
+
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(vi == R.layout.showsinglefriendrequest){
-                    initDialogue(listdata.get(position));
-                }else if(vi == R.layout.singlefriend){
-                    Intent i = new Intent(context,ShowUserMessage.class);
-                    i.putExtra("data",listdata.get(position).toString());
-                    ((Activity)context).startActivity(i);
-                }
-
-            }
-        });
-        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                AlertDialog dialog;
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-                View view1 = inflater.inflate(R.layout.friendlongpressoption,null,false);
-                CardView mutenotificationview = view1.findViewById(R.id.mutenotificationview);
-                TextView mutenotification = view1.findViewById(R.id.mutenotification);
-                CardView markasunreadview = view1.findViewById(R.id.markasunreadview);
-                TextView markasunread = view1.findViewById(R.id.markasunread);
-                CardView ignoremessageview = view1.findViewById(R.id.ignoremessageview);
-                TextView ignoremessage = view1.findViewById(R.id.ignoremessage);
-                CardView sealview = view1.findViewById(R.id.sealview);
-                TextView seal = view1.findViewById(R.id.seal);
-                CardView blockview = view1.findViewById(R.id.blockview);
-                TextView block = view1.findViewById(R.id.block);
-                CardView deleteview = view1.findViewById(R.id.deleteview);
-                TextView delete = view1.findViewById(R.id.delete);
-//                Animation animation = AnimationUtils.loadAnimation(context,R.anim.fadein);
-//                view1.setAnimation(animation);
-//                view1.startAnimation(animation);
 
 
-                builder.setView(view1);
-                builder.setCancelable(true);
-                dialog = builder.create();
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-                dialog.show();
-
-                return true;
-            }
-        });
     }
 
+    protected abstract void imageViewSetUp(String id, CircleImageView imageView);
+
+    protected abstract void longPressOptions(JSONObject jsonObject);
 
 
+    protected JSONObject mylistdata;
 
-protected JSONObject mylistdata;
     private void initDialogue(JSONObject myList) {
         mylistdata = myList;
-        Log.e("mylist",myList.toString());
+        Log.e("mylist", myList.toString());
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
         assert inflater != null;
@@ -146,7 +180,6 @@ protected JSONObject mylistdata;
     public abstract void showDialogue();
 
 
-
     @Override
     public int getItemCount() {
         return listdata.size();
@@ -164,7 +197,7 @@ protected JSONObject mylistdata;
             this.imageView = (CircleImageView) itemView.findViewById(R.id.profile_image);
             this.textView = (TextView) itemView.findViewById(R.id.name);
             this.cardView = (CardView) itemView.findViewById(R.id.singlecardview);
-            this.phonenumber = (TextView)itemView.findViewById(R.id.text);
+            this.phonenumber = (TextView) itemView.findViewById(R.id.text);
         }
     }
 }
