@@ -4,6 +4,8 @@
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
+
+
         <item name="colorPrimary">@color/textcolor</item>
         // Activated State
         <item name="colorOnSurface">@color/textcolor</item>
@@ -23,7 +25,13 @@
         <item name="windowNoTitle">true</item>
 
     </style>
+    <style name="Widget.Start.MaterialCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Start.MaterialCardView</item>
+    </style>
 
+    <style name="Widget.End.MaterialCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.End.MaterialCardView</item>
+    </style>
 
     <style name="AppTheme.Blue" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -48,4 +56,24 @@
 
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+
+    <style name="ShapeAppearanceOverlay.Start.MaterialCardView" parent="">
+<!--        <item name="cornerFamily">rounded</item>-->
+        <item name="cornerFamilyTopLeft">rounded</item>
+        <item name="cornerFamilyTopRight">rounded</item>
+        <item name="cornerFamilyBottomRight">rounded</item>
+        <item name="cornerSizeBottomRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.End.MaterialCardView" parent="">
+        <!--        <item name="cornerFamily">rounded</item>-->
+        <item name="cornerFamilyTopLeft">rounded</item>
+        <item name="cornerFamilyTopRight">rounded</item>
+        <item name="cornerFamilyBottomLeft">rounded</item>
+        <item name="cornerSizeBottomLeft">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+    </style>
 </resources>

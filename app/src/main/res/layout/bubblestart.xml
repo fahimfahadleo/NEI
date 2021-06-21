@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/_2sdp"
+    android:paddingStart="@dimen/_16sdp"
+    android:background="#00000000"
+    android:gravity="end"
+    android:paddingEnd="@dimen/_2sdp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/profile_image"
+        app:cardBackgroundColor="@color/red_500"
+        android:id="@+id/cardview"
+        app:contentPaddingTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_6sdp"
+        android:layout_marginTop="@dimen/_3sdp"
+        app:contentPaddingBottom="@dimen/_8sdp"
+        app:contentPaddingLeft="@dimen/_4sdp"
+        app:contentPaddingRight="@dimen/_4sdp"
+        app:cardElevation="@dimen/_4sdp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.End.MaterialCardView">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/sendertext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="#000" />
+
+            <TextView
+                android:id="@+id/timetext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/sendertext"
+                android:textSize="@dimen/_7sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="#000" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="@dimen/_10sdp"
+        android:layout_height="@dimen/_10sdp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="@dimen/_6sdp"
+        android:padding="@dimen/_3sdp"
+        app:layout_constraintStart_toEndOf="@id/cardview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_launcher_background"
+        app:civ_border_color="@color/red_500"
+        app:civ_border_width="2dp" />
+
+
+
+</LinearLayout>

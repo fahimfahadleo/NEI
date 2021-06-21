@@ -65,7 +65,8 @@
         <activity android:name=".GetPremiumActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".PhoneNumberVerificationActivity" />
-        <activity android:name=".ShowUserMessage" />
+        <activity android:name=".ShowUserMessage"
+            android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".RegisterVerifiedUser" />
         <activity android:name=".UserVerificationActivity" />
         <activity

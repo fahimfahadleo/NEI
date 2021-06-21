@@ -68,73 +68,86 @@ static jmethodID MethodID , MethodID40 , MethodID49 ,
         MethodID21 , MethodID18 , MethodID1 , MethodID15 , MethodID17 , MethodID16 ,
         MethodID5 , MethodID14 , MethodID13 , MethodID3 , MethodID12 , MethodID11 ,
         MethodID7 , MethodID10 , MethodID9 , MethodID8 , MethodID4 , MethodID2 ,
-        MethodID51 , MethodID52 , MethodID53 , MethodID54 , MethodID55 , MethodID6;
-string host = "http://192.168.152.9:8000/api";
+        MethodID51 , MethodID52 , MethodID53 , MethodID54 , MethodID55 , MethodID6
+, MethodID56 , MethodID57 , MethodID58 , MethodID59 , MethodID60;
+string schema = "http";
+string domain = "192.168.152.9";
+string port = "8000";
+string uri = "/api";
+string baseUrl = schema + "://" + domain + ":" + port + uri;
+
+string xmppPort = "5222";
+string xmppHost = domain;
+string xmppResource = "MeCloak";
+
 
 ////////advertise/////////////
-string advertise_links = host + "/advertise/links";
-string advertise_watch = host + "/advertise/watch";
-string advertise_end = host + "/advertise/end";
+string advertise_links = baseUrl + "/advertise/links";
+string advertise_watch = baseUrl + "/advertise/watch";
+string advertise_end = baseUrl + "/advertise/end";
 ////////auth////////////
-string profile_register = host + "/auth/register";
-string page_register = host + "/auth/page-register";
-string profile_login = host + "/auth/login";
-string page_login = host + "/auth/page-login";
-string page_delete = host + "/auth/page-delete";
-string profile_logout = host + "/auth/logout";
-string verify_email = host + "/auth/verify-email";
-string phone_verification = host + "/auth/verify-phone";
-string forgot_profile_password = host + "/auth/forget-profile-password";
-string forgot_page_password = host + "/auth/forget-page-password";
-string validate_reset_password_otp = host + "/auth/validate-reset-password-otp";
-string prepare_offline = host + "/auth/prepare-offline";
-string upload_page_security_image = host + "/auth/upload-page-security-image";
-string upload_page_security_question = host + "/auth/upload-page-security-question";
-string page_security_image = host + "/auth/page-security-image";
-string update_page_security_question = host + "/auth/update-page-security-question";
-string create_page_recovery_certificate = host + "/auth/create-page-recovery-certificate";
-string token_refresh = host + "/auth/token-refresh";
+string profile_register = baseUrl + "/auth/register";
+string page_register = baseUrl + "/auth/page-register";
+string profile_login = baseUrl + "/auth/login";
+string page_login = baseUrl + "/auth/page-login";
+string page_delete = baseUrl + "/auth/page-delete";
+string profile_logout = baseUrl + "/auth/logout";
+string verify_email = baseUrl + "/auth/verify-email";
+string phone_verification = baseUrl + "/auth/verify-phone";
+string forgot_profile_password = baseUrl + "/auth/forget-profile-password";
+string forgot_page_password = baseUrl + "/auth/forget-page-password";
+string validate_reset_password_otp = baseUrl + "/auth/validate-reset-password-otp";
+string prepare_offline = baseUrl + "/auth/prepare-offline";
+string upload_page_security_image = baseUrl + "/auth/upload-page-security-image";
+string upload_page_security_question = baseUrl + "/auth/upload-page-security-question";
+string page_security_image = baseUrl + "/auth/page-security-image";
+string update_page_security_question = baseUrl + "/auth/update-page-security-question";
+string create_page_recovery_certificate = baseUrl + "/auth/create-page-recovery-certificate";
+string token_refresh = baseUrl + "/auth/token-refresh";
+string privatekey = baseUrl + "/auth/private-key";
+string publickey = baseUrl + "/auth/public-key";
+
 //////////Friend//////////////////
-string search_friend = host + "/friend/search";
-string add_friend = host + "/friend/request";
-string accept_friend = host + "/friend/accept";
-string block_friend = host + "/friend/block";
-string block_friend_list = host + "/friend/block-list";
-string unfriend_friend = host + "/friend/unfriend";
-string cancel_friend_request = host + "/friend/decline";
-string delete_friend_request = host + "/friend/delete";
-string ignore_friend = host + "/friend/ignore";
-string friend_list = host + "/friend/list";
-string retrive_friend_request = host + "/friend/request-list";
+string search_friend = baseUrl + "/friend/search";
+string add_friend = baseUrl + "/friend/request";
+string accept_friend = baseUrl + "/friend/accept";
+string block_friend = baseUrl + "/friend/block";
+string block_friend_list = baseUrl + "/friend/block-list";
+string unfriend_friend = baseUrl + "/friend/unfriend";
+string cancel_friend_request = baseUrl + "/friend/decline";
+string delete_friend_request = baseUrl + "/friend/delete";
+string ignore_friend = baseUrl + "/friend/ignore";
+string friend_list = baseUrl + "/friend/list";
+string retrive_friend_request = baseUrl + "/friend/request-list";
 /////////////message//////////////
-string send_message = host + "/message/send";
-string get_message = host + "/message/get";
-string delete_message = host + "/message/delete";
-string upload_offline_message = host + "/message/upload-offline";
+string send_message = baseUrl + "/message/send";
+string get_message = baseUrl + "/message/get";
+string delete_message = baseUrl + "/message/delete";
+string upload_offline_message = baseUrl + "/message/upload-offline";
 /////////////premium/////////////
-string premium_features = host + "/premium/features";
-string buy_premium = host + "/premium/buy";
-string activate_previous_premium = host + "/premium/activate";
-string buy_page = host + "/premium/buy-page";
+string premium_features = baseUrl + "/premium/features";
+string buy_premium = baseUrl + "/premium/buy";
+string activate_previous_premium = baseUrl + "/premium/activate";
+string buy_page = baseUrl + "/premium/buy-page";
 ///////////profile//////////////
-string referrals = host + "/profile/referrals";
-string chang_profile_name = host + "/profile/name-change";
-string chang_profile_picture = host + "/profile/picture-change";
-string chang_page_name = host + "/profile/page-name-change";
-string chang_phone_number = host + "/profile/number-change";
-string view_profile_picture = host + "/profile/picture";
+string referrals = baseUrl + "/profile/referrals";
+string chang_profile_name = baseUrl + "/profile/name-change";
+string chang_profile_picture = baseUrl + "/profile/picture-change";
+string chang_page_name = baseUrl + "/profile/page-name-change";
+string chang_phone_number = baseUrl + "/profile/number-change";
+string view_profile_picture = baseUrl + "/profile/picture";
 /////////transection/////////////
-string reference_balance_withdraw = host + "/transection/ref-withdraw";
-string recharge = host + "/transaction/recharge";
+string reference_balance_withdraw = baseUrl + "/transection/ref-withdraw";
+string recharge = baseUrl + "/transaction/recharge";
 ///////////////tutorial/////////////////
-string tutorial_list = host + "/tutorial/list";
-string watch_tutorial = host + "/tutorial/watch";
+string tutorial_list = baseUrl + "/tutorial/list";
+string watch_tutorial = baseUrl + "/tutorial/watch";
 ///////////////////vault//////////////
-string enter_vault = host + "/vault/login";
-string open_vault = host + "/vault/open";
-string upload_to_vault = host + "/vault/upload";
-string create_vault = host + "/vault/create";
-string getNotification = host + "/notification";
+string enter_vault = baseUrl + "/vault/login";
+string open_vault = baseUrl + "/vault/open";
+string upload_to_vault = baseUrl + "/vault/upload";
+string create_vault = baseUrl + "/vault/create";
+string getNotification = baseUrl + "/notification";
 
 ///////////////////Activity//////////////////////////
 string MainActivity = "com/horofbd/MeCloak/MainActivity";
@@ -173,9 +186,9 @@ string UserVerificationActivity = "com/horofbd/MeCloak/UserVerificationActivity"
 string VaultActivity = "com/horofbd/MeCloak/VaultActivity";
 string WatchVideoActivity = "com/horofbd/MeCloak/WatchVideoActivity";
 
-
+string publickeyname;
 void initlinks(JNIEnv *env) {
-    MethodID = env->GetStaticMethodID(Important , "setHost" , "(Ljava/lang/String;)V");
+    MethodID = env->GetStaticMethodID(Important , "setBaseUrl" , "(Ljava/lang/String;)V");
     MethodID1 = env->GetStaticMethodID(Important , "setAdvertise_links" ,
                                        "(Ljava/lang/String;)V");
     MethodID2 = env->GetStaticMethodID(Important , "setAdvertise_watch" ,
@@ -274,13 +287,23 @@ void initlinks(JNIEnv *env) {
                                         "(Ljava/lang/String;)V");
     MethodID55 = env->GetStaticMethodID(Important , "setViewprofilepicture" ,
                                         "(Ljava/lang/String;)V");
+    MethodID56 = env->GetStaticMethodID(Important , "setXmppHost" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID57 = env->GetStaticMethodID(Important , "setXmppPort" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID58 = env->GetStaticMethodID(Important , "setXmppResource" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID59 = env->GetStaticMethodID(Important , "setPublickey" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID60 = env->GetStaticMethodID(Important , "setPrivatekey" ,
+                                        "(Ljava/lang/String;)V");
 
 
 }
 
 
-void CloseActivity(JNIEnv *env,jobject context){
-    env->CallStaticVoidMethod(Function,closeActivity,context);
+void CloseActivity(JNIEnv *env , jobject context) {
+    env->CallStaticVoidMethod(Function , closeActivity , context);
 }
 
 void initver(JNIEnv *env) {
@@ -295,7 +318,8 @@ void initver(JNIEnv *env) {
     JSONObject = (jclass) env->NewGlobalRef(temp3);
     JSONArray = (jclass) env->NewGlobalRef(temp4);
 
-    closeActivity = env->GetStaticMethodID(Function,"CloseActivity","(Landroid/content/Context;)V");
+    closeActivity = env->GetStaticMethodID(Function , "CloseActivity" ,
+                                           "(Landroid/content/Context;)V");
 
     UploadFile = env->GetStaticMethodID(Function , "UploadFile" ,
                                         "(Lcom/horofbd/MeCloak/ServerResponse;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lorg/json/JSONObject;I)V");
@@ -516,7 +540,7 @@ jstring wstring2jstring(JNIEnv *env , std::wstring cstr) {
 void SetUpLinks(JNIEnv *env) {
     Important = env->FindClass("com/horofbd/MeCloak/Important");
 
-    env->CallStaticVoidMethod(Important , MethodID , env->NewStringUTF(host.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID , env->NewStringUTF(baseUrl.c_str()));
     env->CallStaticVoidMethod(Important , MethodID1 , env->NewStringUTF(advertise_links.c_str()));
     env->CallStaticVoidMethod(Important , MethodID2 , env->NewStringUTF(advertise_watch.c_str()));
     env->CallStaticVoidMethod(Important , MethodID3 , env->NewStringUTF(advertise_end.c_str()));
@@ -595,6 +619,18 @@ void SetUpLinks(JNIEnv *env) {
                               env->NewStringUTF(chang_phone_number.c_str()));
     env->CallStaticVoidMethod(Important , MethodID55 ,
                               env->NewStringUTF(view_profile_picture.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID56 ,
+                              env->NewStringUTF(xmppHost.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID57 ,
+                              env->NewStringUTF(xmppPort.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID58 ,
+                              env->NewStringUTF(xmppResource.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID59 ,
+
+                              env->NewStringUTF(publickey.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID60 ,
+
+                              env->NewStringUTF(privatekey.c_str()));
 }
 
 static void setSharedPreference(JNIEnv *env , jstring key , jstring value) {
@@ -640,8 +676,6 @@ static void request(JNIEnv *env , jobject serverResponse , jstring requestType ,
                     jint requestcode , jobject context) {
 
     showProgressBar(env , context);
-
-
     env->CallStaticVoidMethod(Function , Request , serverResponse , requestType , Link ,
                               jsonObject , requestcode);
 }
@@ -802,6 +836,7 @@ void LoginRequest(JNIEnv *env , jobject context , jobject serverresponse , jstri
 
     showProgressBar(env , context);
 
+    setSharedPreference(env , env->NewStringUTF("sec") , password);
 
     jmethodID jmethodId = env->GetStaticMethodID(Function , "LoginRegisteredUser" ,
                                                  "(Lcom/horofbd/MeCloak/ServerResponse;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
@@ -927,11 +962,11 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                                                                                     "code")));
                         startActivity(env , context , "PhoneNumberVerification" , "");
 
-                        CloseActivity(env,context);
+                        CloseActivity(env , context);
 
                     } else {
                         startActivity(env , context , "UserVerification" , "");
-                        CloseActivity(env,context);
+                        CloseActivity(env , context);
 
                     }
 
@@ -969,7 +1004,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                  getSharedPreference(env , env->NewStringUTF("password")) ,
                                  1);
 
-                    CloseActivity(env,context);
+                    CloseActivity(env , context);
                 } else {
                     showToast(env , context , env->NewStringUTF("Phone Number Already Taken!"));
                 }
@@ -1000,14 +1035,14 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
                     clearSharedPreference(env);
                     startActivity(env , context , "Login" , "");
-                    CloseActivity(env,context);
+                    CloseActivity(env , context);
                 }
                 break;
             }
             case 3: {
                 if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
                     startActivity(env , context , "UserVerification" , "");
-                    CloseActivity(env,context);
+                    CloseActivity(env , context);
                 } else {
                     showToast(env , context , response);
                 }
@@ -1052,7 +1087,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                                                 "updated_at")));
 
                     startActivity(env , context , "Main" , "");
-                    CloseActivity(env,context);
+                    CloseActivity(env , context);
                 } else {
                     showToast(env , context , response);
                 }
@@ -1112,8 +1147,8 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 //logout
 
                 clearSharedPreference(env);
-                startActivity(env,context,"Login","");
-                env->CallStaticVoidMethod(Function,closeActivity,context);
+                startActivity(env , context , "Login" , "");
+                env->CallStaticVoidMethod(Function , closeActivity , context);
 
 
                 break;
@@ -1210,12 +1245,14 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 } else {
 
                     jstring nextlink;
-                    if(!env->CallBooleanMethod(jsonobject,isNull,env->NewStringUTF("next_page_url"))){
-                        nextlink = (jstring)env->CallObjectMethod(jsonobject,getString,env->NewStringUTF("next_page_url"));
-                    } else{
+                    if (!env->CallBooleanMethod(jsonobject , isNull ,
+                                                env->NewStringUTF("next_page_url"))) {
+                        nextlink = (jstring) env->CallObjectMethod(jsonobject , getString ,
+                                                                   env->NewStringUTF(
+                                                                           "next_page_url"));
+                    } else {
                         nextlink = env->NewStringUTF(" ");
                     }
-
 
 
                     jobject jsonArray = env->CallObjectMethod(jsonobject , getJSONArray ,
@@ -1245,9 +1282,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                                                  "friend"));
 
                             jint friendtableid = (jint) env->CallIntMethod(friendobject ,
-                                                                                    getInt ,
-                                                                                    env->NewStringUTF(
-                                                                                            "id"));
+                                                                           getInt ,
+                                                                           env->NewStringUTF(
+                                                                                   "id"));
 
                             jint pagefriendtableid = (jint) env->CallIntMethod(tempjsonobject ,
                                                                                getInt ,
@@ -1263,13 +1300,18 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                                    env->NewStringUTF("to_user"));
 
 
+                            jstring to_status = (jstring) env->CallObjectMethod(tempjsonobject ,
+                                                                                getString ,
+                                                                                env->NewStringUTF(
+                                                                                        "to_status"));
+                            jstring from_status = (jstring) env->CallObjectMethod(tempjsonobject ,
+                                                                                  getString ,
+                                                                                  env->NewStringUTF(
+                                                                                          "from_status"));
 
-                            jstring to_status = (jstring)env->CallObjectMethod(tempjsonobject,getString,env->NewStringUTF("to_status"));
-                            jstring from_status = (jstring)env->CallObjectMethod(tempjsonobject,getString,env->NewStringUTF("from_status"));
 
-
-                            printlogcat(env,"tostatus",jstring2string(env,to_status));
-                            printlogcat(env,"fromstatus",jstring2string(env,from_status));
+                            printlogcat(env , "tostatus" , jstring2string(env , to_status));
+                            printlogcat(env , "fromstatus" , jstring2string(env , from_status));
 
                             jmethodID map = env->GetStaticMethodID(Function , "map" ,
                                                                    "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;)Lorg/json/JSONObject;");
@@ -1285,7 +1327,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listadd = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "table_id") ,
-                                                                              env->NewStringUTF(to_string(friendtableid).c_str()) ,
+                                                                              env->NewStringUTF(
+                                                                                      to_string(
+                                                                                              friendtableid).c_str()) ,
                                                                               touser);
                                 jobject listadd1 = env->CallStaticObjectMethod(Function , map ,
                                                                                env->NewStringUTF(
@@ -1299,7 +1343,8 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listdd2 = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "status") ,
-                                                                              from_status ,listadd1);
+                                                                              from_status ,
+                                                                              listadd1);
 
 
                                 env->CallBooleanMethod(list , addMethod , listdd2);
@@ -1310,18 +1355,22 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listadd = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "table_id") ,
-                                                                             env->NewStringUTF(to_string(friendtableid).c_str())  ,
+                                                                              env->NewStringUTF(
+                                                                                      to_string(
+                                                                                              friendtableid).c_str()) ,
                                                                               fromuser);
                                 jobject listadd1 = env->CallStaticObjectMethod(Function , map ,
                                                                                env->NewStringUTF(
                                                                                        "page_friend_id") ,
                                                                                env->NewStringUTF(
-                                                                                       to_string(pagefriendtableid).c_str()) ,listadd);
+                                                                                       to_string(
+                                                                                               pagefriendtableid).c_str()) ,
+                                                                               listadd);
 
                                 jobject listdd2 = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "status") ,
-                                                                                     to_status ,listadd1);
+                                                                              to_status , listadd1);
 
                                 env->CallBooleanMethod(list , addMethod , listdd2);
                             }
@@ -1380,9 +1429,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                     env->NewStringUTF("friend"))) {
 
                             jint friendtableid = (jint) env->CallIntMethod(friendobject ,
-                                                                                    getInt ,
-                                                                                    env->NewStringUTF(
-                                                                                            "id"));
+                                                                           getInt ,
+                                                                           env->NewStringUTF(
+                                                                                   "id"));
 
                             jint pagefriendtableid = (jint) env->CallIntMethod(tempjsonobject ,
                                                                                getInt ,
@@ -1413,7 +1462,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listadd = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "table_id") ,
-                                                                             env->NewStringUTF( to_string(friendtableid).c_str() ),
+                                                                              env->NewStringUTF(
+                                                                                      to_string(
+                                                                                              friendtableid).c_str()) ,
                                                                               touser);
                                 jobject listadd1 = env->CallStaticObjectMethod(Function , map ,
                                                                                env->NewStringUTF(
@@ -1432,7 +1483,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                 jobject listadd = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "table_id") ,
-                                                                              env->NewStringUTF(to_string(friendtableid).c_str()) ,
+                                                                              env->NewStringUTF(
+                                                                                      to_string(
+                                                                                              friendtableid).c_str()) ,
                                                                               fromuser);
                                 jobject listadd1 = env->CallStaticObjectMethod(Function , map ,
                                                                                env->NewStringUTF(
@@ -1503,45 +1556,61 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 jstring result = (jstring) env->CallObjectMethod(jsonobject , getString ,
                                                                  env->NewStringUTF("response"));
                 if (jstring2string(env , result) == "Successfully changed") {
-                    jclass UserVerificationactivity = env->FindClass("com/horofbd/MeCloak/UserVerificationActivity");
-                    jmethodID setText = env->GetStaticMethodID(UserVerificationactivity,"setNewName","()V");
-                    env->CallStaticVoidMethod(UserVerificationactivity,setText);
-                } else{
-                    showToast(env,context,env->NewStringUTF("Name Change Failed!"));
+                    jclass UserVerificationactivity = env->FindClass(
+                            "com/horofbd/MeCloak/UserVerificationActivity");
+                    jmethodID setText = env->GetStaticMethodID(UserVerificationactivity ,
+                                                               "setNewName" , "()V");
+                    env->CallStaticVoidMethod(UserVerificationactivity , setText);
+                } else {
+                    showToast(env , context , env->NewStringUTF("Name Change Failed!"));
                 }
 
                 break;
             }
             case 18: {
-                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
+                if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
                     jstring result = (jstring) env->CallObjectMethod(jsonobject , getString ,
                                                                      env->NewStringUTF("response"));
                     if (jstring2string(env , result) == "Successfully Updated") {
-                        jclass UserVerificationactivity = env->FindClass("com/horofbd/MeCloak/UserVerificationActivity");
-                        jmethodID setText = env->GetStaticMethodID(UserVerificationactivity,"setProfilePicture","()V");
-                        env->CallStaticVoidMethod(UserVerificationactivity,setText);
-                    } else{
-                        showToast(env,context,env->NewStringUTF("Iamge Upload or Change Failed!"));
+                        jclass UserVerificationactivity = env->FindClass(
+                                "com/horofbd/MeCloak/UserVerificationActivity");
+                        jmethodID setText = env->GetStaticMethodID(UserVerificationactivity ,
+                                                                   "setProfilePicture" , "()V");
+                        env->CallStaticVoidMethod(UserVerificationactivity , setText);
+                    } else {
+                        showToast(env , context ,
+                                  env->NewStringUTF("Iamge Upload or Change Failed!"));
                     }
-                } else{
-                    showToast(env,context,env->NewStringUTF("Iamge Upload or Change Failed!"));
+                } else {
+                    showToast(env , context , env->NewStringUTF("Iamge Upload or Change Failed!"));
                 }
 
                 break;
-            }case 19:{
+            }
+            case 19: {
                 if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
                     showToast(env , context , env->NewStringUTF("Seal Successfull!"));
                 } else {
                     showToast(env , context , env->NewStringUTF("Error occured!"));
                 }
                 break;
-            }
+                }
         }
     } else if (requestcode == 16) {
         jclass Tutorial = env->FindClass("com/horofbd/MeCloak/TutorialActivity");
         jmethodID setUpText = env->GetStaticMethodID(Tutorial , "setTextData" ,
                                                      "(Ljava/lang/String;)V");
         env->CallStaticVoidMethod(Tutorial , setUpText , response);
+    } else if(requestcode == 20){
+       jmethodID writeToFile = env->GetStaticMethodID(Function,"writeToFile", "(Ljava/lang/String;Landroid/content/Context;Ljava/lang/String;)V");
+       env->CallStaticVoidMethod(Function,writeToFile,response,context,env->NewStringUTF("private.key"));
+       dismissProgressBar(env);
+    } else if(requestcode == 21){
+        jmethodID writeToFile = env->GetStaticMethodID(Function,"writeToFile", "(Ljava/lang/String;Landroid/content/Context;Ljava/lang/String;)V");
+        string name = publickeyname+".key";
+        printlogcat(env,"name",name);
+        env->CallStaticVoidMethod(Function,writeToFile,response,context,env->NewStringUTF(name.c_str()));
+        dismissProgressBar(env);
     }
 
 }
@@ -1883,7 +1952,10 @@ Java_com_horofbd_MeCloak_NotificationActivity_getLoginInfo(JNIEnv *env , jclass 
     return getSharedPreference(env , key);
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_horofbd_MeCloak_MainActivity_InitLinks(JNIEnv *env , jclass clazz) {
+Java_com_horofbd_MeCloak_MainActivity_InitLinks(JNIEnv *env , jclass clazz,jobject context) {
+    jmethodID initcerts = env->GetStaticMethodID(Function,"INITCRTS","(Landroid/content/Context;)V");
+    env->CallStaticVoidMethod(Function,initcerts,context);
+
     initver(env);
     SetUpLinks(env);
 }extern "C"
@@ -2002,17 +2074,77 @@ Java_com_horofbd_MeCloak_UserVerificationActivity_UploadFile(JNIEnv *env , jclas
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_UserVerificationActivity_ImageRequest(JNIEnv *env , jclass clazz ,
-                                                               jobject image_response ,jobject imageview,
+                                                               jobject image_response ,
+                                                               jobject imageview ,
                                                                jstring request_type , jstring link ,
-                                                               jobject json_object,jint requestcode) {
-    jmethodID ImageRequest = env->GetStaticMethodID(Function,"ImageRequest", "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
-    env->CallStaticVoidMethod(Function,ImageRequest,image_response,imageview,request_type,link,json_object,requestcode);
+                                                               jobject json_object ,
+                                                               jint requestcode) {
+    jmethodID ImageRequest = env->GetStaticMethodID(Function , "ImageRequest" ,
+                                                    "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
+    env->CallStaticVoidMethod(Function , ImageRequest , image_response , imageview , request_type ,
+                              link , json_object , requestcode);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_MainActivity_ImageRequest(JNIEnv *env , jclass clazz ,
-                                                   jobject image_response,jobject imageview, jstring request_type ,
+                                                   jobject image_response , jobject imageview ,
+                                                   jstring request_type ,
                                                    jstring link , jobject json_object ,
                                                    jint requestcode) {
-    jmethodID ImageRequest = env->GetStaticMethodID(Function,"ImageRequest", "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
-    env->CallStaticVoidMethod(Function,ImageRequest,image_response,imageview,request_type,link,json_object,requestcode);
+    jmethodID ImageRequest = env->GetStaticMethodID(Function , "ImageRequest" ,
+                                                    "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
+    env->CallStaticVoidMethod(Function , ImageRequest , image_response , imageview , request_type ,
+                              link , json_object , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_StartActivity(JNIEnv *env , jclass clazz ,
+                                                       jobject context , jstring activity ,
+                                                       jstring data) {
+    startActivity(env , context , jstring2string(env , activity) , jstring2string(env , data));
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_globalRequest(JNIEnv *env , jclass clazz ,
+                                                       jobject server_response ,
+                                                       jstring requesttype , jstring link ,
+                                                       jobject json_object , jint requestcode ,
+                                                       jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_InitLinks(JNIEnv *env , jclass clazz) {
+    initver(env);
+    SetUpLinks(env);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_CheckResponse(JNIEnv *env , jclass clazz ,
+                                                       jobject server_response , jobject context ,
+                                                       jstring response , jint requestcode) {
+
+    CheckResponse(env , server_response , context , response , requestcode);
+
+}extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_getLoginInfo(JNIEnv *env , jclass clazz , jstring key) {
+
+    return getSharedPreference(env , key);
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_ImageRequest(JNIEnv *env , jclass clazz ,
+                                                      jobject image_response , jobject image_view ,
+                                                      jstring request_type , jstring link ,
+                                                      jobject json_object , jint requestcode) {
+    jmethodID ImageRequest = env->GetStaticMethodID(Function , "ImageRequest" ,
+                                                    "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
+    env->CallStaticVoidMethod(Function , ImageRequest , image_response , image_view , request_type ,
+                              link , json_object , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_publicKeyRequest(JNIEnv *env , jclass clazz ,
+                                                          jobject server_response , jstring name ,
+                                                          jstring requesttype , jstring link ,
+                                                          jobject json_object , jint requestcode ,
+                                                          jobject context) {
+    publickeyname = jstring2string(env,name);
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
 }

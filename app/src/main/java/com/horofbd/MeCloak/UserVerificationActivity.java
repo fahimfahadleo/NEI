@@ -58,10 +58,12 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     TextView initialize;
     static CircleImageView profilepicture;
     static TextView username;
+    ImageView editname,editphone;
+    CircleImageView logout;
     CardView view;
     static PopupWindow popupWindow;
     CardView changeprofilepictureview, logoutview, changeavatarview, changenameveiw, changephonenumberview;
-    TextView changeprofilepicture, logout, changeavatar, changename, changephonenumber;
+    TextView changeprofilepicture, changeavatar, changename, changephonenumber;
 
 
     String pass;
@@ -230,7 +232,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         changeprofilepictureview = findViewById(R.id.profilepictrechangeview);
         changeavatar = findViewById(R.id.changeavatar);
         changeavatarview = findViewById(R.id.changeavatarview);
-        logout = findViewById(R.id.logout);
+        logout = findViewById(R.id.profilelogout);
         logoutview = findViewById(R.id.logoutview);
         drawerLayout = findViewById(R.id.drawer);
         changephonenumber = findViewById(R.id.changenumber);

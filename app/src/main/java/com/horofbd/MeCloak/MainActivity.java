@@ -35,8 +35,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.SASLAuthentication;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat2.Chat;
+import org.jivesoftware.smack.chat2.ChatManager;
+import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.chat2.OutgoingChatMessageListener;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.MessageBuilder;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.sasl.SASLMechanism;
+import org.jivesoftware.smack.util.ByteUtils;
+import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
+import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.Jid;
 import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
@@ -44,7 +63,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.function.Function;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.transform.Source;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -68,13 +89,13 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
     public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
 
-    static native void InitLinks();
+    static native void InitLinks(Context context);
 
     static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
     public static native String getLoginInfo(String key);
 
-    static native void ImageRequest(ImageResponse imageResponse,CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
+    static native void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
 
 
     CircleImageView profileimage, newmessage;
@@ -92,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     LinearLayout searchlayout;
     static ServerResponse serverResponse;
     SwipeRefreshLayout swipeRefreshLayout;
+    public static AbstractXMPPConnection connection;
 
 
     @Override
@@ -160,8 +182,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     }
 
     static Context context;
-
-
     ServerRequest serverRequest;
 
 
@@ -188,9 +208,11 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         serverRequest.ServerRequest(this);
         serverResponse = this;
         swipeRefreshLayout = findViewById(R.id.swipelayout);
-        InitLinks();
+        new Functions(this);
+        InitLinks(this);
 
-        ImageRequest(this, profileimage,"GET", Important.getViewprofilepicture(), new JSONObject(), 1);
+
+        ImageRequest(this, profileimage, "GET", Important.getViewprofilepicture(), new JSONObject(), 1);
 
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -228,6 +250,11 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        if (!Functions.fileExists("private.key", this)) {
+            globalRequest(this, "GET", Important.getPrivatekey(), new JSONObject(), 20, context);
+        }
+
 
         SettingsView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -321,6 +348,9 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                 .MODE_NIGHT_NO);
 
 
+        new ConnnectXmpp(this, getLoginInfo("phone_no"), getLoginInfo("sec"));
+
+
     }
 
     static ListviewAdapter adapter;
@@ -328,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
         Log.e("MainResponse", response);
+        Functions.dismissDialogue();
         CheckResponse(this, this, response, requestcode);
 
     }
@@ -362,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("user_id", id);
-            globalRequest(serverResponse, "POST", Important.getBlock_friend(), jsonObject, 7,context);
+            globalRequest(serverResponse, "POST", Important.getBlock_friend(), jsonObject, 7, context);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -382,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     }
 
     @Override
-    public void onImageResponse(Response response, int code, int requestcode,CircleImageView imageView) throws JSONException {
+    public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) throws JSONException {
         InputStream inputStream = response.body().byteStream();
         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
         runOnUiThread(new Runnable() {
@@ -417,12 +448,12 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         }
 
         @Override
-        protected void imageViewSetUp(String id,CircleImageView imageView) {
-            if(!id.equals("id")){
+        protected void imageViewSetUp(String id, CircleImageView imageView) {
+            if (!id.equals("id")) {
                 JSONObject jsonObject = new JSONObject();
                 try {
-                    jsonObject.put("friend",id);
-                    ImageRequest(this, imageView,"GET", Important.getViewprofilepicture(), jsonObject, 1);
+                    jsonObject.put("friend", id);
+                    ImageRequest(this, imageView, "GET", Important.getViewprofilepicture(), jsonObject, 1);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -433,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         @Override
         protected void longPressOptions(JSONObject jsonObject) {
 
-            Log.e("jsonobject",jsonObject.toString());
+            Log.e("jsonobject", jsonObject.toString());
 
             mutenotificationview.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -480,17 +511,17 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                 @Override
                 public void onClick(View view) {
                     Dialog dialog = new Dialog(context);
-                    View view1 = ((LayoutInflater)context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.requireprofilepassword,null,false);
+                    View view1 = ((LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.requireprofilepassword, null, false);
                     TextView canclebutton = view1.findViewById(R.id.cancelbutton);
                     TextView sealbutton = view1.findViewById(R.id.sealbutton);
                     EditText profilepassword = view1.findViewById(R.id.password);
 
                     try {
                         String s = jsonObject.getString("status");
-                        if(s.equals("8")){
+                        if (s.equals("8")) {
                             sealbutton.setText("Unseal");
-                        }else {
-                            Log.e("false",s);
+                        } else {
+                            Log.e("false", s);
                             sealbutton.setText("Seal");
                         }
                     } catch (JSONException e) {
@@ -499,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                     canclebutton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if(dialog.isShowing()){
+                            if (dialog.isShowing()) {
                                 dialog.dismiss();
                             }
                         }
@@ -508,23 +539,23 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                         @Override
                         public void onClick(View view) {
                             String userpassword = profilepassword.getText().toString();
-                            if(!TextUtils.isEmpty(userpassword)){
+                            if (!TextUtils.isEmpty(userpassword)) {
                                 JSONObject jsonObject1 = new JSONObject();
                                 try {
-                                    jsonObject1.put("page_friend_id",jsonObject.getString("page_friend_id"));
-                                    jsonObject1.put("password_confirmation",userpassword);
-                                    if(jsonObject.getString("status").equals("8")){
-                                        jsonObject1.put("unseal","1");
-                                    }else {
-                                        jsonObject1.put("seal","1");
+                                    jsonObject1.put("page_friend_id", jsonObject.getString("page_friend_id"));
+                                    jsonObject1.put("password_confirmation", userpassword);
+                                    if (jsonObject.getString("status").equals("8")) {
+                                        jsonObject1.put("unseal", "1");
+                                    } else {
+                                        jsonObject1.put("seal", "1");
                                     }
 
-                                    globalRequest(serverResponse,"POST",Important.getIgnore_friend(),jsonObject1,19,context);
+                                    globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
 
-                            }else {
+                            } else {
                                 profilepassword.setError("Field can not be empty!");
                                 profilepassword.requestFocus();
                             }
@@ -541,17 +572,17 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                 @Override
                 public void onClick(View view) {
                     Dialog dialog = new Dialog(context);
-                    View view1 = ((LayoutInflater)context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.requireprofilepassword,null,false);
+                    View view1 = ((LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.requireprofilepassword, null, false);
                     TextView canclebutton = view1.findViewById(R.id.cancelbutton);
                     TextView sealbutton = view1.findViewById(R.id.sealbutton);
                     EditText profilepassword = view1.findViewById(R.id.password);
 
                     try {
                         String s = jsonObject.getString("status");
-                        if(s.equals("8")){
+                        if (s.equals("8")) {
                             sealbutton.setText("Unseal");
-                        }else {
-                            Log.e("false",s);
+                        } else {
+                            Log.e("false", s);
                             sealbutton.setText("Seal");
                         }
                     } catch (JSONException e) {
@@ -560,7 +591,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                     canclebutton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if(dialog.isShowing()){
+                            if (dialog.isShowing()) {
                                 dialog.dismiss();
                             }
                         }
@@ -569,23 +600,23 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                         @Override
                         public void onClick(View view) {
                             String userpassword = profilepassword.getText().toString();
-                            if(!TextUtils.isEmpty(userpassword)){
+                            if (!TextUtils.isEmpty(userpassword)) {
                                 JSONObject jsonObject1 = new JSONObject();
                                 try {
-                                    jsonObject1.put("page_friend_id",jsonObject.getString("page_friend_id"));
-                                    jsonObject1.put("password_confirmation",userpassword);
-                                    if(jsonObject.getString("status").equals("8")){
-                                        jsonObject1.put("unseal","1");
-                                    }else {
-                                        jsonObject1.put("seal","1");
+                                    jsonObject1.put("page_friend_id", jsonObject.getString("page_friend_id"));
+                                    jsonObject1.put("password_confirmation", userpassword);
+                                    if (jsonObject.getString("status").equals("8")) {
+                                        jsonObject1.put("unseal", "1");
+                                    } else {
+                                        jsonObject1.put("seal", "1");
                                     }
 
-                                    globalRequest(serverResponse,"POST",Important.getIgnore_friend(),jsonObject1,19,context);
+                                    globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
 
-                            }else {
+                            } else {
                                 profilepassword.setError("Field can not be empty!");
                                 profilepassword.requestFocus();
                             }
@@ -633,21 +664,18 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         }
 
         @Override
-        public void showDialogue() {}
-
+        public void showDialogue() {
+        }
 
 
         @Override
-        public void onImageResponse(Response response, int code, int requestcode,CircleImageView imageView) throws JSONException {
+        public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) throws JSONException {
 
             InputStream inputStream = response.body().byteStream();
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            ((Activity)context).runOnUiThread(new Runnable() {
+            ((Activity) context).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
-
-
 
 
                     if (bitmap != null) {
@@ -655,12 +683,11 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                         Log.e("bitmap", bitmap.toString());
                         imageView.setImageBitmap(bitmap);
 
-                    }else {
-                        Log.e("bitmap","null");
+                    } else {
+                        Log.e("bitmap", "null");
                     }
                 }
             });
-
 
 
         }
@@ -673,5 +700,104 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
     void setImage(ImageView imageView, Bitmap bitmap) {
         imageView.setImageBitmap(bitmap);
+    }
+
+
+    static class ConnnectXmpp extends XmppConnection implements IncomingChatMessageListener, OutgoingChatMessageListener {
+        public ConnnectXmpp(Context context, String userid, String pass) {
+            super(context, userid, pass);
+           connectionListener = new ConnectionListener() {
+                @Override
+                public void connected(XMPPConnection xmppConnection) {
+                    Log.e("xmpp", "connected");
+                    MainActivity.connection = mConnection;
+                    ChatManager chatManager = ChatManager.getInstanceFor(mConnection);
+                    chatManager.addOutgoingListener(ConnnectXmpp.this);
+                    chatManager.addIncomingListener(ConnnectXmpp.this);
+
+                    try {
+                        SASLAuthentication.registerSASLMechanism(new SASLMechanism() {
+                            @Override
+                            protected void authenticateInternal(CallbackHandler callbackHandler) {
+
+                            }
+
+                            @Override
+                            protected byte[] getAuthenticationText() {
+                                byte[] authcid = toBytes('\u0000' + this.authenticationId);
+                                byte[] passw = toBytes('\u0000' + this.password);
+                                return ByteUtils.concat(authcid, passw);
+                            }
+
+                            @Override
+                            public String getName() {
+                                return "PLAIN";
+                            }
+
+                            @Override
+                            public int getPriority() {
+                                return 410;
+                            }
+
+                            @Override
+                            public void checkIfSuccessfulOrThrow() {
+
+                            }
+
+                            @Override
+                            protected SASLMechanism newInstance() {
+                                return this;
+                            }
+                        });
+                        mConnection.login();
+                    } catch (XMPPException e) {
+                        ((Activity)context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, "Incorrect username or password", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        e.printStackTrace();
+                    } catch (SmackException | IOException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void authenticated(XMPPConnection xmppConnection, boolean b) {
+                    Log.e("xmpp", "authenticated");
+//                    ((Activity)context).runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(context, "Logged in successfully...", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
+                }
+
+                @Override
+                public void connectionClosed() {
+                    Log.e("xmpp", "connection closed");
+                }
+
+                @Override
+                public void connectionClosedOnError(Exception e) {
+                    if (e != null) {
+                        Log.e("xmpp", "cononection closed on error= " + e.getMessage());
+                    }
+                }
+            };
+        }
+
+        @Override
+        public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
+            Log.e("mainincomming",message.getBody());
+        }
+
+        @Override
+        public void newOutgoingMessage(EntityBareJid to, MessageBuilder messageBuilder, Chat chat) {
+            Message message = messageBuilder.build();
+            Log.e("mainoutgoing",message.getBody());
+
+        }
     }
 }

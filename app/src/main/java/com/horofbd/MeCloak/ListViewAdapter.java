@@ -9,12 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
-import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +22,6 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.content.Context.ALARM_SERVICE;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ViewHolder> {
@@ -78,7 +74,19 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                         public void onClick(View view) {
 
                             Intent i = new Intent(context, ShowUserMessage.class);
-                            i.putExtra("data", listdata.get(position).toString());
+
+                            try {
+                                i.putExtra("id",myListData.getString("id"));
+                                i.putExtra("name",myListData.getString("name"));
+                                i.putExtra("phone_no",myListData.getString("phone_no"));
+                                i.putExtra("table_id",myListData.getString("table_id"));
+                                i.putExtra("page_friend_id",myListData.getString("page_friend_id"));
+                                i.putExtra("status",myListData.getString("status"));
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
                             ((Activity) context).startActivity(i);
 
 

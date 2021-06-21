@@ -22,20 +22,37 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
@@ -64,41 +81,42 @@ public class Functions {
     }
 
 
-    public static void CloseActivity(Context context){
-        ((Activity)context).finish();
+    public static void CloseActivity(Context context) {
+        ((Activity) context).finish();
     }
 
 
     static Dialog dialog;
 
-    public static void showProgress(Context context){
+    public static void showProgress(Context context) {
         dialog = new Dialog(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View vi = inflater.inflate(R.layout.progressbar,null,false);
+        View vi = inflater.inflate(R.layout.progressbar, null, false);
         dialog.setContentView(vi);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-        dialog.setCancelable(false);
-        Log.e("context",context.toString());
+     //   dialog.setCancelable(false);
+        Log.e("context", context.toString());
         dialog.show();
     }
 
-    public static void dismissDialogue(){
-        if(dialog!=null && dialog.isShowing()){
+    public static void dismissDialogue() {
+        if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
     }
 
 
-    public static JSONObject map(String title,String id,JSONObject jsonObject){
+    public static JSONObject map(String title, String id, JSONObject jsonObject) {
         try {
-            jsonObject.put(title,id);
+            jsonObject.put(title, id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return jsonObject;
     }
-    public static void Logcat(String tag,String s){
-        Log.e(tag,s);
+
+    public static void Logcat(String tag, String s) {
+        Log.e(tag, s);
     }
 
     public static void setSharedPreference(String key, String value) {
@@ -111,12 +129,13 @@ public class Functions {
         return preferences.getString(key, defaultvalue);
     }
 
-    public static String getIpAddress(Context context){
+    public static String getIpAddress(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         int ip = wifiInfo.getIpAddress();
         return Formatter.formatIpAddress(ip);
     }
+
     public static void ClearSharedPreference() {
         preferences.edit().clear().apply();
     }
@@ -232,7 +251,7 @@ public class Functions {
         MultipartBody.Builder builder = new MultipartBody.Builder();
         RequestBody body = null;
 
-        if (jsonObject.length()!=0) {
+        if (jsonObject.length() != 0) {
             Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
             while (iter.hasNext()) {
                 String key = iter.next();
@@ -244,15 +263,15 @@ public class Functions {
                     e.printStackTrace();
                 }
             }
-        }else {
+        } else {
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
             body = RequestBody.create(JSON, "{}");
         }
         Request request;
-        if(requestType == "GET"){
-            request = new Request.Builder().url(Link).method("GET",null).build();
-        }else {
-            request= new Request.Builder()
+        if (requestType.equals("GET")) {
+            request = new Request.Builder().url(Link).method("GET", null).build();
+        } else {
+            request = new Request.Builder()
                     .url(Link)
                     .method(requestType, body)
                     .build();
@@ -279,6 +298,7 @@ public class Functions {
             }
         });
     }
+
     private static void SetPrivateToken() {
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @NotNull
@@ -326,11 +346,11 @@ public class Functions {
 
         });
     }
+
     private static OkHttpClient getClient() {
         OkHttpClient client1 = null;
 
-        long expires = (Long.parseLong(Functions.getSharedPreference("expires_in", "0"))*1000)+Long.parseLong(Functions.getSharedPreference("login_time","0"));
-
+        long expires = (Long.parseLong(Functions.getSharedPreference("expires_in", "0")) * 1000) + Long.parseLong(Functions.getSharedPreference("login_time", "0"));
 
 
         if (expires - (expires - 10 * 60 * 1000) < 10 * 60 * 1000) {
@@ -349,10 +369,10 @@ public class Functions {
         } else if (System.currentTimeMillis() > expires) {
 
 
-            Log.e("Expiry",String.valueOf(Long.parseLong(Functions.getSharedPreference("expires_in","0"))*(long)1000));
-            Log.e("Expiry",Functions.getSharedPreference("login_time","0"));
-            Log.e("Expiry",String.valueOf(expires));
-            Log.e("currenttime",String.valueOf(System.currentTimeMillis()));
+            Log.e("Expiry", String.valueOf(Long.parseLong(Functions.getSharedPreference("expires_in", "0")) * (long) 1000));
+            Log.e("Expiry", Functions.getSharedPreference("login_time", "0"));
+            Log.e("Expiry", String.valueOf(expires));
+            Log.e("currenttime", String.valueOf(System.currentTimeMillis()));
 
 
             Log.e("expiry1111111111", "deri hoye geche");
@@ -397,9 +417,9 @@ public class Functions {
         builder.addFormDataPart("phone_no", phone);
         builder.addFormDataPart("password", password);
         builder.addFormDataPart("password_confirmation", confirmpassword);
-        builder.addFormDataPart("terms-conditions",termsandconditions);
-        builder.addFormDataPart("policy",policy);
-        Log.e("reference",reference);
+        builder.addFormDataPart("terms-conditions", termsandconditions);
+        builder.addFormDataPart("policy", policy);
+        Log.e("reference", reference);
         if (!reference.equals("")) {
             builder.addFormDataPart("ref", reference);
         }
@@ -433,22 +453,23 @@ public class Functions {
     }
 
 
-    public static String formattime(String time){
+    public static String formattime(String time) {
 
-        String timea = (String)android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss", System.currentTimeMillis());
+        String timea = (String) android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss", System.currentTimeMillis());
         return timea;
     }
-    public static void LoginRegisteredUser(ServerResponse serverResponse, String phone, String password,String link,String devicetype,String devicename,String deviceip,String devicetime, int requestcode) {
+
+    public static void LoginRegisteredUser(ServerResponse serverResponse, String phone, String password, String link, String devicetype, String devicename, String deviceip, String devicetime, int requestcode) {
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("phone_no", phone)
                 .addFormDataPart("password", password)
-                .addFormDataPart("device_type",devicetype)
-                .addFormDataPart("device_name",devicename)
-                .addFormDataPart("device_ip",deviceip)
-                .addFormDataPart("device_time",devicetime)
+                .addFormDataPart("device_type", devicetype)
+                .addFormDataPart("device_name", devicename)
+                .addFormDataPart("device_ip", deviceip)
+                .addFormDataPart("device_time", devicetime)
                 .build();
         Request request = new Request.Builder()
                 .url(link)
@@ -463,6 +484,7 @@ public class Functions {
                     jsonException.printStackTrace();
                 }
             }
+
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
@@ -475,15 +497,14 @@ public class Functions {
     }
 
 
-    public static void ShowToast(Context context,String message){
-        ((Activity)context).runOnUiThread(new Runnable() {
+    public static void ShowToast(Context context, String message) {
+        ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         });
     }
-
 
 
     public static boolean isJSONValid(String test) {
@@ -501,20 +522,18 @@ public class Functions {
         return true;
     }
 
-    public static String getCurrentTimeInMilliseconds(){
+    public static String getCurrentTimeInMilliseconds() {
         return String.valueOf(System.currentTimeMillis());
     }
 
 
-
-
-    public static void UploadFile(ServerResponse serverResponse, String requestType, String Link, File file,JSONObject jsonObject, int requestcode){
+    public static void UploadFile(ServerResponse serverResponse, String requestType, String Link, File file, JSONObject jsonObject, int requestcode) {
         OkHttpClient client = getClient();
 
         MultipartBody.Builder builder = new MultipartBody.Builder();
         RequestBody body = null;
 
-        if (jsonObject.length()!=0) {
+        if (jsonObject.length() != 0) {
             Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
             while (iter.hasNext()) {
                 String key = iter.next();
@@ -525,62 +544,62 @@ public class Functions {
                 }
             }
             builder.setType(MultipartBody.FORM);
-            builder.addFormDataPart("avatar",file.getName(),
+            builder.addFormDataPart("avatar", file.getName(),
                     RequestBody.create(MediaType.parse("application/octet-stream"),
                             file));
             body = builder.build();
-        }else {
+        } else {
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
             body = RequestBody.create(JSON, "{}");
         }
         Request request;
-        if(requestType.equals("GET")){
-            request = new Request.Builder().url(Link).method("GET",null).build();
-        }else {
-            request= new Request.Builder()
+        if (requestType.equals("GET")) {
+            request = new Request.Builder().url(Link).method("GET", null).build();
+        } else {
+            request = new Request.Builder()
                     .url(Link)
                     .method(requestType, body)
                     .build();
         }
 
-       client.newCall(request).enqueue(new Callback() {
-           @Override
-           public void onFailure(@NotNull Call call, @NotNull IOException e) {
-               try {
-                   serverResponse.onFailure(e.getMessage());
-               } catch (JSONException jsonException) {
-                   jsonException.printStackTrace();
-               }
-           }
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                try {
+                    serverResponse.onFailure(e.getMessage());
+                } catch (JSONException jsonException) {
+                    jsonException.printStackTrace();
+                }
+            }
 
-           @Override
-           public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-               try {
-                   serverResponse.onResponse(response.body().string(),response.code(),requestcode);
-               } catch (JSONException e) {
-                   e.printStackTrace();
-               }
-           }
-       });
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try {
+                    serverResponse.onResponse(response.body().string(), response.code(), requestcode);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 
-    public static void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode){
+    public static void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode) {
         OkHttpClient client = getClient();
         Request request;
         HttpUrl.Builder httpBuilder = HttpUrl.parse(Link).newBuilder();
-            if (jsonObject.length()!=0) {
-                Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
-                while (iter.hasNext()) {
-                    String key = iter.next();
-                    try {
-                        httpBuilder.addQueryParameter(key,jsonObject.getString(key));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+        if (jsonObject.length() != 0) {
+            Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
+            while (iter.hasNext()) {
+                String key = iter.next();
+                try {
+                    httpBuilder.addQueryParameter(key, jsonObject.getString(key));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
-            request = new Request.Builder().url(httpBuilder.build()).method("GET",null).build();
+        }
+        request = new Request.Builder().url(httpBuilder.build()).method("GET", null).build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -595,12 +614,196 @@ public class Functions {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    imageResponse.onImageResponse(response, response.code(),requestcode,imageView);
+                    imageResponse.onImageResponse(response, response.code(), requestcode, imageView);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
+    }
+
+
+    public static void writeToFile(String data, Context context, String name) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(name, Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+
+    public static String readFromFile(Context context, String name) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput(name);
+
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append("\n").append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        } catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
+    }
+
+    public static boolean fileExists(String name, Context context) {
+        try {
+            context.openFileInput(name);
+            return true;
+        } catch (FileNotFoundException e) {
+            return false;
+        }
+    }
+
+
+    public static X509TrustManager getTrustFactory(Context context) {
+        return trustfactory;
+    }
+
+
+    public static void INITCRTS(Context context) {
+        ArrayList<Integer> certs = new ArrayList<>();
+        certs.add(R.raw.root);
+        certs.add(R.raw.network);
+        certs.add(R.raw.component);
+        for (int i : certs) {
+            CertificateFactory cf = null;
+            try {
+                cf = CertificateFactory.getInstance("X.509");
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            }
+            InputStream caInput = null;
+            caInput = new BufferedInputStream(context.getResources().openRawResource(i));
+            Certificate ca = null;
+            try {
+                try {
+                    if (cf != null) {
+                        ca = cf.generateCertificate(caInput);
+                        try {
+                            X509Certificate myCert = (X509Certificate) ca;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.e("certificatefactiroy", "null");
+                    }
+                } catch (CertificateException e) {
+                    Log.e("certificateerror", e.getMessage());
+                }
+            } finally {
+                try {
+                    if (caInput != null) {
+                        caInput.close();
+                    } else {
+                        Log.e("error", "cainputnull");
+                    }
+                } catch (IOException e) {
+                    Log.e("ioerror", e.getMessage());
+                }
+            }
+            if (ca != null) {
+                setTrust(ca);
+            } else {
+                Log.e("crtname", String.valueOf(i));
+                //Log.e("certificate",String.valueOf(crt));
+            }
+        }
+    }
+
+
+    static SSLContext sslContext;
+    static X509TrustManager trustfactory;
+
+
+    static void setTrust(Certificate ca) {
+        // Create a KeyStore containing our trusted CAs
+        String keyStoreType = KeyStore.getDefaultType();
+        KeyStore keyStore = null;
+        try {
+            keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            trustfactory = getManager(tmf);
+
+            // Create an SSLContext that uses our TrustManager
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, tmf.getTrustManagers(), null);
+            sslContext = context;
+        } catch (KeyStoreException | KeyManagementException | NoSuchAlgorithmException | IOException | CertificateException e) {
+            Log.e("error", e.getMessage());
+        }
+    }
+
+    static X509TrustManager getManager(TrustManagerFactory tmf) throws NoSuchAlgorithmException, KeyManagementException {
+        X509TrustManager defaultTm = null;
+        for (TrustManager tm : tmf.getTrustManagers()) {
+            if (tm instanceof X509TrustManager) {
+                defaultTm = (X509TrustManager) tm;
+                break;
+            }
+        }
+        X509TrustManager myTm = null;
+        for (TrustManager tm : tmf.getTrustManagers()) {
+            if (tm instanceof X509TrustManager) {
+                myTm = (X509TrustManager) tm;
+                break;
+            }
+        }
+        final X509TrustManager finalDefaultTm = defaultTm;
+        final X509TrustManager finalMyTm = myTm;
+        X509TrustManager customTm = new X509TrustManager() {
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                // If you're planning to use client-cert auth,
+                // merge results from "defaultTm" and "myTm".
+                return finalDefaultTm.getAcceptedIssuers();
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain,
+                                           String authType) throws CertificateException {
+                try {
+                    finalMyTm.checkServerTrusted(chain, authType);
+                } catch (CertificateException e) {
+                    // This will throw another CertificateException if this fails too.
+                    finalDefaultTm.checkServerTrusted(chain, authType);
+                }
+            }
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain,
+                                           String authType) throws CertificateException {
+                finalDefaultTm.checkClientTrusted(chain, authType);
+            }
+        };
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, new TrustManager[]{customTm}, null);
+        SSLContext.setDefault(sslContext);
+        return customTm;
     }
 
 

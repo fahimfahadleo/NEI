@@ -1,7 +1,11 @@
 package com.horofbd.MeCloak;
 
 public class Important {
-    protected static String host;
+    protected static String baseUrl;
+    protected static String xmppHost;
+    protected static String xmppPort;
+    protected static String xmppResource;
+
     ////////advertise/////////////
     protected static String advertise_links;
     protected static String advertise_watch;
@@ -26,6 +30,8 @@ public class Important {
     protected static String update_page_security_question;
     protected static String create_page_recovery_certificate;
     protected static String token_refresh;
+    protected static String publickey;
+    protected static String privatekey;
 
     //////////Friend//////////////////
     protected static String search_friend;
@@ -82,6 +88,47 @@ public class Important {
 
     /////////notification////////////
     protected static String getNotification;
+
+
+
+    public static String getPublickey() {
+        return publickey;
+    }
+
+    public static void setPublickey(String publickey) {
+        Important.publickey = publickey;
+    }
+
+    public static String getPrivatekey() {
+        return privatekey;
+    }
+
+    public static void setPrivatekey(String privatekey) {
+        Important.privatekey = privatekey;
+    }
+    public static String getXmppHost() {
+        return xmppHost;
+    }
+
+    public static void setXmppHost(String xmppHost) {
+        Important.xmppHost = xmppHost;
+    }
+
+    public static String getXmppPort() {
+        return xmppPort;
+    }
+
+    public static void setXmppPort(String xmppPort) {
+        Important.xmppPort = xmppPort;
+    }
+
+    public static String getXmppResource() {
+        return xmppResource;
+    }
+
+    public static void setXmppResource(String xmppResource) {
+        Important.xmppResource = xmppResource;
+    }
 
 
 
@@ -163,12 +210,12 @@ public class Important {
         Important.getNotification = getNotification;
     }
 
-    public static String getHost() {
-        return host;
+    public static String getBaseUrl() {
+        return baseUrl;
     }
 
-    public static void setHost(String host) {
-        Important.host = host;
+    public static void setBaseUrl(String baseUrl) {
+        Important.baseUrl = baseUrl;
     }
 
     public static String getAdvertise_links() {
