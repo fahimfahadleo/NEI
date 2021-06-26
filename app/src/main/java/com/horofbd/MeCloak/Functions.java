@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Base64;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.apache.commons.codec.DecoderException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,24 +33,46 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyFactory;
 import java.security.KeyManagementException;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -65,6 +89,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.logging.LoggingEventListener;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
@@ -74,10 +99,13 @@ public class Functions {
     static Context context;
     static SharedPreferences preferences;
     public static boolean isActive = false;
+    private final String sSs ="MessagePreference";
 
     public Functions(Context context) {
         Functions.context = context;
-        preferences = context.getSharedPreferences("MessagePreference", MODE_PRIVATE);
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+
     }
 
 
@@ -94,7 +122,7 @@ public class Functions {
         View vi = inflater.inflate(R.layout.progressbar, null, false);
         dialog.setContentView(vi);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-     //   dialog.setCancelable(false);
+        //   dialog.setCancelable(false);
         Log.e("context", context.toString());
         dialog.show();
     }
@@ -122,7 +150,12 @@ public class Functions {
     public static void setSharedPreference(String key, String value) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, value);
+        editor.commit();
         editor.apply();// commit is important here.
+    }
+
+    public static boolean dataContains(String key){
+        return preferences.contains(key);
     }
 
     public static String getSharedPreference(String key, String defaultvalue) {
@@ -189,6 +222,52 @@ public class Functions {
         Log.v(TAG, "Provided digest: " + md5);
 
         return calculatedDigest.equalsIgnoreCase(md5);
+    }
+
+    public static String md5(final String s) {
+        final String MD5 = "MD5";
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest
+                    .getInstance(MD5);
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuilder hexString = new StringBuilder();
+            for (byte aMessageDigest : messageDigest) {
+                String h = Integer.toHexString(0xFF & aMessageDigest);
+                while (h.length() < 2)
+                    h = "0" + h;
+                hexString.append(h);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String Sha1(String clearString)
+    {
+        try
+        {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+            messageDigest.update(clearString.getBytes("UTF-8"));
+            byte[] bytes = messageDigest.digest();
+            StringBuilder buffer = new StringBuilder();
+            for (byte b : bytes)
+            {
+                buffer.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+            }
+            return buffer.toString();
+        }
+        catch (Exception ignored)
+        {
+            ignored.printStackTrace();
+            return null;
+        }
     }
 
     public static String calculateMD5(File updateFile) {
@@ -632,6 +711,7 @@ public class Functions {
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
+
 
 
     public static String readFromFile(Context context, String name) {

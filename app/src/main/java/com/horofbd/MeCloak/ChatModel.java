@@ -2,7 +2,21 @@ package com.horofbd.MeCloak;
 
 
 public class ChatModel {
-    String body,boundage,timestamp,encryptionpass,expiry;
+    String body;
+    String boundage;
+    String timestamp;
+    String hash1;
+    String hash2;
+    String expiry;
+    String publicencription;
+
+    public String getPublicencription() {
+        return publicencription;
+    }
+
+    public void setPublicencription(String publicencription) {
+        this.publicencription = publicencription;
+    }
 
     public String getBody() {
         return body;
@@ -28,12 +42,20 @@ public class ChatModel {
         this.timestamp = timestamp;
     }
 
-    public String getEncryptionpass() {
-        return encryptionpass;
+    public String getHash1() {
+        return hash1;
     }
 
-    public void setEncryptionpass(String encryptionpass) {
-        this.encryptionpass = encryptionpass;
+    public void setHash1(String hash1) {
+        this.hash1 = hash1;
+    }
+
+    public String getHash2() {
+        return hash2;
+    }
+
+    public void setHash2(String hash2) {
+        this.hash2 = hash2;
     }
 
     public String getExpiry() {

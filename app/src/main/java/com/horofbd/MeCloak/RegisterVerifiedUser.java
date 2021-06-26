@@ -17,7 +17,6 @@ import org.json.JSONObject;
 public class RegisterVerifiedUser extends AppCompatActivity implements ServerResponse {
     EditText password, confirmpassword,pagename;
     TextView proceed;
-    DatabaseHelper helper;
 
      static {
          System.loadLibrary("native-lib");
@@ -41,7 +40,7 @@ public class RegisterVerifiedUser extends AppCompatActivity implements ServerRes
         confirmpassword = findViewById(R.id.confirmpassword);
         proceed = findViewById(R.id.proceedbutton);
         pagename =findViewById(R.id.pagename);
-        helper = new DatabaseHelper(this);
+
         new Functions(this);
 
         InitLinks();
@@ -72,7 +71,7 @@ public class RegisterVerifiedUser extends AppCompatActivity implements ServerRes
                         e.printStackTrace();
                     }
 
-                    helper.setUserPassword(pass);
+
 
                 }
 

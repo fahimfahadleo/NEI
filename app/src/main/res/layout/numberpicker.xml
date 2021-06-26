@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/titlelayout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="horizontal">
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="@dimen/_35sdp"
+            android:layout_height="@dimen/_35sdp"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:visibility="invisible"
+            android:padding="@dimen/_3sdp"
+            android:src="@drawable/ic_launcher_background"
+            app:civ_border_color="@color/oceanblue"
+            app:civ_border_width="2dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_38sdp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="center"
+            android:text="Worning"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@color/oceanblue" />
+
+        <ImageView
+            android:id="@+id/menubutton"
+            android:layout_width="@dimen/_38sdp"
+            android:layout_height="@dimen/_38sdp"
+            android:visibility="invisible"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/menu_white" />
+
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_32sdp"
+        android:hint="Expire Message After (min)"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:background="@drawable/edtshapewhite"
+        android:paddingTop="@dimen/_6sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:paddingBottom="@dimen/_6sdp"
+        android:textColorHint="@color/hintcolor"
+        android:paddingStart="@dimen/_16sdp"
+        android:id="@+id/timer"
+        android:inputType="number"
+        android:paddingEnd="@dimen/_16sdp"
+        android:textSize="@dimen/_12sdp"
+        android:textColor="@color/textcolor"
+        />
+
+    <TextView
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_32sdp"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/_16sdp"
+        android:background="@drawable/buttonbackgroundgreen"
+        android:gravity="center"
+        android:paddingStart="@dimen/_16sdp"
+        android:paddingEnd="@dimen/_16sdp"
+        android:text="Save"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14sdp" />
+
+
+</LinearLayout>

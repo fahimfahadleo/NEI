@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import org.apache.commons.codec.DecoderException;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SASLAuthentication;
@@ -50,6 +51,9 @@ import org.jivesoftware.smack.packet.MessageBuilder;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.sasl.SASLMechanism;
 import org.jivesoftware.smack.util.ByteUtils;
+import org.jivesoftware.smackx.omemo.signal.SignalCachingOmemoStore;
+import org.jivesoftware.smackx.omemo.signal.SignalFileBasedOmemoStore;
+import org.jivesoftware.smackx.omemo.signal.SignalOmemoService;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 import org.json.JSONException;
@@ -58,13 +62,32 @@ import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.function.Function;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.transform.Source;
 
@@ -256,6 +279,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         }
 
 
+
+
         SettingsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -403,8 +428,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
 //    public void showid(){
 //        String id = android.telephony.TelephonyManager.getDeviceId();
-//
-//
 //        Log.e("Imei",id);
 //    }
 
@@ -715,6 +738,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                     chatManager.addOutgoingListener(ConnnectXmpp.this);
                     chatManager.addIncomingListener(ConnnectXmpp.this);
 
+
                     try {
                         SASLAuthentication.registerSASLMechanism(new SASLMechanism() {
                             @Override
@@ -772,6 +796,9 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 //                            Toast.makeText(context, "Logged in successfully...", Toast.LENGTH_LONG).show();
 //                        }
 //                    });
+
+
+
                 }
 
                 @Override

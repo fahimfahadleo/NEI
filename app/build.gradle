@@ -113,6 +113,10 @@ dependencies {
     //implementation 'org.igniterealtime.smack:smack-resolver-javax:4.4.2'
 
 
+    //implementation 'org.igniterealtime.smack: smack-omemo-signal: 4.4.0'
+    implementation 'org.igniterealtime.smack:smack-omemo-signal:4.4.2'
+
+
 
     implementation 'com.google.code.gson:gson:2.8.4'
 

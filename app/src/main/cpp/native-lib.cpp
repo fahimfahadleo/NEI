@@ -986,6 +986,9 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
 ///////////////////////////////////////////////////////todo:this function should be deleted before release////////////////////////
 
 
+
+
+
 void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstring response ,
                    jint requestcode) {
 
@@ -2147,4 +2150,32 @@ Java_com_horofbd_MeCloak_ShowUserMessage_publicKeyRequest(JNIEnv *env , jclass c
                                                           jobject context) {
     publickeyname = jstring2string(env,name);
     request(env , server_response , requesttype , link , json_object , requestcode , context);
+}extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_EncrytpAndDecrypt(JNIEnv *env , jclass clazz,jstring message,jstring type,jstring password) {
+
+    std::wstring wstr = jstring2wstring(env , message);
+
+
+    std::string pass = jstring2string(env , password);
+    std::string typ = jstring2string(env , type);
+    jstring encoded = getJstringFromWstring(env , textHash(wstr , pass , typ));
+    return encoded;
+}extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_DefaultED(JNIEnv *env , jclass clazz , jstring message ,
+                                                   jstring type) {
+
+    std::wstring wstr = jstring2wstring(env , message);
+
+    std::string pass = jstring2string(env , env->NewStringUTF("password"));
+    std::string typ = jstring2string(env , type);
+    jstring encoded = getJstringFromWstring(env , textHash(wstr , pass , typ));
+
+    return encoded;
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_saveUserData(JNIEnv *env , jclass clazz , jstring key ,
+                                                      jstring value) {
+    setSharedPreference(env,key,value);
 }

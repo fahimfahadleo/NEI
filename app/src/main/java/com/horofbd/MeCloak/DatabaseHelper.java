@@ -9,7 +9,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 
-    public static final String DATABASE_NAME = "NEIMESSENGER.db";
+    private static final String DATABASE_NAME = "MeCloak.db";
+    private static final String USERINFORMATION = "USERINFORMATION";
+    private static final String FRIENDINFORMATION = "FRIENDINFORMATION";
+
 
 
 
@@ -21,81 +24,80 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         // TODO Auto-generated method stub
         db.execSQL(
-                "create table APP_PASSWORD " + "(user_id integer primary key, user_password text)"
+                "create table "+USERINFORMATION+" "+"(id integer primary key AUTOINCREMENT, username text, userphone text, userpassword text, userid text, userref text, loginstatus text)"
         );
 
         db.execSQL(
-                "create table USER_INFORMATION " + "(phone BIGINT primary key, back text, textcolor text, chathead text)"
+                "create table "+FRIENDINFORMATION+" "+"(id INTEGER primary key AUTOINCREMENT, phonenumber text, textpass text, boundage text, timer text,pageno text)"
         );
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // TODO Auto-generated method stub
-        db.execSQL("DROP TABLE IF EXISTS APP_PASSWORD");
-        db.execSQL("DROP TABLE IF EXISTS USER_INFORMATION");
+        db.execSQL("DROP TABLE IF EXISTS "+USERINFORMATION);
+        db.execSQL("DROP TABLE IF EXISTS "+FRIENDINFORMATION);
         onCreate(db);
     }
-
     public void deleteAllData(){
         SQLiteDatabase db = this.getWritableDatabase();
-         db.execSQL("delete from APP_PASSWORD");
+         db.execSQL("delete from "+USERINFORMATION);
+         db.execSQL("delete from "+FRIENDINFORMATION);
          db.close();
     }
-
-
-    public boolean setUserPassword(String password){
+    public boolean setUserInformation(String username,String userphone,String userpass,String userid,String userref,String loginstatus){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("user_password",password);
-        db.insert("APP_PASSWORD",null,contentValues);
+        contentValues.put("username",username);
+        contentValues.put("userphone",userphone);
+        contentValues.put("userpass",userpass);
+        contentValues.put("userid",userid);
+        contentValues.put("userref",userref);
+        contentValues.put("loginstatus",loginstatus);
+        db.insert(USERINFORMATION,null,contentValues);
         return true;
     }
-    public Cursor getUserPassword(int id){
+    public Cursor getUserInformation(){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery( "select * from APP_PASSWORD where user_id= "+id+"", null );
+        return db.rawQuery( "select * from "+USERINFORMATION, null );
     }
-
-    public boolean updateUserPassword(int id,String password){
+    public boolean UpdateUserInformation(String field,String value){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("user_password",password);
-        db.update("APP_PASSWORD",contentValues,"user_id = "+ id,null);
+        contentValues.put(field,value);
+        db.update(USERINFORMATION,contentValues,field+" = ?",null);
+        return true;
+    }
+    public boolean setFriendInformation(String phonenumber,String textpass, String boundage,String timer,String pageno){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("phonenumber",phonenumber);
+        contentValues.put("textpass",textpass);
+        contentValues.put("boundage",boundage);
+        contentValues.put("timer",timer);
+        contentValues.put("pageno",pageno);
+        db.insert(FRIENDINFORMATION, null, contentValues);
         return true;
     }
 
 
+    public Cursor getData(String phonenu,String pageno) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery( "SELECT * FROM "+FRIENDINFORMATION+" WHERE phonenumber=? AND pageno=?",new String[]{phonenu,pageno});
+    }
 
-    public boolean InsertUserInformation(String phone,String name, String referral,String theme){
-
+    public boolean UpdateFriendInformation(String phonenumber,String field,String value,String phoneno){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("phone",phone);
-        contentValues.put("name",name);
-        contentValues.put("referral",referral);
-        contentValues.put("theme",theme);
-        db.insert("USER_INFORMATION", null, contentValues);
+        contentValues.put(field,value);
+        db.update(FRIENDINFORMATION,contentValues,"phonenumber=? AND pageno=?",new String[]{phonenumber,phoneno});
         return true;
     }
 
-
-    public boolean UpdateUserInformation(String phone,String bg){
+    public boolean deleteFriend(String phonenumber,String pageno){
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("back",bg);
-        db.update("background",contentValues,"phone = ? ", new String[] {phone});
-        return true;
+        return db.delete(FRIENDINFORMATION, "phonenumber=? AND pageno=?", new String[]{phonenumber,pageno}) > 0;
     }
-
-
-
-
-    public Cursor getData(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery( "select * from password where id="+id+"", null );
-    }
-
 
 
 }

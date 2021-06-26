@@ -1,8 +1,14 @@
 package com.horofbd.MeCloak;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -11,10 +17,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,7 +31,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
+import org.apache.commons.codec.DecoderException;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
@@ -33,10 +44,28 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.MessageBuilder;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smackx.carbons.packet.CarbonExtension;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.ChatStateListener;
 import org.jivesoftware.smackx.chatstates.ChatStateManager;
 import org.jivesoftware.smackx.mam.MamManager;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.omemo.OmemoManager;
+import org.jivesoftware.smackx.omemo.OmemoMessage;
+import org.jivesoftware.smackx.omemo.OmemoService;
+import org.jivesoftware.smackx.omemo.exceptions.CorruptedOmemoKeyException;
+import org.jivesoftware.smackx.omemo.exceptions.CryptoFailedException;
+import org.jivesoftware.smackx.omemo.exceptions.UndecidedOmemoIdentityException;
+import org.jivesoftware.smackx.omemo.internal.OmemoDevice;
+import org.jivesoftware.smackx.omemo.listener.OmemoMessageListener;
+import org.jivesoftware.smackx.omemo.listener.OmemoMucMessageListener;
+import org.jivesoftware.smackx.omemo.signal.SignalCachingOmemoStore;
+import org.jivesoftware.smackx.omemo.signal.SignalFileBasedOmemoStore;
+import org.jivesoftware.smackx.omemo.signal.SignalOmemoService;
+import org.jivesoftware.smackx.omemo.trust.OmemoFingerprint;
+import org.jivesoftware.smackx.omemo.trust.OmemoTrustCallback;
+import org.jivesoftware.smackx.omemo.trust.TrustState;
+import org.jivesoftware.smackx.pubsub.PubSubException;
 import org.jivesoftware.smackx.receipts.DeliveryReceipt;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
@@ -46,11 +75,17 @@ import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.smackx.xevent.MessageEventNotificationListener;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jxmpp.jid.BareJid;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+import org.whispersystems.libsignal.IdentityKey;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +95,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.function.Function;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.logging.LoggingEventListener;
@@ -72,6 +114,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static {
         System.loadLibrary("native-lib");
     }
+
+    CardView setpasswordview;
+    TextView setPassword;
+
 
     static native void StartActivity(Context context, String activity, String data);
 
@@ -87,63 +133,77 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     static native void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
 
+    static native String EncrytpAndDecrypt(String message, String type, String password);
+
+    static native void saveUserData(String key,String value);
+
+
+    static native String DefaultED(String message, String type);
+
+
     TextInputEditText typemessage;
     ImageView send;
     List<Message> messages;
     ChatManager chatManager;
     RecyclerView messagerecyclerview;
     int me = 0;
-    int him =0;
+    int him = 0;
     DrawerLayout drawerLayout;
     ChatMessageAdapter adapter;
+    EditText typepassword;
+    OmemoManager omemoManager;
+    ImageView timer, enableboundage;
+    CardView timerview, enableboundageview;
+    DatabaseHelper helper;
+
+
 
     private Date yesterday() {
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         return cal.getTime();
     }
-
-    void InitConnection(){
+    void InitConnection() throws Settings.SettingNotFoundException {
         if (connection != null) {
             Log.e("connection", "notnull");
             chatManager = ChatManager.getInstanceFor(connection);
             chatManager.addIncomingListener(this);
             chatManager.addOutgoingListener(this);
 
+
             ChatStateManager chatmanager = ChatStateManager.getInstance(connection);
             chatmanager.addChatStateListener(new ChatStateListener() {
                 @Override
                 public void stateChanged(Chat chat, ChatState state, Message message) {
-                    Log.e("chatstate",String.valueOf(state));
+                    Log.e("chatstate", String.valueOf(state));
                 }
             });
-
 
 
             MessageEventNotificationListener listener = new MessageEventNotificationListener() {
                 @Override
                 public void deliveredNotification(Jid from, String packetID) {
-                    Log.e("messaereceived","from: "+from.toString()+" id: "+packetID);
+                    Log.e("messaereceived", "from: " + from.toString() + " id: " + packetID);
                 }
 
                 @Override
                 public void displayedNotification(Jid from, String packetID) {
-                    Log.e("notification","from: "+from.toString()+" id: "+packetID);
+                    Log.e("notification", "from: " + from.toString() + " id: " + packetID);
                 }
 
                 @Override
                 public void composingNotification(Jid from, String packetID) {
-                    Log.e("typing","from: "+from.toString()+" id: "+packetID);
+                    Log.e("typing", "from: " + from.toString() + " id: " + packetID);
                 }
 
                 @Override
                 public void offlineNotification(Jid from, String packetID) {
-                    Log.e("offline","from: "+from.toString()+" id: "+packetID);
+                    Log.e("offline", "from: " + from.toString() + " id: " + packetID);
                 }
 
                 @Override
                 public void cancelledNotification(Jid from, String packetID) {
-                    Log.e("cancelled","from: "+from.toString()+" id: "+packetID);
+                    Log.e("cancelled", "from: " + from.toString() + " id: " + packetID);
                 }
             };
 
@@ -153,17 +213,17 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             dm.setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
             dm.autoAddDeliveryReceiptRequests();
             try {
-                if(dm.isSupported(JidCreate.bareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost()))){
-                    Log.e("Deliveryreceipt","supported");
-                }else {
-                    Log.e("Deliveryreceipt","notsupported");
+                if (dm.isSupported(JidCreate.bareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost()))) {
+                    Log.e("Deliveryreceipt", "supported");
+                } else {
+                    Log.e("Deliveryreceipt", "notsupported");
                 }
                 dm.addReceiptReceivedListener(new ReceiptReceivedListener() {
 
                     @Override
                     public void onReceiptReceived(Jid fromJid, Jid toJid,
                                                   final String receiptId, Stanza receipt) {
-                        Log.e("messagestatus","received");
+                        Log.e("messagestatus", "received");
                     }
                 });
             } catch (SmackException | XmppStringprepException | InterruptedException | XMPPException e) {
@@ -185,15 +245,16 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                     .build();
             try {
                 MamManager.MamQuery mamQuery = manager.queryArchive(mamQueryArgs);
-                messages =  new LinkedList<Message>(mamQuery.getMessages());;
+                messages = new LinkedList<Message>(mamQuery.getMessages());
+                ;
                 Log.e("list", messages.toString());
 
-                adapter = new ChatMessageAdapter(this,messages);
+                adapter = new ChatMessageAdapter(this, messages);
                 messagerecyclerview.setAdapter(adapter);
-                Log.e("message size",String.valueOf(messages.size()));
+                Log.e("message size", String.valueOf(messages.size()));
 
 
-                messagerecyclerview.scrollToPosition(adapter.getItemCount()-1);
+                messagerecyclerview.scrollToPosition(adapter.getItemCount() - 1);
                 messagerecyclerview.setItemViewCacheSize(30);
                 messagerecyclerview.setDrawingCacheEnabled(true);
                 messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
@@ -212,6 +273,104 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
         }
     }
+    void setPassword() {
+        Dialog dialog = new Dialog(ShowUserMessage.this);
+        View vi = getLayoutInflater().inflate(R.layout.setencryptionpassword, null, false);
+        EditText setpassword = vi.findViewById(R.id.typepassword);
+        TextView cancel = vi.findViewById(R.id.cancel);
+        TextView save = vi.findViewById(R.id.save);
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String password = setpassword.getText().toString();
+                if (TextUtils.isEmpty(password)) {
+                    setpassword.setError("Field Can Not be empty!");
+                    setpassword.requestFocus();
+                } else {
+                    try {
+                        updateUserInfo(1,password);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    dialog.dismiss();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setContentView(vi);
+        dialog.show();
+    }
+    void updateUserInfo(int field, String value) throws JSONException {
+        switch (field) {
+            case 1: {
+                //update password
+                helper.UpdateFriendInformation(userphonenumber,"textpass",value,getLoginInfo("page_no"));
+                passstr = value;
+                break;
+            }
+            case 2: {
+                //update timer
+                helper.UpdateFriendInformation(userphonenumber,"timer",value,getLoginInfo("page_no"));
+                timerstr = value;
+                break;
+            }
+            case 3: {
+                //update boundage
+                helper.UpdateFriendInformation(userphonenumber,"boundage",value,getLoginInfo("page_no"));
+                boundagestr = value;
+                break;
+            }
+        }
+    }
+    AlertDialog dialog;
+    void showTimerDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view1 = getLayoutInflater().inflate(R.layout.numberpicker, null, false);
+        EditText setTimer = view1.findViewById(R.id.timer);
+        TextView save = view1.findViewById(R.id.save);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String time = setTimer.getText().toString();
+                if (TextUtils.isEmpty(time)) {
+                    setTimer.setError("Field can not be emtpty!");
+                    setTimer.requestFocus();
+                } else {
+                    try {
+                        updateUserInfo(2, time);
+                        if (time.equals("0")) {
+                            timerview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+                        } else {
+                            timerview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                        }
+                        dialog.dismiss();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        builder.setView(view1);
+        dialog = builder.create();
+        dialog.show();
+    }
+
+
+    String passstr = "";
+    String timerstr="";
+    String boundagestr="";
+    String userphonenumber;
+    boolean isDatabaseAvailable = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,16 +380,114 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         typemessage = findViewById(R.id.typemessage);
         send = findViewById(R.id.sendbutton);
         InitLinks();
-        InitConnection();
+        timer = findViewById(R.id.timer);
+        timerview = findViewById(R.id.timerview);
+        enableboundage = findViewById(R.id.enableboundage);
+        enableboundageview = findViewById(R.id.enableboundageview);
+        helper = new DatabaseHelper(this);
+        userphonenumber = getIntent().getStringExtra("phone_no");
+
+        Cursor c = helper.getData(userphonenumber,getLoginInfo("page_no"));
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+            String data2 = c.getString(c.getColumnIndex("phonenumber"));
+            passstr = c.getString(c.getColumnIndex("textpass"));
+            boundagestr = c.getString(c.getColumnIndex("boundage"));
+            timerstr = c.getString(c.getColumnIndex("timer"));
+            isDatabaseAvailable =true;
+        }
+            c.close();
+
+            if(!isDatabaseAvailable){
+                helper.setFriendInformation(userphonenumber,"","0","0",getLoginInfo("page_no"));
+                passstr = "";
+                timerstr = "0";
+                boundagestr = "0";
+            }
+
+
+
+        if (!timerstr.equals("0")) {
+            timerview.setCardBackgroundColor(getResources().getColor(R.color.green));
+        }
+
+        if (!boundagestr.equals("0")) {
+            enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
+        }
+
+        timer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimerDialog();
+            }
+        });
+        timerview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimerDialog();
+            }
+        });
+
+
+        enableboundageview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    if (!boundagestr.equals("0")) {
+                        updateUserInfo(3, "0");
+                        enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+                    } else {
+                        updateUserInfo(3, "1");
+                        enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        enableboundage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+
+                    if (!boundagestr.equals("0")) {
+                        updateUserInfo(3, "0");
+                        enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+                    } else {
+                        updateUserInfo(3, "1");
+                        enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        try {
+            InitConnection();
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setStackFromEnd(true);
         messagerecyclerview.setLayoutManager(manager);
-       drawerLayout=findViewById(R.id.drawer);
+        drawerLayout = findViewById(R.id.drawer);
+        typepassword = findViewById(R.id.security).findViewById(R.id.typepassword);
+        setPassword = findViewById(R.id.setpasswordtext);
+        setpasswordview = findViewById(R.id.setpasswordview);
 
 
-
-
-
+        setpasswordview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPassword();
+            }
+        });
+        setPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPassword();
+            }
+        });
 
 
 
@@ -253,8 +510,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                                 isKeyboardShowing = true;
                                 onKeyboardVisibilityChanged(true);
                             }
-                        }
-                        else {
+                        } else {
                             // keyboard is closed
                             if (isKeyboardShowing) {
                                 isKeyboardShowing = false;
@@ -266,12 +522,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
 
-
-
-
-        if (!Functions.fileExists(getIntent().getStringExtra("phone_no") + ".key", this)) {
-            publicKeyRequest(this, getIntent().getStringExtra("phone_no"), "GET", Important.getPublickey() + "?user_id=" + getIntent().getStringExtra("id"), new JSONObject(), 21, this);
-        }
         typemessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -284,7 +534,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 send.setEnabled(mess != null);
                 Chat chat = null;
                 try {
-                    chat = chatManager.chatWith(JidCreate.entityBareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost()));
+                    chat = chatManager.chatWith(JidCreate.entityBareFrom(userphonenumber+ "@" + Important.getXmppHost()));
                 } catch (XmppStringprepException e) {
                     e.printStackTrace();
                 }
@@ -307,7 +557,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             public void onClick(View view) {
                 String message = typemessage.getText().toString();
                 if (!TextUtils.isEmpty(message)) {
-                    sendMessage(message, getIntent().getStringExtra("phone_no"));
+                    typemessage.setText(null);
+                    sendMessage(message, userphonenumber);
                 }
 
             }
@@ -319,13 +570,14 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     }
 
 
-
     boolean isKeyboardShowing = false;
+
     void onKeyboardVisibilityChanged(boolean opened) {
         messagerecyclerview.postDelayed(new Runnable() {
             @Override
             public void run() {
-                messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                if (messagerecyclerview.getAdapter() != null)
+                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
             }
         }, 100);
 
@@ -333,7 +585,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
-        CheckResponse(this,this,response,requestcode);
+        CheckResponse(this, this, response, requestcode);
     }
 
     @Override
@@ -347,10 +599,11 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         Log.e("messageincomming", message.getBody());
         MessageEventManager manager = MessageEventManager.getInstanceFor(connection);
         try {
-            manager.sendDeliveredNotification(from,message.getStanzaId());
+            manager.sendDeliveredNotification(from, message.getStanzaId());
         } catch (SmackException.NotConnectedException | InterruptedException e) {
             e.printStackTrace();
         }
+
         addNewMessage(message);
 
     }
@@ -358,12 +611,12 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     @Override
     public void newOutgoingMessage(EntityBareJid to, MessageBuilder messageBuilder, Chat chat) {
         Message message = messageBuilder.build();
+        Log.e("messageincomming", message.getBody());
         try {
             message.setFrom(JidCreate.entityBareFrom(getLoginInfo("phone_no") + "@" + Important.getXmppHost()));
         } catch (XmppStringprepException e) {
             e.printStackTrace();
         }
-        Log.e("messageoutgoing", message.getTo().toString());
         addNewMessage(message);
 
     }
@@ -381,18 +634,39 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 char c = chars[random.nextInt(chars.length)];
                 sb.append(c);
             }
+
+
             ChatModel model = new ChatModel();
-            model.setBody(body);
-            model.setBoundage("0");
-            model.setEncryptionpass("64742812");
-            model.setTimestamp(getDate());
-            model.setExpiry("none");
+
+
+            String encodec;
+
+
+            encodec = EncrytpAndDecrypt(body, "encode", passstr);
+
+            String userpassword = passstr;
+            String userboundage = boundagestr;
+            String userexpiry = timerstr;
+
+
+
+
+            model.setBody(encodec);
+            model.setBoundage(userboundage);
+            model.setHash1(Functions.md5(userpassword));
+            model.setHash2(Functions.Sha1(userpassword));
+            model.setTimestamp(getDate("0"));
+            model.setExpiry(getDate(userexpiry));
 
             Gson gson = new Gson();
             String finalbody = gson.toJson(model);
+
+
             Message message = new Message();
+            message.setBody(DefaultED(finalbody, "encode"));
+
+
             message.setType(Message.Type.chat);
-            message.setBody(finalbody);
             message.setStanzaId(sb.toString());
             message.setFrom(JidCreate.entityBareFrom(getLoginInfo("phone_no") + "@" + Important.getXmppHost()));
             message.setTo(jid);
@@ -400,7 +674,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
             Chat chat = chatManager.chatWith(jid);
             chat.send(message);
-            MessageEventManager.addNotificationsRequests( message, false, true, false, false );
+            MessageEventManager.addNotificationsRequests(message, false, true, false, false);
             DeliveryReceiptManager.setDefaultAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
             ProviderManager.addExtensionProvider(DeliveryReceipt.ELEMENT, DeliveryReceipt.NAMESPACE, new DeliveryReceipt.Provider());
             ProviderManager.addExtensionProvider(DeliveryReceiptRequest.ELEMENT, DeliveryReceipt.NAMESPACE, new DeliveryReceiptRequest.Provider());
@@ -416,18 +690,34 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     }
 
 
-    void addNewMessage(Message message){
+    void addNewMessage(Message message) {
         messages.add(message);
-        Log.e("size ",String.valueOf(messages.size()));
-        adapter.notifyDataSetChanged();
+        Log.e("size ", String.valueOf(messages.size()));
 
-        messagerecyclerview.postDelayed(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
-            }
-        }, 100);
 
+                adapter.notifyDataSetChanged();
+                messagerecyclerview.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                    }
+                }, 100);
+            }
+        });
+
+
+    }
+
+    void setUpBoundage(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ShowUserMessage.this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
+            }
+        });
 
     }
 
@@ -446,7 +736,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         private class MessageInViewHolder extends RecyclerView.ViewHolder {
 
 
-            private TextView message,time;
+            private TextView message, time;
             private CircleImageView profilepicture;
 
             MessageInViewHolder(final View itemView) {
@@ -458,21 +748,80 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
             void bind(int position) {
                 him++;
-                me=0;
-                if(him>1){
+                me = 0;
+                if (him > 1) {
                     profilepicture.setVisibility(View.INVISIBLE);
                 }
                 Message messageModel = list.get(position);
                 Gson gson = new Gson();
-                //final ChatModel chatModel = gson.fromJson(messageModel.getBody(), ChatModel.class);
-                message.setText("Someuser Sent A amessage "+position);
-                time.setText("10/12/21");
+                String s = DefaultED(messageModel.getBody(), "decode");
+
+                final ChatModel chatModel = gson.fromJson(s, ChatModel.class);
+
+                String encodec;
+
+                encodec = EncrytpAndDecrypt(chatModel.getBody(), "decode", passstr);
+
+                String timestamp = chatModel.getTimestamp();
+                String expirytime = chatModel.getExpiry();
+                String boundagetime = chatModel.getBoundage();
+                if(!boundagetime.equals("0")){
+                    setUpBoundage();
+                }
+
+                Log.e("timestamp",timestamp);
+                Log.e("expirytime",expirytime);
+
+
+                message.setText(encodec);
+                time.setText(chatModel.getTimestamp());
+
+                if(!expirytime.equals(timestamp)){
+                    SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
+                    try {
+                        Date expiredate = format.parse(expirytime);
+                        Date currentime = format.parse(getDate("0"));
+                        Date timestampdate = format.parse(timestamp);
+
+
+                        if(currentime.compareTo(expiredate)>0){
+                            message.setText("Message Expired!");
+                        }else {
+                            long difference = dateDifference(timestampdate,expiredate);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            message.setText("Message Expired!");
+                                            messagerecyclerview.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                                                }
+                                            }, 100);
+                                        }
+                                    });
+
+                                }
+                            },difference);
+                        }
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+
+
             }
         }
 
         private class MessageOutViewHolder extends RecyclerView.ViewHolder {
 
-           private TextView message,time;
+            private TextView message, time;
             private CircleImageView profilepicture;
 
             MessageOutViewHolder(final View itemView) {
@@ -483,22 +832,69 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
 
             void bind(int position) {
-                him=0;
+                him = 0;
                 profilepicture.setVisibility(View.INVISIBLE);
                 Message messageModel = list.get(position);
                 Gson gson = new Gson();
-                //final ChatModel chatModel = gson.fromJson(messageModel.getBody(), ChatModel.class);
-                message.setText("I sent a message "+position);
-                time.setText("10/12/21");
+                String mode = DefaultED(messageModel.getBody(), "deocode");
+                final ChatModel chatModel = gson.fromJson(mode, ChatModel.class);
+                String encodec;
+                encodec = EncrytpAndDecrypt(chatModel.getBody(), "decode", passstr);
+                String timestamp = chatModel.getTimestamp();
+                String expirytime = chatModel.getExpiry();
+                String boundagetime = chatModel.getBoundage();
+                message.setText(encodec);
+                time.setText(chatModel.getTimestamp());
+
+                if(!boundagetime.equals("0")){
+                    setUpBoundage();
+                }
+
+
+                if(!expirytime.equals(timestamp)){
+                    SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
+                    try {
+                        Date expiredate = format.parse(expirytime);
+                        Date currentime = format.parse(getDate("0"));
+                        Date timestampdate = format.parse(timestamp);
+                        if(currentime.compareTo(expiredate)>0){
+                            message.setText("Message Expired!");
+                        }else {
+                            long difference = dateDifference(timestampdate,expiredate);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            message.setText("Message Expired!");
+                                            messagerecyclerview.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                                                }
+                                            }, 100);
+                                        }
+                                    });
+
+                                }
+                            },difference);
+                        }
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
             }
         }
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.e("messagetypecreateviewholder",String.valueOf(viewType));
             if (viewType == MESSAGE_TYPE_IN) {
                 return new MessageInViewHolder(LayoutInflater.from(context).inflate(R.layout.bubbleend, parent, false));
-            }else {
+            } else {
                 return new MessageOutViewHolder(LayoutInflater.from(context).inflate(R.layout.bubblestart, parent, false));
             }
         }
@@ -513,11 +909,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 e.printStackTrace();
             }
 
-
             if (jid.toString().equals(message.getFrom().toString().split("/")[0])) {
                 ((MessageOutViewHolder) holder).bind(position);
 
-            } else if(jid.toString().equals(message.getTo().toString().split("/")[0])) {
+            } else if (jid.toString().equals(message.getTo().toString().split("/")[0])) {
                 ((MessageInViewHolder) holder).bind(position);
 
             }
@@ -533,43 +928,48 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             Message message = list.get(position);
             Jid jid = null;
             try {
-                 jid= JidCreate.bareFrom(JidCreate.bareFrom(getLoginInfo("phone_no") + "@" + Important.getXmppHost()));
+                jid = JidCreate.bareFrom(JidCreate.bareFrom(getLoginInfo("phone_no") + "@" + Important.getXmppHost()));
             } catch (XmppStringprepException e) {
                 e.printStackTrace();
             }
 
-            Log.e("messagefrom",message.getFrom().toString());
 
-            if(message.getFrom().toString().split("/")[0].equals(jid.toString())){
-                Log.e("itemtype","fromme");
+            if (message.getFrom().toString().split("/")[0].equals(jid.toString())) {
                 return 0;
-            }else if(message.getTo().toString().split("/")[0]==jid.toString()){
-                Log.e("itemtype","fromhim");
+            } else if (message.getTo().toString().split("/")[0] == jid.toString()) {
                 return 1;
-            }else {
+            } else {
                 return 1;
             }
 
         }
     }
 
-    private String getDate()
-    {
-        String ourDate;
-        try
-        {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            formatter.setTimeZone(TimeZone.getDefault());
-            Date value = formatter.parse(String.valueOf(System.currentTimeMillis()));
 
-            SimpleDateFormat dateFormatter = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss"); //this format changeable
-            dateFormatter.setTimeZone(TimeZone.getDefault());
-            ourDate = dateFormatter.format(value);
+    //1 day = 3600 x 24 = 86400
+    public long dateDifference(Date startDate, Date endDate) {
+        //milliseconds
+       return endDate.getTime() - startDate.getTime();
+
+
+
+    }
+
+    private String getDate(String expiry) {
+        String ourDate;
+        try {
+
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //this format changeable
+
+
+            Calendar date = Calendar.getInstance();
+            long t= date.getTimeInMillis();
+            Date afterAddingTenMins=new Date(t + (Integer.parseInt(expiry) * 60000));
+
+            ourDate = dateFormatter.format(afterAddingTenMins);
 
             //Log.d("ourDate", ourDate);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             ourDate = "00-00-0000 00:00";
         }
         return ourDate;
