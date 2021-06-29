@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.radiobutton.MaterialRadioButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionListener;
@@ -55,6 +56,8 @@ import org.jivesoftware.smack.util.ByteUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -99,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
     CircleImageView profileimage, newmessage;
     public static boolean active = false;
-    DatabaseHelper helper;
+    static DatabaseHelper helper;
     ImageView options, notification;
     boolean isopen = false;
     static RecyclerView recyclerView;
@@ -113,6 +116,10 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     static ServerResponse serverResponse;
     SwipeRefreshLayout swipeRefreshLayout;
     public static AbstractXMPPConnection connection;
+    public static int notificationcount = 0;
+    public static String notificationRead = "true";
+    static TextView notificationcounter;
+    static CardView notificationcounterveiw;
 
 
     @Override
@@ -219,10 +226,43 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         policyview = findViewById(R.id.policyview);
         aboutustext = findViewById(R.id.abouttext);
         aboutusview = findViewById(R.id.aboutview);
-
-
+        notificationcounter = findViewById(R.id.notificationcounter);
+        notificationcounterveiw = findViewById(R.id.notificationcounterview);
+        helper = new DatabaseHelper(this);
         new Functions(this);
         InitLinks(this);
+
+        Cursor c = helper.getNotificationData();
+        if (c != null) {
+            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                notificationRead = c.getString(c.getColumnIndex("notificationread"));
+                notificationcount = Integer.parseInt(c.getString(c.getColumnIndex("notificationcount")));
+            }
+            c.close();
+        } else {
+            helper.setNotificationInformation("0", "true");
+        }
+
+
+        if (notificationcount != 0) {
+            if (notificationRead.equals("false")) {
+                notificationcounter.setText(String.valueOf(notificationcount));
+                notificationcounterveiw.setVisibility(View.VISIBLE);
+            }
+        } else {
+            notificationcounter.setText(null);
+            notificationcounterveiw.setVisibility(View.INVISIBLE);
+        }
+
+
+        if (connection != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    connection.disconnect();
+                }
+            });
+        }
 
 
         ImageRequest(this, profileimage, "GET", Important.getViewprofilepicture(), new JSONObject(), 1);
@@ -262,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
 
         new Functions(this);
-        helper = new DatabaseHelper(this);
+
 
         AppCompatDelegate
                 .setDefaultNightMode(
@@ -271,6 +311,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
 
         new ConnnectXmpp(this, getLoginInfo("phone_no"), getLoginInfo("sec"));
+        Log.e("phone", getLoginInfo("phone_no"));
+        Log.e("pass", getLoginInfo("sec"));
 
 
     }
@@ -291,8 +333,31 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         gopremiumtext.setOnClickListener(view -> StartActivity(MainActivity.this, "GetPremium", ""));
         SettingsView.setOnClickListener(view -> StartActivity(MainActivity.this, "Settings", ""));
         Settings.setOnClickListener(view -> StartActivity(MainActivity.this, "Settings", ""));
-        logoutview.setOnClickListener(view -> globalRequest(MainActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context));
-        logout.setOnClickListener(view -> globalRequest(MainActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context));
+        logoutview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                globalRequest(MainActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        connection.disconnect();
+                    }
+                });
+
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                globalRequest(MainActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        connection.disconnect();
+                    }
+                });
+            }
+        });
         search.setOnClickListener(view -> {
             if (isopen) {
                 TransitionManager.beginDelayedTransition(searchlayout, new AutoTransition());
@@ -473,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                     jsonObject1.put("mute", "0");
                                 } else {
                                     jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(24*60)));
+                                    jsonObject.put("mute_expiry", getDate(String.valueOf(24 * 60)));
                                 }
 
                                 globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
@@ -497,7 +562,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                     jsonObject1.put("mute", "0");
                                 } else {
                                     jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(30*24*60)));
+                                    jsonObject.put("mute_expiry", getDate(String.valueOf(30 * 24 * 60)));
                                 }
 
                                 globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
@@ -521,7 +586,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                     jsonObject1.put("mute", "0");
                                 } else {
                                     jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(60*60*60*60)));
+                                    jsonObject.put("mute_expiry", getDate(String.valueOf(60 * 60 * 60 * 60)));
                                 }
 
                                 globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
@@ -589,7 +654,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                     jsonObject1.put("mute", "0");
                                 } else {
                                     jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(24*60)));
+                                    jsonObject.put("mute_expiry", getDate(String.valueOf(24 * 60)));
                                 }
 
                                 globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
@@ -613,7 +678,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                     jsonObject1.put("mute", "0");
                                 } else {
                                     jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(30*24*60)));
+                                    jsonObject.put("mute_expiry", getDate(String.valueOf(30 * 24 * 60)));
                                 }
 
                                 globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
@@ -637,7 +702,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                     jsonObject1.put("mute", "0");
                                 } else {
                                     jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(60*60*60*60)));
+                                    jsonObject.put("mute_expiry", getDate(String.valueOf(60 * 60 * 60 * 60)));
                                 }
 
                                 globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
@@ -948,9 +1013,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                 @Override
                 public void authenticated(XMPPConnection xmppConnection, boolean b) {
                     Log.e("xmpp", "authenticated");
-                    //   ((Activity)context).runOnUiThread(() -> Toast.makeText(context, "Logged in successfully...", Toast.LENGTH_LONG).show());
-
-
                 }
 
                 @Override
@@ -969,7 +1031,45 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
         @Override
         public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-            Log.e("mainincomming", message.getBody());
+            try {
+                EntityBareJid jid = JidCreate.entityBareFrom("mecloak@" + Important.getXmppHost());
+                if (jid.toString().equals(from.toString())) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(message.getBody());
+                        String type = jsonObject.getString("type");
+                        String body = jsonObject.getString("message");
+                        Log.e("body", body);
+                        Log.e("type", type);
+                        switch (type) {
+                            case "alert":
+                                showSnackbar(body);
+                                break;
+                            case "new_friend_request":
+                            case "friend_request_accepted":
+                                notificationcount = notificationcount + 1;
+                                notificationRead = "false";
+                                helper.UpdateNotification("notificationcount", String.valueOf(notificationcount));
+                                helper.UpdateNotification("notificationread", "false");
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        notificationcounter.setText(String.valueOf(notificationcount));
+                                        notificationcounterveiw.setVisibility(View.VISIBLE);
+                                    }
+                                });
+
+                                break;
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            } catch (XmppStringprepException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -978,5 +1078,28 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             Log.e("mainoutgoing", message.getBody());
 
         }
+    }
+
+
+    static void showSnackbar(String message) {
+        ((Activity) context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Snackbar.make(((Activity) context).getWindow().getDecorView().getRootView(), message, Snackbar.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                connection.disconnect();
+            }
+        });
     }
 }

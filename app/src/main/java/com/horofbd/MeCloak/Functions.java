@@ -117,20 +117,32 @@ public class Functions {
     static Dialog dialog;
 
     public static void showProgress(Context context) {
-        dialog = new Dialog(context);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View vi = inflater.inflate(R.layout.progressbar, null, false);
-        dialog.setContentView(vi);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-        //   dialog.setCancelable(false);
-        Log.e("context", context.toString());
-        dialog.show();
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog = new Dialog(context);
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                View vi = inflater.inflate(R.layout.progressbar, null, false);
+                dialog.setContentView(vi);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                //   dialog.setCancelable(false);
+                Log.e("context", context.toString());
+                dialog.show();
+            }
+        });
+
     }
 
     public static void dismissDialogue() {
-        if (dialog != null && dialog.isShowing()) {
-            dialog.dismiss();
-        }
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
     }
 
 

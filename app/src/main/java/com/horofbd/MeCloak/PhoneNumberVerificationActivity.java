@@ -48,7 +48,7 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
     static native void StartActivity(Context context, String activity,String flag);
     static native void InitLinks();
     static native void CheckResponse(ServerResponse serverResponse,Context context, String response,int requestcode);
-    static native void RequestPhoneverification(ServerResponse serverResponse,String requesttype,String link,JSONObject jsonObject,int requestcode);
+    static native void RequestPhoneverification(ServerResponse serverResponse,String requesttype,String link,JSONObject jsonObject,int requestcode,Context context);
 
     String code;
 
@@ -76,6 +76,7 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
         }
 
        code =Functions.getSharedPreference("code","0");
+        Log.e("code",code);
 
 
         //sendVerificationCode(phonenumber);
@@ -91,7 +92,7 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
                     jsonObject.put("code",code);
 
                     Log.e("tag",Important.getPhone_verification());
-                    RequestPhoneverification(PhoneNumberVerificationActivity.this,"POST",Important.getPhone_verification(),jsonObject,2);
+                    RequestPhoneverification(PhoneNumberVerificationActivity.this,"POST",Important.getPhone_verification(),jsonObject,2,PhoneNumberVerificationActivity.this);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

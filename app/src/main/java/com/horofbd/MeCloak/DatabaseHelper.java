@@ -12,6 +12,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "MeCloak.db";
     private static final String USERINFORMATION = "USERINFORMATION";
     private static final String FRIENDINFORMATION = "FRIENDINFORMATION";
+    private static final String NOTIFICATION = "NOTIFICATION";
 
 
 
@@ -30,6 +31,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(
                 "create table "+FRIENDINFORMATION+" "+"(id INTEGER primary key AUTOINCREMENT, phonenumber text, textpass text, boundage text, timer text,pageno text)"
         );
+
+        db.execSQL(
+                "create table "+NOTIFICATION+" "+"(id INTEGER primary key AUTOINCREMENT, notificationcount text, notificationread text)"
+        );
+
     }
 
     @Override
@@ -37,12 +43,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // TODO Auto-generated method stub
         db.execSQL("DROP TABLE IF EXISTS "+USERINFORMATION);
         db.execSQL("DROP TABLE IF EXISTS "+FRIENDINFORMATION);
+        db.execSQL("DROP TABLE IF EXISTS "+NOTIFICATION);
         onCreate(db);
     }
     public void deleteAllData(){
         SQLiteDatabase db = this.getWritableDatabase();
          db.execSQL("delete from "+USERINFORMATION);
          db.execSQL("delete from "+FRIENDINFORMATION);
+         db.execSQL("delete from "+NOTIFICATION);
          db.close();
     }
     public boolean setUserInformation(String username,String userphone,String userpass,String userid,String userref,String loginstatus){
@@ -97,6 +105,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean deleteFriend(String phonenumber,String pageno){
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(FRIENDINFORMATION, "phonenumber=? AND pageno=?", new String[]{phonenumber,pageno}) > 0;
+    }
+
+
+    public void setNotificationInformation(String notification,String notificationread){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("notificationcount",notification);
+        contentValues.put("notificationread",notificationread);
+        db.insert(NOTIFICATION, null, contentValues);
+    }
+
+    public boolean UpdateNotification(String field,String value){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(field,value);
+        db.update(NOTIFICATION,contentValues,field+" = ?",null);
+        return true;
+    }
+
+    public Cursor getNotificationData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery( "SELECT * FROM "+NOTIFICATION+"",null);
     }
 
 

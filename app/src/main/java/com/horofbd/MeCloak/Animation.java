@@ -35,6 +35,7 @@ public class Animation extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_animation);
        ImageView iv =  findViewById(R.id.animation);
+       new Functions(this);
 
         android.view.animation.Animation animation = AnimationUtils.loadAnimation(this,R.anim.fadein);
         animation.setAnimationListener(new android.view.animation.Animation.AnimationListener() {

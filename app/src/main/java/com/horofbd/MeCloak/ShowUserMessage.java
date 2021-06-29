@@ -7,13 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import android.net.Uri;
-import android.os.Build;
+import android.media.Image;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.text.Editable;
@@ -24,11 +22,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,15 +34,11 @@ import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
-import org.apache.commons.codec.DecoderException;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
@@ -57,28 +49,11 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.MessageBuilder;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smackx.carbons.packet.CarbonExtension;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.ChatStateListener;
 import org.jivesoftware.smackx.chatstates.ChatStateManager;
 import org.jivesoftware.smackx.mam.MamManager;
-import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.omemo.OmemoManager;
-import org.jivesoftware.smackx.omemo.OmemoMessage;
-import org.jivesoftware.smackx.omemo.OmemoService;
-import org.jivesoftware.smackx.omemo.exceptions.CorruptedOmemoKeyException;
-import org.jivesoftware.smackx.omemo.exceptions.CryptoFailedException;
-import org.jivesoftware.smackx.omemo.exceptions.UndecidedOmemoIdentityException;
-import org.jivesoftware.smackx.omemo.internal.OmemoDevice;
-import org.jivesoftware.smackx.omemo.listener.OmemoMessageListener;
-import org.jivesoftware.smackx.omemo.listener.OmemoMucMessageListener;
-import org.jivesoftware.smackx.omemo.signal.SignalCachingOmemoStore;
-import org.jivesoftware.smackx.omemo.signal.SignalFileBasedOmemoStore;
-import org.jivesoftware.smackx.omemo.signal.SignalOmemoService;
-import org.jivesoftware.smackx.omemo.trust.OmemoFingerprint;
-import org.jivesoftware.smackx.omemo.trust.OmemoTrustCallback;
-import org.jivesoftware.smackx.omemo.trust.TrustState;
-import org.jivesoftware.smackx.pubsub.PubSubException;
 import org.jivesoftware.smackx.receipts.DeliveryReceipt;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
@@ -88,43 +63,26 @@ import org.jivesoftware.smackx.xevent.MessageEventManager;
 import org.jivesoftware.smackx.xevent.MessageEventNotificationListener;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jxmpp.jid.BareJid;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
-import org.whispersystems.libsignal.IdentityKey;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.TimeZone;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.function.Function;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.logging.LoggingEventListener;
+import okhttp3.Response;
 
-import static com.horofbd.MeCloak.MainActivity.adapter;
 import static com.horofbd.MeCloak.MainActivity.connection;
 
-public class ShowUserMessage extends AppCompatActivity implements ServerResponse, IncomingChatMessageListener, OutgoingChatMessageListener {
+public class ShowUserMessage extends AppCompatActivity implements ServerResponse, IncomingChatMessageListener, OutgoingChatMessageListener,ImageResponse {
 
     static {
         System.loadLibrary("native-lib");
@@ -134,6 +92,32 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     TextView setPassword;
     String boundageposition;
 
+    EditText typemessage;
+    ImageView send;
+    List<Message> messages;
+    ChatManager chatManager;
+    RecyclerView messagerecyclerview;
+    int me = 0;
+    int him = 0;
+    DrawerLayout drawerLayout;
+    ChatMessageAdapter adapter;
+    EditText typepassword;
+    OmemoManager omemoManager;
+    ImageView timer, enableboundage;
+    CardView timerview, enableboundageview;
+    DatabaseHelper helper;
+    ImageView menubutton;
+    static boolean isboundageitemavailable = false;
+    static Context context;
+    AlertDialog dialog;
+    String passstr = "";
+    String timerstr = "";
+    String boundagestr = "";
+    String userphonenumber;
+    boolean isDatabaseAvailable = false;
+    Bundle save;
+    TextView titletext;
+    CircleImageView profilepicture;
 
     static native void StartActivity(Context context, String activity, String data);
 
@@ -153,26 +137,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     static native void saveUserData(String key, String value);
 
-
     static native String DefaultED(String message, String type);
-
-
-    EditText typemessage;
-    ImageView send;
-    List<Message> messages;
-    ChatManager chatManager;
-    RecyclerView messagerecyclerview;
-    int me = 0;
-    int him = 0;
-    DrawerLayout drawerLayout;
-    ChatMessageAdapter adapter;
-    EditText typepassword;
-    OmemoManager omemoManager;
-    ImageView timer, enableboundage;
-    CardView timerview, enableboundageview;
-    DatabaseHelper helper;
-    ImageView menubutton;
-    static boolean isboundageitemavailable = false;
 
 
     private Date yesterday() {
@@ -180,8 +145,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         cal.add(Calendar.DATE, -1);
         return cal.getTime();
     }
-
-
     void setScrollPosition() {
         if (getIntent().hasExtra("recyclerview")) {
             typemessage.setText(getIntent().getStringExtra("message"));
@@ -205,8 +168,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
     }
-
-
     void InitConnection() throws Settings.SettingNotFoundException {
         if (connection != null) {
             Log.e("connection", "notnull");
@@ -350,8 +311,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
         }
     }
-
-
     void setPassword() {
         Dialog dialog = new Dialog(ShowUserMessage.this);
         View vi = getLayoutInflater().inflate(R.layout.setencryptionpassword, null, false);
@@ -389,7 +348,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         dialog.setContentView(vi);
         dialog.show();
     }
-
     void updateUserInfo(int field, String value) throws JSONException {
         switch (field) {
             case 1: {
@@ -412,9 +370,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
         }
     }
-
-    AlertDialog dialog;
-
     void showTimerDialog() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -449,13 +404,33 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         dialog.show();
     }
 
+    void setImage(ImageView imageView, Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
+    }
 
-    String passstr = "";
-    String timerstr = "";
-    String boundagestr = "";
-    String userphonenumber;
-    boolean isDatabaseAvailable = false;
-    Bundle save;
+
+    @Override
+    public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) {
+
+        InputStream inputStream = response.body().byteStream();
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        ((Activity) context).runOnUiThread(() -> {
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+
+            } else {
+                Log.e("bitmap", "null");
+            }
+        });
+
+
+    }
+
+    @Override
+    public void onImageFailure(String failresponse) {
+
+    }
+
 
 
     @Override
@@ -466,7 +441,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         }
         save = savedInstanceState;
-
         setContentView(R.layout.activity_show_user_message);
         messagerecyclerview = findViewById(R.id.messagerecyclerview);
         typemessage = findViewById(R.id.typemessage);
@@ -480,6 +454,19 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         menubutton = findViewById(R.id.menubutton);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
+        titletext = findViewById(R.id.titletext);
+        profilepicture = findViewById(R.id.profile_image);
+        context = this;
+        titletext.setText(getIntent().getStringExtra("name"));
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("friend", getIntent().getStringExtra("id"));
+            ImageRequest(this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
 
         menubutton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -612,13 +599,13 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                             // keyboard is opened
                             if (!isKeyboardShowing) {
                                 isKeyboardShowing = true;
-                                onKeyboardVisibilityChanged(true);
+                                onKeyboardVisibilityChanged();
                             }
                         } else {
                             // keyboard is closed
                             if (isKeyboardShowing) {
                                 isKeyboardShowing = false;
-                                onKeyboardVisibilityChanged(false);
+                                onKeyboardVisibilityChanged();
                             }
                         }
                     }
@@ -677,7 +664,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     boolean isKeyboardShowing = false;
 
-    void onKeyboardVisibilityChanged(boolean opened) {
+    void onKeyboardVisibilityChanged() {
         messagerecyclerview.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -731,7 +718,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
         try {
             EntityBareJid jid = JidCreate.entityBareFrom(toJid + "@" + Important.getXmppHost());
-            //org.jivesoftware.smack.chat2.Chat chat = org.jivesoftware.smack.chat2.ChatManager.getInstanceFor(mConnection).chatWith(jid);
             char[] chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
             StringBuilder sb = new StringBuilder(20);
             Random random = new Random();
@@ -812,7 +798,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     }
 
 
-    public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ImageResponse {
         Context context;
         List<Message> list;
 
@@ -822,6 +808,25 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         public ChatMessageAdapter(Context context, List<Message> mlist) { // you can pass other parameters in constructor
             this.context = context;
             list = mlist;
+        }
+
+        @Override
+        public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) throws JSONException {
+            InputStream inputStream = response.body().byteStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            ((Activity) context).runOnUiThread(() -> {
+                if (bitmap != null) {
+                    imageView.setImageBitmap(bitmap);
+
+                } else {
+                    Log.e("bitmap", "null");
+                }
+            });
+        }
+
+        @Override
+        public void onImageFailure(String failresponse) throws JSONException {
+
         }
 
         private class MessageInViewHolder extends RecyclerView.ViewHolder {
@@ -843,6 +848,14 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 me = 0;
                 if (him > 1) {
                     profilepicture.setVisibility(View.INVISIBLE);
+                }else {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("friend", getIntent().getStringExtra("id"));
+                        ImageRequest(ChatMessageAdapter.this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 Message messageModel = list.get(position);
                 Gson gson = new Gson();
@@ -956,6 +969,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                         }
                     }
                 }
+
 
 
                 if (!expirytime.equals(timestamp)) {

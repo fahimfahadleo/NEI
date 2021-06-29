@@ -58,7 +58,7 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
     static native void InitLinks();
     static native void CheckResponse(ServerResponse serverResponse,Context context, String response,int requestcode);
     static native void StartActivity(Context context, String activity,String data);
-    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode);
+    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
 
     static AlertDialog profiledialogue;
     public static void showProfileDialogue(ServerResponse serverResponse,String name,String phone,String id,String pageid){
@@ -92,7 +92,7 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
                        try {
                            jsonObject.put("id",id);
                            jsonObject.put("page_id",pageid);
-                           globalRequest(serverResponse,"POST",Important.getAdd_friend(),jsonObject,6);
+                           globalRequest(serverResponse,"POST",Important.getAdd_friend(),jsonObject,6,context);
                        } catch (JSONException e) {
                            e.printStackTrace();
                        }
@@ -106,7 +106,7 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
                        JSONObject jsonObject = new JSONObject();
                        try {
                            jsonObject.put("user_id",id);
-                           globalRequest(serverResponse,"POST",Important.getBlock_friend(),jsonObject,7);
+                           globalRequest(serverResponse,"POST",Important.getBlock_friend(),jsonObject,7,context);
                        } catch (JSONException e) {
                            e.printStackTrace();
                        }
@@ -148,7 +148,7 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
 
                 try {
                     object.put("number",number);
-                    globalRequest(this,"POST",Important.getSearch_friend(),object,5);
+                    globalRequest(this,"POST",Important.getSearch_friend(),object,5,context);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -210,7 +210,7 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
 
                 try {
                     object.put("number",phonestr);
-                    globalRequest(AddFriend.this,"POST",Important.getSearch_friend(),object,5);
+                    globalRequest(AddFriend.this,"POST",Important.getSearch_friend(),object,5,context);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

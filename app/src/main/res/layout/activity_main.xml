@@ -5,7 +5,7 @@
     android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:openDrawer="end"
+
     android:background="@color/background"
     android:theme="@style/AppTheme.NoActionBar"
     tools:context=".MainActivity">
@@ -73,6 +73,7 @@
                         android:src="@drawable/bell" />
 
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/notificationcounterview"
                         android:layout_width="@dimen/_12sdp"
                         android:layout_height="@dimen/_12sdp"
                         android:layout_gravity="center"
@@ -81,9 +82,8 @@
                         app:cardBackgroundColor="@color/notificationnotifier"
                         app:cardCornerRadius="@dimen/_6sdp"
                         app:cardElevation="4dp">
-
-
                         <TextView
+                            android:id="@+id/notificationcounter"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="center"

@@ -5,6 +5,7 @@
     android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:openDrawer="end"
     android:background="@color/background"
     android:theme="@style/AppTheme.NoActionBar"
     tools:context=".ShowUserMessage">
@@ -35,6 +36,7 @@
                 app:civ_border_width="2dp" />
 
             <TextView
+                android:id="@+id/titletext"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/_38sdp"
                 android:layout_gravity="center"
@@ -44,6 +46,20 @@
                 android:text="Inbox"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="@color/oceanblue" />
+
+            <ImageView
+                android:id="@+id/audiocall"
+                android:layout_width="@dimen/_38sdp"
+                android:layout_height="@dimen/_38sdp"
+                android:padding="@dimen/_8sdp"
+                android:src="@drawable/audiocall" />
+
+            <ImageView
+                android:id="@+id/videocall"
+                android:layout_width="@dimen/_38sdp"
+                android:layout_height="@dimen/_38sdp"
+                android:padding="@dimen/_8sdp"
+                android:src="@drawable/videocall" />
 
             <ImageView
                 android:id="@+id/menubutton"
@@ -244,6 +260,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:clickable="true"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -320,9 +337,18 @@
 <!--            </androidx.cardview.widget.CardView>-->
 
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:text="The Encryption Password encrypts your data so that any middle man or people without tha password can not see your Messages.\nNote: If your friend don't know or sets the same password as yours he/she will see only encrypted characters. So you must inform your friend about your message password and he must set it in your inbox. "
+                android:layout_marginStart="@dimen/_4sdp"
+                android:layout_marginEnd="@dimen/_4sdp"
+                android:textColor="#000"/>
+
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/policy"
+                android:id="@+id/boundageview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -349,7 +375,7 @@
                         android:src="@drawable/policy" />
 
                     <TextView
-                        android:id="@+id/policytext"
+                        android:id="@+id/boundagetext"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_35sdp"
 
@@ -357,11 +383,71 @@
 
                         android:paddingStart="@dimen/_8sdp"
                         android:paddingEnd="@dimen/_8sdp"
-                        android:text="Policy"
+                        android:text="Boundage"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="#000" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:text="The Boundage option is for your privacy. If you don't want your friend to record or take screenshot of your message or data turn this on and your friend will not be able to take screenshot or record screen video. "
+                android:layout_marginStart="@dimen/_4sdp"
+                android:layout_marginEnd="@dimen/_4sdp"
+                android:textColor="#000"/>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/tiemrview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="@color/cardbgcolor"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="@dimen/_26sdp"
+                        android:layout_height="@dimen/_26sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/_8sdp"
+                        android:src="@drawable/policy" />
+
+                    <TextView
+                        android:id="@+id/tiemrtext"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_35sdp"
+
+                        android:gravity="center|start"
+
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
+                        android:text="Expiry Time"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:text="You can set your message Expiry time. that message will expire from you and your friend at that exact moment you want."
+                android:layout_marginStart="@dimen/_4sdp"
+                android:layout_marginEnd="@dimen/_4sdp"
+                android:textColor="#000"/>
 
 
         </LinearLayout>
