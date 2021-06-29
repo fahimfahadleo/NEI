@@ -13,8 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@null">
-
-
     </FrameLayout>
 
     <FrameLayout
@@ -38,16 +36,16 @@
                 app:cardElevation="@dimen/_6sdp"
                 app:cardCornerRadius="@dimen/_8sdp"
                 android:layout_margin="@dimen/_4sdp"
-                app:contentPadding="@dimen/_2sdp">
+                app:contentPadding="8dp">
 
                 <ImageView
                     android:id="@+id/enableboundage"
-                    android:layout_width="?attr/actionBarSize"
-                    android:layout_height="@dimen/_38sdp"
+                    android:layout_width="@dimen/_15sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_gravity="center"
                     android:layout_marginStart="@dimen/_4sdp"
                     android:layout_marginEnd="@dimen/_4sdp"
-                    android:padding="@dimen/_8sdp"
+
                     android:textColor="@color/white"
                     android:src="@drawable/restrictedicon"
                     />
@@ -63,16 +61,15 @@
                 app:cardElevation="@dimen/_6sdp"
                 android:layout_margin="@dimen/_4sdp"
                 app:cardCornerRadius="@dimen/_8sdp"
-                app:contentPadding="@dimen/_2sdp">
+                app:contentPadding="8dp">
 
                 <ImageView
                     android:id="@+id/timer"
-                    android:layout_width="?attr/actionBarSize"
-                    android:layout_height="@dimen/_38sdp"
+                    android:layout_width="@dimen/_15sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_gravity="center"
                     android:layout_marginStart="@dimen/_4sdp"
                     android:layout_marginEnd="@dimen/_4sdp"
-                    android:padding="@dimen/_8sdp"
                     android:src="@drawable/timericon" />
 
             </androidx.cardview.widget.CardView>

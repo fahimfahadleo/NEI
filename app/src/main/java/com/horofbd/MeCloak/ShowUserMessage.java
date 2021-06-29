@@ -1,13 +1,20 @@
 package com.horofbd.MeCloak;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.PersistableBundle;
+import android.os.StrictMode;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -17,15 +24,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,6 +95,8 @@ import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.whispersystems.libsignal.IdentityKey;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -117,6 +132,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     CardView setpasswordview;
     TextView setPassword;
+    String boundageposition;
 
 
     static native void StartActivity(Context context, String activity, String data);
@@ -135,13 +151,13 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     static native String EncrytpAndDecrypt(String message, String type, String password);
 
-    static native void saveUserData(String key,String value);
+    static native void saveUserData(String key, String value);
 
 
     static native String DefaultED(String message, String type);
 
 
-    TextInputEditText typemessage;
+    EditText typemessage;
     ImageView send;
     List<Message> messages;
     ChatManager chatManager;
@@ -155,7 +171,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     ImageView timer, enableboundage;
     CardView timerview, enableboundageview;
     DatabaseHelper helper;
-
+    ImageView menubutton;
+    static boolean isboundageitemavailable = false;
 
 
     private Date yesterday() {
@@ -163,6 +180,33 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         cal.add(Calendar.DATE, -1);
         return cal.getTime();
     }
+
+
+    void setScrollPosition() {
+        if (getIntent().hasExtra("recyclerview")) {
+            typemessage.setText(getIntent().getStringExtra("message"));
+            messagerecyclerview.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    messagerecyclerview.scrollToPosition(getIntent().getIntExtra("recyclerview", 0));
+                }
+            }, 10);
+
+        } else {
+
+            messagerecyclerview.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                }
+            }, 10);
+
+        }
+
+
+    }
+
+
     void InitConnection() throws Settings.SettingNotFoundException {
         if (connection != null) {
             Log.e("connection", "notnull");
@@ -260,12 +304,45 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                 messagerecyclerview.setItemAnimator(new DefaultItemAnimator());
 
-                messagerecyclerview.postDelayed(new Runnable() {
+
+                messagerecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
                     @Override
-                    public void run() {
-                        messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                        if (RecyclerView.SCROLL_STATE_IDLE == newState) {
+                            // fragProductLl.setVisibility(View.VISIBLE);
+                            Log.e("scrollstate", "idel");
+
+                            LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
+                            int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+                            int lastvisiblePosition = layoutManager.findLastVisibleItemPosition();
+
+                            Log.e("first", String.valueOf(firstVisiblePosition));
+                            Log.e("last", String.valueOf(lastvisiblePosition));
+
+                            boundageposition = getIntent().getStringExtra("boundage");
+
+
+                            ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
+                            for (int i = firstVisiblePosition; i <= lastvisiblePosition; i++) {
+                                String s = DefaultED(adapter.getItem(i).getBody(), "decode");
+                                ChatModel model = new Gson().fromJson(s, ChatModel.class);
+                                if (model.getBoundage().equals("1")) {
+                                    if (!boundageposition.equals("1")) {
+                                        RestartActivity("type1");
+                                    }
+                                    isboundageitemavailable = true;
+                                    break;
+                                } else if (i == lastvisiblePosition) {
+                                    if (!boundageposition.equals("0")) {
+                                        RestartActivity("type0");
+                                        isboundageitemavailable = false;
+                                    }
+                                }
+                            }
+                        }
                     }
-                }, 100);
+                });
 
 
             } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException | SmackException.NotLoggedInException | InterruptedException e) {
@@ -273,12 +350,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
         }
     }
+
+
     void setPassword() {
         Dialog dialog = new Dialog(ShowUserMessage.this);
         View vi = getLayoutInflater().inflate(R.layout.setencryptionpassword, null, false);
         EditText setpassword = vi.findViewById(R.id.typepassword);
         TextView cancel = vi.findViewById(R.id.cancel);
         TextView save = vi.findViewById(R.id.save);
+        setpassword.setText(passstr);
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,7 +369,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                     setpassword.requestFocus();
                 } else {
                     try {
-                        updateUserInfo(1,password);
+                        updateUserInfo(1, password);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -309,35 +389,39 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         dialog.setContentView(vi);
         dialog.show();
     }
+
     void updateUserInfo(int field, String value) throws JSONException {
         switch (field) {
             case 1: {
                 //update password
-                helper.UpdateFriendInformation(userphonenumber,"textpass",value,getLoginInfo("page_no"));
+                helper.UpdateFriendInformation(userphonenumber, "textpass", value, getLoginInfo("page_no"));
                 passstr = value;
                 break;
             }
             case 2: {
                 //update timer
-                helper.UpdateFriendInformation(userphonenumber,"timer",value,getLoginInfo("page_no"));
+                helper.UpdateFriendInformation(userphonenumber, "timer", value, getLoginInfo("page_no"));
                 timerstr = value;
                 break;
             }
             case 3: {
                 //update boundage
-                helper.UpdateFriendInformation(userphonenumber,"boundage",value,getLoginInfo("page_no"));
+                helper.UpdateFriendInformation(userphonenumber, "boundage", value, getLoginInfo("page_no"));
                 boundagestr = value;
                 break;
             }
         }
     }
+
     AlertDialog dialog;
+
     void showTimerDialog() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view1 = getLayoutInflater().inflate(R.layout.numberpicker, null, false);
         EditText setTimer = view1.findViewById(R.id.timer);
         TextView save = view1.findViewById(R.id.save);
+        setTimer.setText(timerstr);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -367,14 +451,22 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
     String passstr = "";
-    String timerstr="";
-    String boundagestr="";
+    String timerstr = "";
+    String boundagestr = "";
     String userphonenumber;
     boolean isDatabaseAvailable = false;
+    Bundle save;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        boundageposition = getIntent().getStringExtra("boundage");
+        if (boundageposition.equals("1")) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        }
+        save = savedInstanceState;
+
         setContentView(R.layout.activity_show_user_message);
         messagerecyclerview = findViewById(R.id.messagerecyclerview);
         typemessage = findViewById(R.id.typemessage);
@@ -385,26 +477,39 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         enableboundage = findViewById(R.id.enableboundage);
         enableboundageview = findViewById(R.id.enableboundageview);
         helper = new DatabaseHelper(this);
+        menubutton = findViewById(R.id.menubutton);
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
+        menubutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               // takeScreenshot();
+                drawerLayout.openDrawer(GravityCompat.END);
+            }
+        });
         userphonenumber = getIntent().getStringExtra("phone_no");
 
-        Cursor c = helper.getData(userphonenumber,getLoginInfo("page_no"));
+        Cursor c = helper.getData(userphonenumber, getLoginInfo("page_no"));
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
             String data2 = c.getString(c.getColumnIndex("phonenumber"));
             passstr = c.getString(c.getColumnIndex("textpass"));
             boundagestr = c.getString(c.getColumnIndex("boundage"));
             timerstr = c.getString(c.getColumnIndex("timer"));
-            isDatabaseAvailable =true;
+            isDatabaseAvailable = true;
         }
-            c.close();
+        c.close();
 
-            if(!isDatabaseAvailable){
-                helper.setFriendInformation(userphonenumber,"","0","0",getLoginInfo("page_no"));
-                passstr = "";
-                timerstr = "0";
-                boundagestr = "0";
-            }
+        if (!isDatabaseAvailable) {
+            helper.setFriendInformation(userphonenumber, "", "0", "0", getLoginInfo("page_no"));
+            passstr = "";
+            timerstr = "0";
+            boundagestr = "0";
+        }
 
 
+
+        Log.e("pass",passstr);
 
         if (!timerstr.equals("0")) {
             timerview.setCardBackgroundColor(getResources().getColor(R.color.green));
@@ -490,7 +595,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         });
 
 
-
 // ContentView is the root view of the layout of this activity/fragment
         drawerLayout.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -521,7 +625,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 });
 
 
-
         typemessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -534,7 +637,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 send.setEnabled(mess != null);
                 Chat chat = null;
                 try {
-                    chat = chatManager.chatWith(JidCreate.entityBareFrom(userphonenumber+ "@" + Important.getXmppHost()));
+                    chat = chatManager.chatWith(JidCreate.entityBareFrom(userphonenumber + "@" + Important.getXmppHost()));
                 } catch (XmppStringprepException e) {
                     e.printStackTrace();
                 }
@@ -567,6 +670,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         InitLinks();
 
 
+        setScrollPosition();
+
     }
 
 
@@ -579,7 +684,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 if (messagerecyclerview.getAdapter() != null)
                     messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
             }
-        }, 100);
+        }, 10);
 
     }
 
@@ -635,12 +740,9 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 sb.append(c);
             }
 
-
             ChatModel model = new ChatModel();
 
-
             String encodec;
-
 
             encodec = EncrytpAndDecrypt(body, "encode", passstr);
 
@@ -649,22 +751,20 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             String userexpiry = timerstr;
 
 
-
-
             model.setBody(encodec);
             model.setBoundage(userboundage);
             model.setHash1(Functions.md5(userpassword));
             model.setHash2(Functions.Sha1(userpassword));
             model.setTimestamp(getDate("0"));
+
             model.setExpiry(getDate(userexpiry));
+
 
             Gson gson = new Gson();
             String finalbody = gson.toJson(model);
 
-
             Message message = new Message();
             message.setBody(DefaultED(finalbody, "encode"));
-
 
             message.setType(Message.Type.chat);
             message.setStanzaId(sb.toString());
@@ -704,22 +804,13 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                     public void run() {
                         messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
                     }
-                }, 100);
+                }, 10);
             }
         });
 
 
     }
 
-    void setUpBoundage(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ShowUserMessage.this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
-            }
-        });
-
-    }
 
     public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Context context;
@@ -736,11 +827,12 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         private class MessageInViewHolder extends RecyclerView.ViewHolder {
 
 
-            private TextView message, time;
-            private CircleImageView profilepicture;
+            private final TextView message, time;
+            private final CircleImageView profilepicture;
 
             MessageInViewHolder(final View itemView) {
                 super(itemView);
+
                 message = itemView.findViewById(R.id.sendertext);
                 time = itemView.findViewById(R.id.timetext);
                 profilepicture = itemView.findViewById(R.id.profile_image);
@@ -765,18 +857,22 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 String timestamp = chatModel.getTimestamp();
                 String expirytime = chatModel.getExpiry();
                 String boundagetime = chatModel.getBoundage();
-                if(!boundagetime.equals("0")){
-                    setUpBoundage();
+                if (!boundagetime.equals("0")) {
+                    if (list.size() - 1 == position) {
+                        if (!boundageposition.equals("1")) {
+                            Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
+                            RestartActivity("type1");
+                        }
+                        if (!isboundageitemavailable) {
+                            RestartActivity("type0");
+                        }
+                    }
                 }
-
-                Log.e("timestamp",timestamp);
-                Log.e("expirytime",expirytime);
-
 
                 message.setText(encodec);
                 time.setText(chatModel.getTimestamp());
 
-                if(!expirytime.equals(timestamp)){
+                if (!expirytime.equals(timestamp)) {
                     SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
                     try {
                         Date expiredate = format.parse(expirytime);
@@ -784,10 +880,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                         Date timestampdate = format.parse(timestamp);
 
 
-                        if(currentime.compareTo(expiredate)>0){
+                        if (currentime.compareTo(expiredate) > 0) {
                             message.setText("Message Expired!");
-                        }else {
-                            long difference = dateDifference(timestampdate,expiredate);
+                        } else {
+                            long difference = dateDifference(timestampdate, expiredate);
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
@@ -800,12 +896,12 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                                                 public void run() {
                                                     messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
                                                 }
-                                            }, 100);
+                                            }, 10);
                                         }
                                     });
 
                                 }
-                            },difference);
+                            }, difference);
                         }
 
                     } catch (ParseException e) {
@@ -815,14 +911,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 }
 
 
-
             }
         }
 
         private class MessageOutViewHolder extends RecyclerView.ViewHolder {
 
-            private TextView message, time;
-            private CircleImageView profilepicture;
+            private final TextView message;
+            private final TextView time;
+            private final CircleImageView profilepicture;
+
 
             MessageOutViewHolder(final View itemView) {
                 super(itemView);
@@ -846,21 +943,31 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 message.setText(encodec);
                 time.setText(chatModel.getTimestamp());
 
-                if(!boundagetime.equals("0")){
-                    setUpBoundage();
+                if (!boundagetime.equals("0")) {
+                    if (list.size() - 1 == position) {
+                        if (!boundageposition.equals("1")) {
+                            Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
+                            RestartActivity("type1");
+                            isboundageitemavailable = true;
+                        } else {
+                            if (!isboundageitemavailable) {
+                                RestartActivity("type0");
+                            }
+                        }
+                    }
                 }
 
 
-                if(!expirytime.equals(timestamp)){
+                if (!expirytime.equals(timestamp)) {
                     SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
                     try {
                         Date expiredate = format.parse(expirytime);
                         Date currentime = format.parse(getDate("0"));
                         Date timestampdate = format.parse(timestamp);
-                        if(currentime.compareTo(expiredate)>0){
+                        if (currentime.compareTo(expiredate) > 0) {
                             message.setText("Message Expired!");
-                        }else {
-                            long difference = dateDifference(timestampdate,expiredate);
+                        } else {
+                            long difference = dateDifference(timestampdate, expiredate);
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
@@ -873,12 +980,12 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                                                 public void run() {
                                                     messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
                                                 }
-                                            }, 100);
+                                            }, 10);
                                         }
                                     });
 
                                 }
-                            },difference);
+                            }, difference);
                         }
 
                     } catch (ParseException e) {
@@ -918,6 +1025,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
         }
 
+        public Message getItem(int position) {
+            return list.get(position);
+        }
+
         @Override
         public int getItemCount() {
             return list.size();
@@ -946,11 +1057,35 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     }
 
 
+    void RestartActivity(String type) {
+        Intent i = getIntent();
+        if (type.equals("type1")) {
+            i.putExtra("boundage", "1");
+            Toast.makeText(this, "Boundage Content found!", Toast.LENGTH_LONG).show();
+        } else {
+            i.putExtra("boundage", "0");
+            Toast.makeText(this, "Boundage Content not found!", Toast.LENGTH_LONG).show();
+        }
+
+        LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
+
+        overridePendingTransition(0, 0);
+        i.putExtra("recyclerview", layoutManager.findFirstVisibleItemPosition());
+        if(typemessage.getText().toString()!=null){
+            i.putExtra("message",typemessage.getText().toString());
+        }
+        startActivity(i);
+
+        overridePendingTransition(0, 0);
+        finish();
+
+    }
+
+
     //1 day = 3600 x 24 = 86400
     public long dateDifference(Date startDate, Date endDate) {
         //milliseconds
-       return endDate.getTime() - startDate.getTime();
-
+        return endDate.getTime() - startDate.getTime();
 
 
     }
@@ -963,8 +1098,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
             Calendar date = Calendar.getInstance();
-            long t= date.getTimeInMillis();
-            Date afterAddingTenMins=new Date(t + (Integer.parseInt(expiry) * 60000));
+            long t = date.getTimeInMillis();
+            Date afterAddingTenMins = new Date(t + (Integer.parseInt(expiry) * 60000));
 
             ourDate = dateFormatter.format(afterAddingTenMins);
 
@@ -974,5 +1109,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         }
         return ourDate;
     }
+
 
 }

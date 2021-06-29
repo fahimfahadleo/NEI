@@ -24,7 +24,7 @@ public class AboutActivity extends AppCompatActivity {
         context = this;
 
 
-        finish();
+
 
 
     }

@@ -82,6 +82,7 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                                 i.putExtra("table_id",myListData.getString("table_id"));
                                 i.putExtra("page_friend_id",myListData.getString("page_friend_id"));
                                 i.putExtra("status",myListData.getString("status"));
+                                i.putExtra("boundage", "0");
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -124,6 +125,22 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                             String status = myListData.getString("status");
                             if(status.equals("8")){
                                 seal.setText("Unseal");
+                                mutenotification.setEnabled(false);
+                                mutenotificationview.setEnabled(false);
+                                markasunread.setEnabled(false);
+                                markasunreadview.setEnabled(false);
+                                ignoremessage.setEnabled(false);
+                                ignoremessageview.setEnabled(false);
+                                block.setEnabled(false);
+                                blockview.setEnabled(false);
+                                delete.setEnabled(false);
+                                deleteview.setEnabled(false);
+                            }else if(status.equals("6")){
+                                ignoremessage.setText("Release");
+                                mutenotification.setEnabled(false);
+                                mutenotificationview.setEnabled(false);
+                                markasunread.setEnabled(false);
+                                markasunreadview.setEnabled(false);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

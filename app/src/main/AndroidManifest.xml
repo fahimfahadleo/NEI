@@ -71,10 +71,10 @@
         <activity android:name=".UserVerificationActivity" />
         <activity
             android:name=".RegisterNewUser"
-            android:windowSoftInputMode="stateHidden|adjustResize"></activity>
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".LoginActivity"
-            android:windowSoftInputMode="adjustNothing"></activity>
+            android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".MainActivity" />
     </application>
 

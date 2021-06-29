@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingTop="@dimen/_2sdp"
+    android:id="@+id/containerlayout"
     android:paddingStart="@dimen/_16sdp"
     android:background="#00000000"
     android:gravity="end"

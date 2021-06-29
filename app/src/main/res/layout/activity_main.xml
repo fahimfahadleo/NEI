@@ -363,7 +363,7 @@
                                 android:src="@drawable/help" />
 
                             <TextView
-                                android:id="@+id/help"
+                                android:id="@+id/helptext"
                                 android:layout_width="match_parent"
                                 android:layout_height="@dimen/_35sdp"
                                 android:gravity="center|start"
@@ -405,7 +405,7 @@
                                 android:src="@drawable/contact_us" />
 
                             <TextView
-                                android:id="@+id/contactus"
+                                android:id="@+id/contactustext"
                                 android:layout_width="match_parent"
                                 android:layout_height="@dimen/_35sdp"
                                 android:gravity="center|start"
@@ -447,7 +447,7 @@
                                 android:src="@drawable/tandc" />
 
                             <TextView
-                                android:id="@+id/termsandconditions"
+                                android:id="@+id/termsandconditionstext"
                                 android:layout_width="match_parent"
                                 android:layout_height="@dimen/_35sdp"
                                 android:gravity="center|start"
@@ -462,7 +462,7 @@
 
 
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/policy"
+                        android:id="@+id/policyview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
