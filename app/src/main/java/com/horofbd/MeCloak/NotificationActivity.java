@@ -33,6 +33,9 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.horofbd.MeCloak.MainActivity.notificationcounter;
+import static com.horofbd.MeCloak.MainActivity.notificationcounterveiw;
+
 public class NotificationActivity extends AppCompatActivity implements ServerResponse {
     static Context context;
 
@@ -44,6 +47,7 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
     TabLayout tabLayout;
     ViewPager viewPager;
     ArrayList<String> namelist;
+    DatabaseHelper helper;
 
     static {
         System.loadLibrary("native-lib");
@@ -66,6 +70,23 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
         namelist = new ArrayList<>();
         //ServerRequest.RetriveFriendRequest(this,1);
         context = this;
+        helper = new DatabaseHelper(this);
+        new Functions(this);
+
+
+        MainActivity.notificationcount = 0;
+        MainActivity.notificationRead = "true";
+        helper.UpdateNotification("notificationcount", "0");
+        helper.UpdateNotification("notificationread", "true");
+        ((Activity) context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notificationcounter.setText("0");
+                notificationcounterveiw.setVisibility(View.INVISIBLE);
+            }
+        });
+
+
 
 
         final MyAdapter adapter = new MyAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount());
@@ -95,6 +116,7 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
         Log.e("notification", response);
+        Functions.dismissDialogue();
         CheckResponse(this, this, response, requestcode);
     }
 

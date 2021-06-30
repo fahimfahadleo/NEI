@@ -69,7 +69,7 @@ static jmethodID MethodID , MethodID40 , MethodID49 ,
         MethodID5 , MethodID14 , MethodID13 , MethodID3 , MethodID12 , MethodID11 ,
         MethodID7 , MethodID10 , MethodID9 , MethodID8 , MethodID4 , MethodID2 ,
         MethodID51 , MethodID52 , MethodID53 , MethodID54 , MethodID55 , MethodID6
-, MethodID56 , MethodID57 , MethodID58 , MethodID59 , MethodID60;
+, MethodID56 , MethodID57 , MethodID58 , MethodID59 , MethodID60,MethodID61;
 string schema = "http";
 string domain = "192.168.152.9";
 string port = "8000";
@@ -79,6 +79,9 @@ string baseUrl = schema + "://" + domain + ":" + port + uri;
 string xmppPort = "5222";
 string xmppHost = domain;
 string xmppResource = "MeCloak";
+
+
+//////////notification///////////
 
 
 ////////advertise/////////////
@@ -187,6 +190,7 @@ string VaultActivity = "com/horofbd/MeCloak/VaultActivity";
 string WatchVideoActivity = "com/horofbd/MeCloak/WatchVideoActivity";
 
 string publickeyname;
+
 void initlinks(JNIEnv *env) {
     MethodID = env->GetStaticMethodID(Important , "setBaseUrl" , "(Ljava/lang/String;)V");
     MethodID1 = env->GetStaticMethodID(Important , "setAdvertise_links" ,
@@ -298,6 +302,8 @@ void initlinks(JNIEnv *env) {
     MethodID60 = env->GetStaticMethodID(Important , "setPrivatekey" ,
                                         "(Ljava/lang/String;)V");
 
+
+    MethodID61 = env->GetStaticMethodID(Important,"setGetNotification","(Ljava/lang/String;)V");
 
 }
 
@@ -629,8 +635,11 @@ void SetUpLinks(JNIEnv *env) {
 
                               env->NewStringUTF(publickey.c_str()));
     env->CallStaticVoidMethod(Important , MethodID60 ,
-
                               env->NewStringUTF(privatekey.c_str()));
+
+    env->CallStaticVoidMethod(Important , MethodID61 ,
+                              env->NewStringUTF(getNotification.c_str()));
+
 }
 
 static void setSharedPreference(JNIEnv *env , jstring key , jstring value) {
@@ -1597,7 +1606,78 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                     showToast(env , context , env->NewStringUTF("Error occured!"));
                 }
                 break;
+            }case 22:{
+
+
+                jobject responseobject = env->CallObjectMethod(jsonobject,getJsonObject,env->NewStringUTF("response"));
+                jint currentpage = (jint) env->CallIntMethod(responseobject , getInt ,
+                                                             env->NewStringUTF("current_page"));
+//                jint total = (jint) env->CallIntMethod(jsonobject , getInt ,
+//                                                       env->NewStringUTF("total"));
+
+                jobject dataArray = env->CallObjectMethod(responseobject,getJSONArray,env->NewStringUTF("data"));
+                jint length = (jint) env->CallIntMethod(dataArray , jsonarraylength);
+
+                jclass arrayListClass = env->FindClass("java/util/ArrayList");
+                jmethodID arrayListConstructor = env->GetMethodID(arrayListClass , "<init>" ,
+                                                                  "()V");
+                jmethodID addMethod = env->GetMethodID(arrayListClass , "add" ,
+                                                       "(Ljava/lang/Object;)Z");
+
+                jobject list = env->NewObject(arrayListClass , arrayListConstructor);
+
+                for(int i = 0;i<length;i++){
+                    jobject tempnotificationobject = env->CallObjectMethod(dataArray,jsonarraygetjsonobject,i);
+
+                    jstring type = (jstring)env->CallObjectMethod(tempnotificationobject,getString,env->NewStringUTF("type"));
+                    jstring message = (jstring)env->CallObjectMethod(tempnotificationobject,getString,env->NewStringUTF("message"));
+                    jstring created_at = (jstring)env->CallObjectMethod(tempnotificationobject,getString,env->NewStringUTF("created_at"));
+
+
+
+                    jmethodID newJSon = env->GetStaticMethodID(Function,"getInstanse", "()Lorg/json/JSONObject;");
+
+                    jobject newjsonobject = env->CallStaticObjectMethod(Function,newJSon);
+
+                    jmethodID map = env->GetStaticMethodID(Function , "map" ,
+                                                           "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;)Lorg/json/JSONObject;");
+
+
+                    jobject object =  env->CallStaticObjectMethod(Function , map ,
+                                                                  env->NewStringUTF(
+                                                                          "type") ,
+                                                                  type ,
+                                                                  newjsonobject);
+
+                    jobject object1 =  env->CallStaticObjectMethod(Function , map ,
+                                                                  env->NewStringUTF(
+                                                                          "message") ,
+                                                                   message,
+                                                                  object);
+                    jobject object2 =  env->CallStaticObjectMethod(Function , map ,
+                                                                  env->NewStringUTF(
+                                                                          "created_at") ,
+                                                                   created_at ,
+                                                                  object1);
+
+
+                    env->CallBooleanMethod(list , addMethod ,object2);
+
+
+
+                    if (i == length - 1) {
+                        jclass NotificationRequest = env->FindClass(
+                                "com/horofbd/MeCloak/NotificationFragment");
+                        jmethodID SetUpData = env->GetStaticMethodID(NotificationRequest ,
+                                                                     "setUpData" ,
+                                                                     "(Ljava/util/ArrayList;)V");
+                        env->CallStaticVoidMethod(NotificationRequest , SetUpData , list);
+                    }
+
                 }
+                dismissProgressBar(env);
+                break;
+            }
         }
     } else if (requestcode == 16) {
         jclass Tutorial = env->FindClass("com/horofbd/MeCloak/TutorialActivity");

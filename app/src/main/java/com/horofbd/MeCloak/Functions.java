@@ -155,6 +155,10 @@ public class Functions {
         return jsonObject;
     }
 
+    public static JSONObject getInstanse(){
+        return new JSONObject();
+    }
+
     public static void Logcat(String tag, String s) {
         Log.e(tag, s);
     }

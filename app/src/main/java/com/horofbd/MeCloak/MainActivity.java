@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,9 +20,11 @@ import android.text.TextUtils;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -288,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         try {
             jsonObject.put("page_id", getLoginInfo("page_id"));
             globalRequest(this, "POST", Important.getFriend_list(), jsonObject, 12, context);
-            Log.e("onResume", "Called");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -391,6 +393,15 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         Functions.dismissDialogue();
         CheckResponse(this, this, response, requestcode);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (notificationRead != null && notificationcount == 0) {
+            notificationcounterveiw.setVisibility(View.INVISIBLE);
+            notificationcounter.setText("0");
+        }
     }
 
     @Override
@@ -1040,26 +1051,23 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                         String body = jsonObject.getString("message");
                         Log.e("body", body);
                         Log.e("type", type);
-                        switch (type) {
-                            case "alert":
-                                showSnackbar(body);
-                                break;
-                            case "new_friend_request":
-                            case "friend_request_accepted":
-                                notificationcount = notificationcount + 1;
-                                notificationRead = "false";
-                                helper.UpdateNotification("notificationcount", String.valueOf(notificationcount));
-                                helper.UpdateNotification("notificationread", "false");
-                                ((Activity) context).runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        notificationcounter.setText(String.valueOf(notificationcount));
-                                        notificationcounterveiw.setVisibility(View.VISIBLE);
-                                    }
-                                });
 
-                                break;
-                        }
+                        notificationcount = notificationcount + 1;
+                        notificationRead = "false";
+                        helper.UpdateNotification("notificationcount", String.valueOf(notificationcount));
+                        helper.UpdateNotification("notificationread", "false");
+
+                        Log.e("notification count", String.valueOf(notificationcount));
+                        Log.e("notification status", String.valueOf(notificationRead));
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                notificationcounter.setText(String.valueOf(notificationcount));
+                                notificationcounterveiw.setVisibility(View.VISIBLE);
+
+                            }
+                        });
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -1085,7 +1093,15 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Snackbar.make(((Activity) context).getWindow().getDecorView().getRootView(), message, Snackbar.LENGTH_LONG).show();
+                Snackbar snack = Snackbar.make(((Activity) context).getWindow().getDecorView().getRootView(), message, Snackbar.LENGTH_LONG);
+                View view = snack.getView();
+                view.setBackgroundColor(context.getResources().getColor(R.color.background));
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+                params.gravity = Gravity.TOP;
+                TextView tv = (TextView) view.findViewById(R.id.snackbar_text);
+                tv.setTextColor(Color.parseColor("#000000"));
+                view.setLayoutParams(params);
+                snack.show();
             }
         });
 

@@ -54,9 +54,49 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
     public void onBindViewHolder(@NotNull ListViewAdapter.ViewHolder holder, int position) {
         final JSONObject myListData = listdata.get(position);
         try {
-            if (vi == R.layout.showsinglefriendrequest) {
-                holder.textView.setText(myListData.getString("name") + "(" + myListData.getString("phone_no") + ")");
+            if(vi == R.layout.notificationlayout){
 
+                holder.textView.setText(myListData.getString("message"));
+                switch (myListData.getString("type")){
+                    case "alert":{
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.red));
+                        break;
+                    } case "new_friend_request":{
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.green));
+                        break;
+                    } case "friend_request_accepted":{
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.green_500));
+                        break;
+                    } case "expiry":{
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.red_500));
+                        break;
+                    } case "offers":{
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.background));
+                        break;
+                    } case "recharge":{
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.blue_grey_500));
+                        break;
+                    } case "message_recall":{
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.shadow));
+                        break;
+                    } case "success":{
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.oceanblue));
+                        break;
+                    }
+                }
+                imageViewSetUp(myListData.getString("type"), holder.imageView);
+                holder.cardView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            Log.e("notification","notificationcardviewselected "+myListData.getString("message"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }else if (vi == R.layout.showsinglefriendrequest) {
+                holder.textView.setText(myListData.getString("name") + "(" + myListData.getString("phone_no") + ")");
                 holder.cardView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -64,6 +104,7 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                     }
                 });
 
+                imageViewSetUp(myListData.getString("id"), holder.imageView);
             } else if (vi == R.layout.singlefriend) {
                 if (myListData.getString("status").equals("2")) {
                     holder.textView.setText(myListData.getString("name"));
