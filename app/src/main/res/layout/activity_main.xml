@@ -5,7 +5,6 @@
     android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:background="@color/background"
     android:theme="@style/AppTheme.NoActionBar"
     tools:context=".MainActivity">
@@ -106,9 +105,9 @@
                     android:padding="@dimen/_8sdp"
                     android:src="@drawable/menu_white" />
             </LinearLayout>
-
-
         </LinearLayout>
+
+
 
 
         <LinearLayout
@@ -155,9 +154,38 @@
                 android:id="@+id/recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:scrollbars="vertical"
                 android:divider="@null" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_18sdp"
+            android:id="@+id/connectionlayout"
+            android:layout_below="@id/titlelayout"
+            android:background="@color/red_500"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/_2sdp"
+                android:text="Connecting"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textStyle="bold"
+                android:textColor="#000"/>
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/connectingprogressbar"
+                />
+
+        </LinearLayout>
+
 
         <androidx.cardview.widget.CardView
             android:layout_width="@dimen/_36sdp"
@@ -198,7 +226,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:foreground="?android:attr/selectableItemBackground"
-
                 app:cardBackgroundColor="@color/cardbgcolor"
                 app:cardCornerRadius="5dp"
                 app:cardElevation="8dp">
@@ -250,6 +277,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/_8sdp"
                     android:orientation="vertical">
                     <androidx.cardview.widget.CardView
                         android:id="@+id/gopremiumview"

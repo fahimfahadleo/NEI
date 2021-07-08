@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,9 +54,53 @@ public class ContactRequest extends Fragment {
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
                 recyclerView.setAdapter(adapter);
+
+
+                recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                    }
+
+                    @Override
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                            if(!nextpageurl.equals("")){
+                                NotificationActivity.globalRequest(serverResponse, "GET", nextpageurl, new JSONObject(), 9, context);
+                                nextpageurl = "";
+                                LinearLayoutManager linearLayoutManager = (LinearLayoutManager)recyclerView.getLayoutManager();
+                                pageposition = linearLayoutManager.findFirstVisibleItemPosition();
+
+                            }else {
+                                Toast.makeText(context, "Reached Bottom", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    }
+                });
+
+                adapter.notifyDataSetChanged();
+                setRecyclerviewposition();
+                Functions.dismissDialogue();
             }
         });
 
+    }
+
+    static int pageposition;
+    static void setRecyclerviewposition(){
+        recyclerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                recyclerView.getLayoutManager().scrollToPosition(pageposition);
+            }
+        },50);
+    }
+
+    static String nextpageurl = "";
+    public static void setNextpageurl(String next){
+        nextpageurl =next;
     }
 
     static class ListviewAdapter extends ListViewAdapter {

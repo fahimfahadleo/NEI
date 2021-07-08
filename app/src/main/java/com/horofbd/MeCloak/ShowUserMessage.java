@@ -25,6 +25,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,6 +68,7 @@ import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.text.ParseException;
@@ -82,7 +84,7 @@ import okhttp3.Response;
 
 import static com.horofbd.MeCloak.MainActivity.connection;
 
-public class ShowUserMessage extends AppCompatActivity implements ServerResponse, IncomingChatMessageListener, OutgoingChatMessageListener,ImageResponse {
+public class ShowUserMessage extends AppCompatActivity implements ServerResponse, IncomingChatMessageListener, OutgoingChatMessageListener, ImageResponse {
 
     static {
         System.loadLibrary("native-lib");
@@ -102,9 +104,9 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     DrawerLayout drawerLayout;
     ChatMessageAdapter adapter;
     EditText typepassword;
-    OmemoManager omemoManager;
     ImageView timer, enableboundage;
-    CardView timerview, enableboundageview;
+    CardView timerview, enableboundageview, boundageview;
+    TextView boundagetext, boundagetip;
     DatabaseHelper helper;
     ImageView menubutton;
     static boolean isboundageitemavailable = false;
@@ -116,8 +118,16 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     String userphonenumber;
     boolean isDatabaseAvailable = false;
     Bundle save;
-    TextView titletext;
+    TextView titletext,timerside;
     CircleImageView profilepicture;
+    ImageView showbelow;
+    ScrollView belowview;
+    boolean isbelowviewvisible = false;
+    ImageView boundagebelow;
+    CardView boundagebelowview;
+    CardView passwordview,passwordbelowview,timerbelowview,timersideview;
+    ImageView passwordbutton,passwordbelowbutton,timerbelow;
+
 
     static native void StartActivity(Context context, String activity, String data);
 
@@ -140,305 +150,13 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static native String DefaultED(String message, String type);
 
 
-    private Date yesterday() {
-        final Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        return cal.getTime();
-    }
-    void setScrollPosition() {
-        if (getIntent().hasExtra("recyclerview")) {
-            typemessage.setText(getIntent().getStringExtra("message"));
-            messagerecyclerview.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    messagerecyclerview.scrollToPosition(getIntent().getIntExtra("recyclerview", 0));
-                }
-            }, 10);
-
-        } else {
-
-            messagerecyclerview.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
-                }
-            }, 10);
-
-        }
-
-
-    }
-    void InitConnection() throws Settings.SettingNotFoundException {
-        if (connection != null) {
-            Log.e("connection", "notnull");
-            chatManager = ChatManager.getInstanceFor(connection);
-            chatManager.addIncomingListener(this);
-            chatManager.addOutgoingListener(this);
-
-
-            ChatStateManager chatmanager = ChatStateManager.getInstance(connection);
-            chatmanager.addChatStateListener(new ChatStateListener() {
-                @Override
-                public void stateChanged(Chat chat, ChatState state, Message message) {
-                    Log.e("chatstate", String.valueOf(state));
-                }
-            });
-
-
-            MessageEventNotificationListener listener = new MessageEventNotificationListener() {
-                @Override
-                public void deliveredNotification(Jid from, String packetID) {
-                    Log.e("messaereceived", "from: " + from.toString() + " id: " + packetID);
-                }
-
-                @Override
-                public void displayedNotification(Jid from, String packetID) {
-                    Log.e("notification", "from: " + from.toString() + " id: " + packetID);
-                }
-
-                @Override
-                public void composingNotification(Jid from, String packetID) {
-                    Log.e("typing", "from: " + from.toString() + " id: " + packetID);
-                }
-
-                @Override
-                public void offlineNotification(Jid from, String packetID) {
-                    Log.e("offline", "from: " + from.toString() + " id: " + packetID);
-                }
-
-                @Override
-                public void cancelledNotification(Jid from, String packetID) {
-                    Log.e("cancelled", "from: " + from.toString() + " id: " + packetID);
-                }
-            };
-
-            MessageEventManager messageEventManager = MessageEventManager.getInstanceFor(connection);
-            messageEventManager.addMessageEventNotificationListener(listener);
-            DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
-            dm.setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
-            dm.autoAddDeliveryReceiptRequests();
-            try {
-                if (dm.isSupported(JidCreate.bareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost()))) {
-                    Log.e("Deliveryreceipt", "supported");
-                } else {
-                    Log.e("Deliveryreceipt", "notsupported");
-                }
-                dm.addReceiptReceivedListener(new ReceiptReceivedListener() {
-
-                    @Override
-                    public void onReceiptReceived(Jid fromJid, Jid toJid,
-                                                  final String receiptId, Stanza receipt) {
-                        Log.e("messagestatus", "received");
-                    }
-                });
-            } catch (SmackException | XmppStringprepException | InterruptedException | XMPPException e) {
-                e.printStackTrace();
-            }
-
-
-            FormField formField = null;
-            try {
-                formField = FormField.builder("with").setValue(JidCreate.bareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost())).build();
-            } catch (XmppStringprepException e) {
-                e.printStackTrace();
-            }
-
-            MamManager manager = MamManager.getInstanceFor(connection);
-            MamManager.MamQueryArgs mamQueryArgs = MamManager.MamQueryArgs.builder()
-                    .limitResultsSince(yesterday())
-                    .queryLastPage().withAdditionalFormField(formField)
-                    .build();
-            try {
-                MamManager.MamQuery mamQuery = manager.queryArchive(mamQueryArgs);
-                messages = new LinkedList<Message>(mamQuery.getMessages());
-                ;
-                Log.e("list", messages.toString());
-
-                adapter = new ChatMessageAdapter(this, messages);
-                messagerecyclerview.setAdapter(adapter);
-                Log.e("message size", String.valueOf(messages.size()));
-
-
-                messagerecyclerview.scrollToPosition(adapter.getItemCount() - 1);
-                messagerecyclerview.setItemViewCacheSize(30);
-                messagerecyclerview.setDrawingCacheEnabled(true);
-                messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                messagerecyclerview.setItemAnimator(new DefaultItemAnimator());
-
-
-                messagerecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-                        if (RecyclerView.SCROLL_STATE_IDLE == newState) {
-                            // fragProductLl.setVisibility(View.VISIBLE);
-                            Log.e("scrollstate", "idel");
-
-                            LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
-                            int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
-                            int lastvisiblePosition = layoutManager.findLastVisibleItemPosition();
-
-                            Log.e("first", String.valueOf(firstVisiblePosition));
-                            Log.e("last", String.valueOf(lastvisiblePosition));
-
-                            boundageposition = getIntent().getStringExtra("boundage");
-
-
-                            ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
-                            for (int i = firstVisiblePosition; i <= lastvisiblePosition; i++) {
-                                String s = DefaultED(adapter.getItem(i).getBody(), "decode");
-                                ChatModel model = new Gson().fromJson(s, ChatModel.class);
-                                if (model.getBoundage().equals("1")) {
-                                    if (!boundageposition.equals("1")) {
-                                        RestartActivity("type1");
-                                    }
-                                    isboundageitemavailable = true;
-                                    break;
-                                } else if (i == lastvisiblePosition) {
-                                    if (!boundageposition.equals("0")) {
-                                        RestartActivity("type0");
-                                        isboundageitemavailable = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-
-
-            } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException | SmackException.NotLoggedInException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    void setPassword() {
-        Dialog dialog = new Dialog(ShowUserMessage.this);
-        View vi = getLayoutInflater().inflate(R.layout.setencryptionpassword, null, false);
-        EditText setpassword = vi.findViewById(R.id.typepassword);
-        TextView cancel = vi.findViewById(R.id.cancel);
-        TextView save = vi.findViewById(R.id.save);
-        setpassword.setText(passstr);
-
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String password = setpassword.getText().toString();
-                if (TextUtils.isEmpty(password)) {
-                    setpassword.setError("Field Can Not be empty!");
-                    setpassword.requestFocus();
-                } else {
-                    try {
-                        updateUserInfo(1, password);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    dialog.dismiss();
-                }
-            }
-        });
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.setContentView(vi);
-        dialog.show();
-    }
-    void updateUserInfo(int field, String value) throws JSONException {
-        switch (field) {
-            case 1: {
-                //update password
-                helper.UpdateFriendInformation(userphonenumber, "textpass", value, getLoginInfo("page_no"));
-                passstr = value;
-                break;
-            }
-            case 2: {
-                //update timer
-                helper.UpdateFriendInformation(userphonenumber, "timer", value, getLoginInfo("page_no"));
-                timerstr = value;
-                break;
-            }
-            case 3: {
-                //update boundage
-                helper.UpdateFriendInformation(userphonenumber, "boundage", value, getLoginInfo("page_no"));
-                boundagestr = value;
-                break;
-            }
-        }
-    }
-    void showTimerDialog() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View view1 = getLayoutInflater().inflate(R.layout.numberpicker, null, false);
-        EditText setTimer = view1.findViewById(R.id.timer);
-        TextView save = view1.findViewById(R.id.save);
-        setTimer.setText(timerstr);
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String time = setTimer.getText().toString();
-                if (TextUtils.isEmpty(time)) {
-                    setTimer.setError("Field can not be emtpty!");
-                    setTimer.requestFocus();
-                } else {
-                    try {
-                        updateUserInfo(2, time);
-                        if (time.equals("0")) {
-                            timerview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
-                        } else {
-                            timerview.setCardBackgroundColor(getResources().getColor(R.color.green));
-                        }
-                        dialog.dismiss();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        builder.setView(view1);
-        dialog = builder.create();
-        dialog.show();
-    }
-
-    void setImage(ImageView imageView, Bitmap bitmap) {
-        imageView.setImageBitmap(bitmap);
-    }
-
-
-    @Override
-    public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) {
-
-        InputStream inputStream = response.body().byteStream();
-        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-        ((Activity) context).runOnUiThread(() -> {
-            if (bitmap != null) {
-                imageView.setImageBitmap(bitmap);
-
-            } else {
-                Log.e("bitmap", "null");
-            }
-        });
-
-
-    }
-
-    @Override
-    public void onImageFailure(String failresponse) {
-
-    }
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         boundageposition = getIntent().getStringExtra("boundage");
         if (boundageposition.equals("1")) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+
         }
         save = savedInstanceState;
         setContentView(R.layout.activity_show_user_message);
@@ -456,25 +174,27 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         StrictMode.setVmPolicy(builder.build());
         titletext = findViewById(R.id.titletext);
         profilepicture = findViewById(R.id.profile_image);
-        context = this;
-        titletext.setText(getIntent().getStringExtra("name"));
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("friend", getIntent().getStringExtra("id"));
-            ImageRequest(this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        showbelow = findViewById(R.id.showbelow);
+        belowview = findViewById(R.id.belowbar);
+        drawerLayout = findViewById(R.id.drawer);
+        typepassword = findViewById(R.id.typepassword);
+        setPassword = findViewById(R.id.setpasswordtext);
+        setpasswordview = findViewById(R.id.setpasswordview);
+        boundageview = findViewById(R.id.boundageview);
+        boundagetext = findViewById(R.id.boundagetext);
+        boundagetip = findViewById(R.id.boundagetips);
+        boundagebelow = findViewById(R.id.enablebelowboundage);
+        boundagebelowview = findViewById(R.id.enablebelowboundageview);
+        passwordview = findViewById(R.id.security).findViewById(R.id.passwordview);
+        passwordbutton = findViewById(R.id.security).findViewById(R.id.password);
+        passwordbelowbutton = findViewById(R.id.belowpassword);
+        passwordbelowview = findViewById(R.id.belowpasswordview);
+        timerbelow = findViewById(R.id.belowtimer);
+        timerbelowview = findViewById(R.id.belowtimerview);
+        timerside = findViewById(R.id.tiemrtext);
+        timersideview = findViewById(R.id.tiemrview);
 
-
-
-        menubutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               // takeScreenshot();
-                drawerLayout.openDrawer(GravityCompat.END);
-            }
-        });
+        String premiumstatus = getLoginInfo("premium");
         userphonenumber = getIntent().getStringExtra("phone_no");
 
         Cursor c = helper.getData(userphonenumber, getLoginInfo("page_no"));
@@ -494,16 +214,134 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             boundagestr = "0";
         }
 
+        timerbelow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimerDialog();
+            }
+        });
+        timerbelowview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimerDialog();
+            }
+        });
+
+        timerside.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimerDialog();
+            }
+        });
+
+        timersideview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimerDialog();
+            }
+        });
 
 
-        Log.e("pass",passstr);
+        boundagebelowview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setBoundageIcon();
+            }
+        });
+
+        boundagebelow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setBoundageIcon();
+            }
+        });
+
+        boundageview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setBoundageIcon();
+            }
+        });
+        boundagetext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setBoundageIcon();
+            }
+        });
+
+        boundagetip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTips(getResources().getString(R.string.boundagetip));
+            }
+        });
+
+
+        enableboundageview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setBoundageIcon();
+
+            }
+        });
+        enableboundage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setBoundageIcon();
+            }
+        });
+
+
+        context = this;
+        titletext.setText(getIntent().getStringExtra("name"));
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("friend", getIntent().getStringExtra("id"));
+            ImageRequest(this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        belowview.setVisibility(View.GONE);
+
+        showbelow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isbelowviewvisible) {
+                    isbelowviewvisible = false;
+                    belowview.setVisibility(View.GONE);
+                    showbelow.setImageDrawable(getResources().getDrawable(R.drawable.arrowdown));
+                } else {
+                    isbelowviewvisible = true;
+                    belowview.setVisibility(View.VISIBLE);
+                    showbelow.setImageDrawable(getResources().getDrawable(R.drawable.arrowupicon));
+                }
+            }
+        });
+
+        menubutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // takeScreenshot();
+                drawerLayout.openDrawer(GravityCompat.END);
+            }
+        });
+
+
+
+        Log.e("pass", passstr);
+        Log.e("pass", "passstr");
 
         if (!timerstr.equals("0")) {
             timerview.setCardBackgroundColor(getResources().getColor(R.color.green));
+            timersideview.setCardBackgroundColor(getResources().getColor(R.color.green));
+            timerbelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
         }
 
         if (!boundagestr.equals("0")) {
             enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
+            boundagebelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
+            boundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
         }
 
         timer.setOnClickListener(new View.OnClickListener() {
@@ -520,40 +358,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         });
 
 
-        enableboundageview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    if (!boundagestr.equals("0")) {
-                        updateUserInfo(3, "0");
-                        enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
-                    } else {
-                        updateUserInfo(3, "1");
-                        enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
-            }
-        });
-        enableboundage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-
-                    if (!boundagestr.equals("0")) {
-                        updateUserInfo(3, "0");
-                        enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
-                    } else {
-                        updateUserInfo(3, "1");
-                        enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
         try {
             InitConnection();
         } catch (Settings.SettingNotFoundException e) {
@@ -562,10 +367,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setStackFromEnd(true);
         messagerecyclerview.setLayoutManager(manager);
-        drawerLayout = findViewById(R.id.drawer);
-        typepassword = findViewById(R.id.security).findViewById(R.id.typepassword);
-        setPassword = findViewById(R.id.setpasswordtext);
-        setpasswordview = findViewById(R.id.setpasswordview);
 
 
         setpasswordview.setOnClickListener(new View.OnClickListener() {
@@ -580,6 +381,33 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 setPassword();
             }
         });
+
+        passwordview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPassword();
+            }
+        });
+
+        passwordbelowview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPassword();
+            }
+        });
+        passwordbelowbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPassword();
+            }
+        });
+        passwordbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPassword();
+            }
+        });
+
 
 
 // ContentView is the root view of the layout of this activity/fragment
@@ -658,6 +486,378 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
         setScrollPosition();
+
+    }
+
+
+    void setBoundageIcon() {
+        try {
+            if (!boundagestr.equals("0")) {
+                updateUserInfo(3, "0");
+                enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+                boundageview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+                boundagebelowview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+
+            } else {
+                updateUserInfo(3, "1");
+                enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                boundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                boundagebelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    AlertDialog tipdialog;
+
+    void showTips(String type) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View vi = getLayoutInflater().inflate(R.layout.tipbanner, null, false);
+        TextView tipmessage = vi.findViewById(R.id.tipmessage);
+        tipmessage.setText(type);
+        builder.setView(vi);
+        tipdialog = builder.create();
+        tipdialog.show();
+    }
+
+    private Date yesterday() {
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        return cal.getTime();
+    }
+
+    void setScrollPosition() {
+        if (getIntent().hasExtra("recyclerview")) {
+            typemessage.setText(getIntent().getStringExtra("message"));
+            messagerecyclerview.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    messagerecyclerview.scrollToPosition(getIntent().getIntExtra("recyclerview", 0));
+                }
+            }, 10);
+
+        } else {
+
+            messagerecyclerview.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                }
+            }, 10);
+
+        }
+
+
+    }
+
+    void InitConnection() throws Settings.SettingNotFoundException {
+        if (connection != null) {
+            Log.e("connection", "notnull");
+            chatManager = ChatManager.getInstanceFor(connection);
+            chatManager.addIncomingListener(this);
+            chatManager.addOutgoingListener(this);
+
+
+            ChatStateManager chatmanager = ChatStateManager.getInstance(connection);
+            chatmanager.addChatStateListener(new ChatStateListener() {
+                @Override
+                public void stateChanged(Chat chat, ChatState state, Message message) {
+                    Log.e("chatstate", String.valueOf(state));
+                }
+            });
+
+
+            MessageEventNotificationListener listener = new MessageEventNotificationListener() {
+                @Override
+                public void deliveredNotification(Jid from, String packetID) {
+                    Log.e("messaereceived", "from: " + from.toString() + " id: " + packetID);
+                }
+
+                @Override
+                public void displayedNotification(Jid from, String packetID) {
+                    Log.e("notification", "from: " + from.toString() + " id: " + packetID);
+                }
+
+                @Override
+                public void composingNotification(Jid from, String packetID) {
+                    Log.e("typing", "from: " + from.toString() + " id: " + packetID);
+                }
+
+                @Override
+                public void offlineNotification(Jid from, String packetID) {
+                    Log.e("offline", "from: " + from.toString() + " id: " + packetID);
+                }
+
+                @Override
+                public void cancelledNotification(Jid from, String packetID) {
+                    Log.e("cancelled", "from: " + from.toString() + " id: " + packetID);
+                }
+            };
+
+            MessageEventManager messageEventManager = MessageEventManager.getInstanceFor(connection);
+            messageEventManager.addMessageEventNotificationListener(listener);
+            DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
+            dm.setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
+            dm.autoAddDeliveryReceiptRequests();
+            try {
+                if (dm.isSupported(JidCreate.bareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost()))) {
+                    Log.e("Deliveryreceipt", "supported");
+                } else {
+                    Log.e("Deliveryreceipt", "notsupported");
+                }
+                dm.addReceiptReceivedListener(new ReceiptReceivedListener() {
+
+                    @Override
+                    public void onReceiptReceived(Jid fromJid, Jid toJid,
+                                                  final String receiptId, Stanza receipt) {
+                        Log.e("messagestatus", "received");
+                    }
+                });
+            } catch (SmackException | XmppStringprepException | InterruptedException | XMPPException e) {
+                e.printStackTrace();
+            }
+
+
+
+
+
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            FormField formField = null;
+                            try {
+                                formField = FormField.builder("with").setValue(JidCreate.bareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost())).build();
+                            } catch (XmppStringprepException e) {
+                                e.printStackTrace();
+                            }
+
+                            MamManager manager = MamManager.getInstanceFor(connection);
+                            MamManager.MamQueryArgs mamQueryArgs = MamManager.MamQueryArgs.builder()
+                                    .limitResultsSince(yesterday())
+                                    .queryLastPage().withAdditionalFormField(formField)
+                                    .build();
+                            try {
+                                MamManager.MamQuery mamQuery = manager.queryArchive(mamQueryArgs);
+                                messages = new LinkedList<Message>(mamQuery.getMessages());
+                                // Log.e("list", messages.toString());
+
+                                adapter = new ChatMessageAdapter(ShowUserMessage.this, messages);
+                                messagerecyclerview.setAdapter(adapter);
+                                Log.e("message size", String.valueOf(messages.size()));
+
+                                messagerecyclerview.scrollToPosition(adapter.getItemCount() - 1);
+                                messagerecyclerview.setItemViewCacheSize(30);
+                                messagerecyclerview.setDrawingCacheEnabled(true);
+                                messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+                                messagerecyclerview.setItemAnimator(new DefaultItemAnimator());
+
+
+                                messagerecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                                    @Override
+                                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                                        super.onScrollStateChanged(recyclerView, newState);
+                                        if (RecyclerView.SCROLL_STATE_IDLE == newState) {
+                                            // fragProductLl.setVisibility(View.VISIBLE);
+                                            Log.e("scrollstate", "idel");
+
+                                            LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
+                                            int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+                                            int lastvisiblePosition = layoutManager.findLastVisibleItemPosition();
+
+                                            Log.e("first", String.valueOf(firstVisiblePosition));
+                                            Log.e("last", String.valueOf(lastvisiblePosition));
+
+                                            boundageposition = getIntent().getStringExtra("boundage");
+
+
+                                            ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
+                                            for (int i = firstVisiblePosition; i <= lastvisiblePosition; i++) {
+                                                String s = DefaultED(adapter.getItem(i).getBody(), "decode");
+                                                ChatModel model = new Gson().fromJson(s, ChatModel.class);
+                                                if (model.getBoundage().equals("1")) {
+                                                    if (!boundageposition.equals("1")) {
+                                                        RestartActivity("type1");
+                                                    }
+                                                    isboundageitemavailable = true;
+                                                    break;
+                                                } else if (i == lastvisiblePosition) {
+                                                    if (!boundageposition.equals("0")) {
+                                                        RestartActivity("type0");
+                                                        isboundageitemavailable = false;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+
+
+                            } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException | SmackException.NotLoggedInException | InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            });
+
+
+        }
+    }
+
+
+    void setUpData(){
+        Log.e("setUpData","called");
+        messagerecyclerview.setAdapter(null);
+        adapter = new ChatMessageAdapter(this, messages);
+        messagerecyclerview.setAdapter(adapter);
+        Log.e("message size", String.valueOf(messages.size()));
+
+
+        messagerecyclerview.scrollToPosition(adapter.getItemCount() - 1);
+        messagerecyclerview.setItemViewCacheSize(30);
+        messagerecyclerview.setDrawingCacheEnabled(true);
+        messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        messagerecyclerview.setItemAnimator(new DefaultItemAnimator());
+        messagerecyclerview.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (messagerecyclerview.getAdapter() != null)
+                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+            }
+        }, 10);
+
+    }
+
+    void setPassword() {
+        Dialog dialog = new Dialog(ShowUserMessage.this);
+        View vi = getLayoutInflater().inflate(R.layout.setencryptionpassword, null, false);
+        EditText setpassword = vi.findViewById(R.id.typepassword);
+        TextView cancel = vi.findViewById(R.id.cancel);
+        TextView save = vi.findViewById(R.id.save);
+        setpassword.setText(passstr);
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String password = setpassword.getText().toString();
+                if (TextUtils.isEmpty(password)) {
+                    setpassword.setError("Field Can Not be empty!");
+                    setpassword.requestFocus();
+                } else {
+                    try {
+                        updateUserInfo(1, password);
+                        setpasswordview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                        passwordview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                        passwordbelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                        setUpData();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    dialog.dismiss();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setContentView(vi);
+        dialog.show();
+    }
+
+    void updateUserInfo(int field, String value) throws JSONException {
+        switch (field) {
+            case 1: {
+                //update password
+                helper.UpdateFriendInformation(userphonenumber, "textpass", value, getLoginInfo("page_no"));
+                passstr = value;
+                break;
+            }
+            case 2: {
+                //update timer
+                helper.UpdateFriendInformation(userphonenumber, "timer", value, getLoginInfo("page_no"));
+                timerstr = value;
+                break;
+            }
+            case 3: {
+                //update boundage
+                helper.UpdateFriendInformation(userphonenumber, "boundage", value, getLoginInfo("page_no"));
+                boundagestr = value;
+                break;
+            }
+        }
+    }
+
+    void showTimerDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view1 = getLayoutInflater().inflate(R.layout.numberpicker, null, false);
+        EditText setTimer = view1.findViewById(R.id.timer);
+        TextView save = view1.findViewById(R.id.save);
+        setTimer.setText(timerstr);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String time = setTimer.getText().toString();
+                if (TextUtils.isEmpty(time)) {
+                    setTimer.setError("Field can not be emtpty!");
+                    setTimer.requestFocus();
+                } else {
+                    try {
+                        updateUserInfo(2, time);
+                        if (time.equals("0")) {
+                            timerview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+                            timerbelowview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+                            timersideview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
+
+                        } else {
+                            timerview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                            timerbelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                            timersideview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                        }
+                        dialog.dismiss();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        builder.setView(view1);
+        dialog = builder.create();
+        dialog.show();
+    }
+
+    void setImage(ImageView imageView, Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) {
+
+        InputStream inputStream = response.body().byteStream();
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        ((Activity) context).runOnUiThread(() -> {
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+
+            } else {
+                Log.e("bitmap", "null");
+            }
+        });
+
+
+    }
+
+    @Override
+    public void onImageFailure(String failresponse) {
 
     }
 
@@ -848,7 +1048,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 me = 0;
                 if (him > 1) {
                     profilepicture.setVisibility(View.INVISIBLE);
-                }else {
+                } else {
                     JSONObject jsonObject = new JSONObject();
                     try {
                         jsonObject.put("friend", getIntent().getStringExtra("id"));
@@ -971,7 +1171,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 }
 
 
-
                 if (!expirytime.equals(timestamp)) {
                     SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
                     try {
@@ -1075,18 +1274,16 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         Intent i = getIntent();
         if (type.equals("type1")) {
             i.putExtra("boundage", "1");
-            Toast.makeText(this, "Boundage Content found!", Toast.LENGTH_LONG).show();
         } else {
             i.putExtra("boundage", "0");
-            Toast.makeText(this, "Boundage Content not found!", Toast.LENGTH_LONG).show();
         }
 
         LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
-
         overridePendingTransition(0, 0);
         i.putExtra("recyclerview", layoutManager.findFirstVisibleItemPosition());
-        if(typemessage.getText().toString()!=null){
-            i.putExtra("message",typemessage.getText().toString());
+
+        if (typemessage.getText().toString() != null) {
+            i.putExtra("message", typemessage.getText().toString());
         }
         startActivity(i);
 
@@ -1125,4 +1322,13 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     }
 
 
+    @Override
+    protected void onDestroy() {
+        try {
+            updateUserInfo(1, "");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
 }

@@ -27,9 +27,11 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
@@ -82,6 +84,12 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         System.loadLibrary("native-lib");
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Functions.dismissDialogue();
+    }
+
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
@@ -123,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     public static String notificationRead = "true";
     static TextView notificationcounter;
     static CardView notificationcounterveiw;
+    static LinearLayout connectinglayout;
 
 
     @Override
@@ -231,9 +240,11 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         aboutusview = findViewById(R.id.aboutview);
         notificationcounter = findViewById(R.id.notificationcounter);
         notificationcounterveiw = findViewById(R.id.notificationcounterview);
+        connectinglayout = findViewById(R.id.connectionlayout);
         helper = new DatabaseHelper(this);
         new Functions(this);
         InitLinks(this);
+
 
         Cursor c = helper.getNotificationData();
         if (c != null) {
@@ -317,6 +328,21 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         Log.e("pass", getLoginInfo("sec"));
 
 
+    }
+
+    static int pageposition;
+    static void setRecyclerviewposition(){
+        recyclerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                recyclerView.getLayoutManager().scrollToPosition(pageposition);
+            }
+        },50);
+    }
+
+    static String nextpageurl = "";
+    public static void setNextpageurl(String next){
+        nextpageurl =next;
     }
 
 
@@ -420,6 +446,37 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             recyclerView.setHasFixedSize(true);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(adapter);
+
+
+
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                        if(!nextpageurl.equals("")){
+                            NotificationActivity.globalRequest(serverResponse, "GET", nextpageurl, new JSONObject(), 22, context);
+                            nextpageurl = "";
+                            LinearLayoutManager linearLayoutManager = (LinearLayoutManager)recyclerView.getLayoutManager();
+                            pageposition = linearLayoutManager.findFirstVisibleItemPosition();
+
+                        }else {
+                            Toast.makeText(context, "Reached Bottom", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                }
+            });
+
+            adapter.notifyDataSetChanged();
+            setRecyclerviewposition();
+            Functions.dismissDialogue();
+
         });
 
     }
@@ -963,9 +1020,20 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             super(context, userid, pass);
 
             Log.e("connection", "estublished");
+
+
+
             connectionListener = new ConnectionListener() {
                 @Override
                 public void connected(XMPPConnection xmppConnection) {
+
+                    connectinglayout.setBackgroundColor(context.getResources().getColor(R.color.green));
+                    connectinglayout.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            connectinglayout.setVisibility(View.GONE);
+                        }
+                    },500);
                     Log.e("xmpp", "connected");
                     MainActivity.connection = mConnection;
                     ChatManager chatManager = ChatManager.getInstanceFor(mConnection);

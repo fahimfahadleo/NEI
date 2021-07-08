@@ -1,5 +1,6 @@
 package com.horofbd.MeCloak;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -102,10 +103,55 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
                 friendlist.setHasFixedSize(true);
                 friendlist.setLayoutManager(new LinearLayoutManager(context));
                 friendlist.setAdapter(adapter);
+
+
+                friendlist.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                    }
+
+                    @Override
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                            if(!nextpageurl.equals("")){
+                                NotificationActivity.globalRequest(serverResponse, "GET", nextpageurl, new JSONObject(), 22, context);
+                                nextpageurl = "";
+                                LinearLayoutManager linearLayoutManager = (LinearLayoutManager)recyclerView.getLayoutManager();
+                                pageposition = linearLayoutManager.findFirstVisibleItemPosition();
+
+                            }else {
+                                Toast.makeText(context, "Reached Bottom", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    }
+                });
+
+                adapter.notifyDataSetChanged();
+                setRecyclerviewposition();
+                Functions.dismissDialogue();
+
                 totalfriendcount.setText("Total " + listdata.size() + " Friends");
             }
         });
 
+    }
+
+    static int pageposition;
+    static void setRecyclerviewposition(){
+        friendlist.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                friendlist.getLayoutManager().scrollToPosition(pageposition);
+            }
+        },50);
+    }
+
+    static String nextpageurl = "";
+    public static void setNextpageurl(String next){
+        nextpageurl =next;
     }
 
     static class ListviewAdapter extends FriendListAdapter {

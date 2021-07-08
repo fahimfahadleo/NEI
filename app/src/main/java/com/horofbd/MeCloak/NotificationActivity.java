@@ -115,9 +115,27 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
-        Log.e("notification", response);
-        Functions.dismissDialogue();
+
+        int maxLogSize = 1000;
+        for(int i = 0; i <= response.length() / maxLogSize; i++) {
+            int start = i * maxLogSize;
+            int end = (i+1) * maxLogSize;
+            end = Math.min(end, response.length());
+            Log.e("data", response.substring(start, end));
+        }
+
+        JSONObject jsonObject = new JSONObject(response);
+        JSONObject tempjson = jsonObject.getJSONObject("response");
+        JSONArray array = tempjson.getJSONArray("data");
+        for(int i = 0;i<array.length();i++){
+            JSONObject js = array.getJSONObject(i);
+            Log.e("notification",js.toString());
+        }
+        String s= tempjson.getString("next_page_url");
+        Log.e("nextpageurl",s);
+
         CheckResponse(this, this, response, requestcode);
+        Functions.dismissDialogue();
     }
 
     @Override

@@ -2,12 +2,8 @@
 <LinearLayout
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background"
-    tools:context=".FriendListActivity">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:id="@+id/titlelayout"
@@ -20,6 +16,7 @@
 
             android:layout_width="@dimen/_38sdp"
             android:layout_height="@dimen/_38sdp"
+            android:visibility="invisible"
             android:src="@drawable/backbutton"
             android:padding="@dimen/_8sdp"
             />
@@ -31,39 +28,29 @@
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
             android:gravity="center"
-            android:text="Friend List"
+            android:text="Settings"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="@color/oceanblue" />
 
-            <ImageView
-                android:id="@+id/search"
-                android:layout_width="@dimen/_38sdp"
-                android:layout_height="@dimen/_38sdp"
-                android:padding="@dimen/_8sdp"
-                android:src="@drawable/search" />
+        <ImageView
+            android:id="@+id/search"
+            android:layout_width="@dimen/_38sdp"
+            android:layout_height="@dimen/_38sdp"
+            android:padding="@dimen/_8sdp"
+            android:visibility="invisible"
+            android:src="@drawable/close" />
 
     </LinearLayout>
 
 
     <TextView
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/oceanblue"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:text="Total 50 Friends"
-        android:id="@+id/totalfriends"
-        android:layout_gravity="center"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:textStyle="bold"
-        android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:layout_marginBottom="@dimen/_8sdp"/>
-
-    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tipmessage"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:id="@+id/friendlistrecyclerview"/>
+        android:layout_height="wrap_content"
+        android:text="@string/enctyptionpasstip"
+        android:textColor="#000"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_margin="@dimen/_4sdp"
+        android:gravity="center"/>
 
 </LinearLayout>

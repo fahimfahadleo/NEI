@@ -918,8 +918,14 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                     jstring updated_at = (jstring) env->CallObjectMethod(jobject1 , getString ,
                                                                          env->NewStringUTF(
                                                                                  "updated_at"));
-                    jstring premium = (jstring) env->CallObjectMethod(object , getString ,
-                                                                      env->NewStringUTF("premium"));
+                    jstring premium;
+                    if(env->CallBooleanMethod(object,isNull,env->NewStringUTF("premium"))){
+                        premium = env->NewStringUTF("Null");
+                    } else{
+                        premium = (jstring) env->CallObjectMethod(object , getString ,
+                                                                  env->NewStringUTF("premium"));
+                    }
+
 
                     printlogcat(env , "tag1" , jstring2string(env , user_id));
                     printlogcat(env , "tag2" , jstring2string(env , user_name));
@@ -1190,6 +1196,17 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
 
                     // The list we're going to return:
                     jobject list = env->NewObject(arrayListClass , arrayListConstructor);
+
+                    jstring nextpageurl;
+                    if(!env->CallBooleanMethod(tempobject,isNull,env->NewStringUTF("next_page_url"))){
+                        nextpageurl = (jstring)env->CallObjectMethod(tempobject,getString,env->NewStringUTF("next_page_url"));
+                    } else{
+                        nextpageurl = env->NewStringUTF("");
+                    }
+
+                    jmethodID nextpage = env->GetStaticMethodID(env->FindClass("com/horofbd/MeCloak/ContactRequest"),"setNextpageurl", "(Ljava/lang/String;)V");
+                    env->CallStaticVoidMethod(env->FindClass("com/horofbd/MeCloak/ContactRequest"),nextpage,nextpageurl);
+
                     // Add it to the list
                     for (int i = 0; i < length; i++) {
                         jobject tempjsonobject = env->CallObjectMethod(jsonArray ,
@@ -1252,19 +1269,26 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                              env->NewStringUTF("current_page"));
                 jint total = (jint) env->CallIntMethod(jsonobject , getInt ,
                                                        env->NewStringUTF("total"));
+
+
+
+
+
                 if (total == 0) {
                     showToast(env , context , env->NewStringUTF("Friend List Empty!"));
                 } else {
 
                     jstring nextlink;
-                    if (!env->CallBooleanMethod(jsonobject , isNull ,
-                                                env->NewStringUTF("next_page_url"))) {
-                        nextlink = (jstring) env->CallObjectMethod(jsonobject , getString ,
-                                                                   env->NewStringUTF(
-                                                                           "next_page_url"));
-                    } else {
-                        nextlink = env->NewStringUTF(" ");
+                    jstring nextpageurl;
+                    if(!env->CallBooleanMethod(jsonobject,isNull,env->NewStringUTF("next_page_url"))){
+                        nextpageurl = (jstring)env->CallObjectMethod(jsonobject,getString,env->NewStringUTF("next_page_url"));
+                    } else{
+                        nextpageurl = env->NewStringUTF("");
                     }
+
+
+                    jmethodID nextpage = env->GetStaticMethodID(env->FindClass("com/horofbd/MeCloak/MainActivity"),"setNextpageurl", "(Ljava/lang/String;)V");
+                    env->CallStaticVoidMethod(env->FindClass("com/horofbd/MeCloak/MainActivity"),nextpage,nextpageurl);
 
 
                     jobject jsonArray = env->CallObjectMethod(jsonobject , getJSONArray ,
@@ -1279,6 +1303,8 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
 
                     // The list we're going to return:
                     jobject list = env->NewObject(arrayListClass , arrayListConstructor);
+
+
 
 
                     for (int i = 0; i < length; i++) {
@@ -1410,6 +1436,14 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 jint total = (jint) env->CallIntMethod(jsonobject , getInt ,
                                                        env->NewStringUTF("total"));
 
+
+                jstring nextpageurl;
+                if(!env->CallBooleanMethod(jsonobject,isNull,env->NewStringUTF("next_page_url"))){
+                    nextpageurl = (jstring)env->CallObjectMethod(jsonobject,getString,env->NewStringUTF("next_page_url"));
+                } else{
+                    nextpageurl = env->NewStringUTF("");
+                }
+
                 if (total == 0) {
                     showToast(env , context , env->NewStringUTF("Friend List Empty!"));
                 } else {
@@ -1425,6 +1459,10 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
 
                     // The list we're going to return:
                     jobject list = env->NewObject(arrayListClass , arrayListConstructor);
+
+                    jmethodID nextpage = env->GetStaticMethodID(env->FindClass("com/horofbd/MeCloak/FriendListActivity"),"setNextpageurl", "(Ljava/lang/String;)V");
+                    env->CallStaticVoidMethod(env->FindClass("com/horofbd/MeCloak/FriendListActivity"),nextpage,nextpageurl);
+
 
 
                     for (int i = 0; i < length; i++) {
@@ -1625,6 +1663,15 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                        "(Ljava/lang/Object;)Z");
 
                 jobject list = env->NewObject(arrayListClass , arrayListConstructor);
+                jstring nextpageurl;
+                if(!env->CallBooleanMethod(responseobject,isNull,env->NewStringUTF("next_page_url"))){
+                     nextpageurl = (jstring)env->CallObjectMethod(responseobject,getString,env->NewStringUTF("next_page_url"));
+                } else{
+                    nextpageurl = env->NewStringUTF("");
+                }
+
+                jmethodID nextpage = env->GetStaticMethodID(env->FindClass("com/horofbd/MeCloak/NotificationFragment"),"setNextpageurl", "(Ljava/lang/String;)V");
+                env->CallStaticVoidMethod(env->FindClass("com/horofbd/MeCloak/NotificationFragment"),nextpage,nextpageurl);
 
                 for(int i = 0;i<length;i++){
                     jobject tempnotificationobject = env->CallObjectMethod(dataArray,jsonarraygetjsonobject,i);
@@ -1660,6 +1707,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                                    created_at ,
                                                                   object1);
 
+                    printlogcat(env,"data1nat",jstring2string(env,nextpageurl));
 
                     env->CallBooleanMethod(list , addMethod ,object2);
 
@@ -1672,10 +1720,11 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                                                                      "setUpData" ,
                                                                      "(Ljava/util/ArrayList;)V");
                         env->CallStaticVoidMethod(NotificationRequest , SetUpData , list);
+                        dismissProgressBar(env);
                     }
 
                 }
-                dismissProgressBar(env);
+
                 break;
             }
         }
@@ -2258,4 +2307,10 @@ JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_ShowUserMessage_saveUserData(JNIEnv *env , jclass clazz , jstring key ,
                                                       jstring value) {
     setSharedPreference(env,key,value);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_SettingsActivity_StartActivity(JNIEnv *env , jclass clazz ,
+                                                        jobject context , jstring activity ,
+                                                        jstring data) {
+    startActivity(env , context , jstring2string(env , activity) , jstring2string(env , data));
 }

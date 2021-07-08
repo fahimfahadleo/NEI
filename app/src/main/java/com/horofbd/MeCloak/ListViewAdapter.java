@@ -55,11 +55,12 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
         final JSONObject myListData = listdata.get(position);
         try {
             if(vi == R.layout.notificationlayout){
-
+                holder.activestatus.setVisibility(View.INVISIBLE);
                 holder.textView.setText(myListData.getString("message"));
                 switch (myListData.getString("type")){
-                    case "alert":{
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.red));
+                    case "alert":
+                    case "expiry": {
+                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.red_500));
                         break;
                     } case "new_friend_request":{
                         holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.green));
@@ -67,10 +68,8 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                     } case "friend_request_accepted":{
                         holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.green_500));
                         break;
-                    } case "expiry":{
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.red_500));
-                        break;
-                    } case "offers":{
+                    }
+                    case "offers":{
                         holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.background));
                         break;
                     } case "recharge":{
@@ -256,6 +255,7 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
         public TextView textView;
         public CardView cardView;
         public TextView phonenumber;
+        public CircleImageView activestatus;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -264,6 +264,7 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
             this.textView = (TextView) itemView.findViewById(R.id.name);
             this.cardView = (CardView) itemView.findViewById(R.id.singlecardview);
             this.phonenumber = (TextView) itemView.findViewById(R.id.text);
+            this.activestatus = itemView.findViewById(R.id.activestatus);
         }
     }
 }

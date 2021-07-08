@@ -120,14 +120,27 @@ public class Functions {
         ((Activity)context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                dialog = new Dialog(context);
-                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-                View vi = inflater.inflate(R.layout.progressbar, null, false);
-                dialog.setContentView(vi);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-                //   dialog.setCancelable(false);
-                Log.e("context", context.toString());
-                dialog.show();
+                if(dialog!=null){
+                    if( !dialog.isShowing()){
+                        dialog = new Dialog(context);
+                        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View vi = inflater.inflate(R.layout.progressbar, null, false);
+                        dialog.setContentView(vi);
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                        //   dialog.setCancelable(false);
+                        Log.e("context", context.toString());
+                        dialog.show();
+                    }
+                }else {
+                    dialog = new Dialog(context);
+                    LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                    View vi = inflater.inflate(R.layout.progressbar, null, false);
+                    dialog.setContentView(vi);
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                    //   dialog.setCancelable(false);
+                    Log.e("context", context.toString());
+                    dialog.show();
+                }
             }
         });
 
@@ -138,6 +151,8 @@ public class Functions {
             @Override
             public void run() {
                 if (dialog != null && dialog.isShowing()) {
+                    Log.e("contextdialogue","dismissed");
+                    Log.e("contextcontext",context.toString());
                     dialog.dismiss();
                 }
             }

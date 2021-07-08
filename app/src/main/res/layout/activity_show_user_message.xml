@@ -5,8 +5,8 @@
     android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:openDrawer="end"
     android:background="@color/background"
+    tools:openDrawer="end"
     android:theme="@style/AppTheme.NoActionBar"
     tools:context=".ShowUserMessage">
 
@@ -85,19 +85,19 @@
         <include
             android:id="@+id/security"
             layout="@layout/security"
-            android:layout_marginTop="@dimen/_4sdp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/titlelayout" />
+            android:layout_below="@id/titlelayout"
+            android:layout_marginTop="@dimen/_4sdp" />
 
 
         <LinearLayout
             android:id="@+id/messageoptions"
             android:layout_width="match_parent"
-            android:visibility="gone"
             android:layout_height="?attr/actionBarSize"
             android:layout_above="@+id/sendmessagelayout"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <ImageView
                 android:layout_width="@dimen/_38sdp"
@@ -161,45 +161,194 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/_8sdp"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="@dimen/_25sdp"
-                android:layout_height="@dimen/_25sdp"
-                android:layout_gravity="center"
-                android:layout_marginStart="@dimen/_8sdp"
-                android:src="@drawable/arrowupicon" />
-            <EditText
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Type Here..."
-                android:layout_marginStart="@dimen/_2sdp"
-                android:layout_marginEnd="@dimen/_2sdp"
-                android:background="@drawable/edtshapewhite"
-                android:paddingTop="@dimen/_6sdp"
-                android:paddingBottom="@dimen/_6sdp"
-                android:textColorHint="@color/hintcolor"
-                android:layout_marginTop="2dp"
-                android:paddingStart="@dimen/_16sdp"
-                android:id="@+id/typemessage"
-                android:inputType="text"
-                android:paddingEnd="@dimen/_16sdp"
-                android:textSize="@dimen/_12sdp"
-                android:textColor="@color/textcolor"
-                />
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/showbelow"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/_8sdp"
+                    android:src="@drawable/arrowdown" />
+
+                <EditText
+                    android:id="@+id/typemessage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_2sdp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="@dimen/_2sdp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edtshapewhite"
+                    android:hint="Type Here..."
+                    android:inputType="text"
+                    android:paddingStart="@dimen/_16sdp"
+                    android:paddingTop="@dimen/_6sdp"
+                    android:paddingEnd="@dimen/_16sdp"
+                    android:paddingBottom="@dimen/_6sdp"
+                    android:textColor="@color/textcolor"
+                    android:textColorHint="@color/hintcolor"
+                    android:textSize="@dimen/_12sdp" />
+
+                <ImageView
+                    android:id="@+id/sendbutton"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:src="@drawable/sendicon" />
+            </LinearLayout>
+
+            <ScrollView
+                android:id="@+id/belowbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_4sdp"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/_8sdp">
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/enablebelowboundageview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4sdp"
+                        app:cardBackgroundColor="@color/red_500"
+                        app:cardCornerRadius="@dimen/_8sdp"
+                        app:cardElevation="@dimen/_6sdp"
+                        app:contentPadding="8dp">
+
+                        <ImageView
+                            android:id="@+id/enablebelowboundage"
+                            android:layout_width="@dimen/_15sdp"
+                            android:layout_height="@dimen/_15sdp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="@dimen/_4sdp"
+                            android:layout_marginEnd="@dimen/_4sdp"
+
+                            android:src="@drawable/restrictedicon"
+                            android:textColor="@color/white" />
+
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/belowtimerview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4sdp"
+                        app:cardBackgroundColor="@color/red_500"
+                        app:cardCornerRadius="@dimen/_8sdp"
+                        app:cardElevation="@dimen/_6sdp"
+                        app:contentPadding="8dp">
+
+                        <ImageView
+                            android:id="@+id/belowtimer"
+                            android:layout_width="@dimen/_15sdp"
+                            android:layout_height="@dimen/_15sdp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="@dimen/_4sdp"
+                            android:layout_marginEnd="@dimen/_4sdp"
+                            android:src="@drawable/timericon" />
+
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/belowpasswordview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4sdp"
+                        app:cardBackgroundColor="@color/red_500"
+                        app:cardCornerRadius="@dimen/_8sdp"
+                        app:cardElevation="@dimen/_6sdp"
+                        app:contentPadding="8dp">
+
+                        <ImageView
+                            android:id="@+id/belowpassword"
+                            android:layout_width="@dimen/_15sdp"
+                            android:layout_height="@dimen/_15sdp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="@dimen/_4sdp"
+                            android:layout_marginEnd="@dimen/_4sdp"
+                            android:src="@drawable/key" />
+
+                    </androidx.cardview.widget.CardView>
 
 
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/fileview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4sdp"
+                        app:cardBackgroundColor="@color/red_500"
+                        app:cardCornerRadius="@dimen/_8sdp"
+                        app:cardElevation="@dimen/_6sdp"
+                        app:contentPadding="8dp">
 
+                        <ImageView
+                            android:id="@+id/file"
+                            android:layout_width="@dimen/_15sdp"
+                            android:layout_height="@dimen/_15sdp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="@dimen/_4sdp"
+                            android:layout_marginEnd="@dimen/_4sdp"
+                            android:src="@drawable/file" />
 
-            <ImageView
-                android:id="@+id/sendbutton"
-                android:layout_width="@dimen/_25sdp"
-                android:layout_height="@dimen/_25sdp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="@dimen/_8sdp"
-                android:src="@drawable/sendicon" />
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/videoview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4sdp"
+                        app:cardBackgroundColor="@color/red_500"
+                        app:cardCornerRadius="@dimen/_8sdp"
+                        app:cardElevation="@dimen/_6sdp"
+                        app:contentPadding="8dp">
+
+                        <ImageView
+                            android:id="@+id/video"
+                            android:layout_width="@dimen/_15sdp"
+                            android:layout_height="@dimen/_15sdp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="@dimen/_4sdp"
+                            android:layout_marginEnd="@dimen/_4sdp"
+                            android:src="@drawable/video" />
+
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/imageview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4sdp"
+                        app:cardBackgroundColor="@color/red_500"
+                        app:cardCornerRadius="@dimen/_8sdp"
+                        app:cardElevation="@dimen/_6sdp"
+                        app:contentPadding="8dp">
+
+                        <ImageView
+                            android:id="@+id/image"
+                            android:layout_width="@dimen/_15sdp"
+                            android:layout_height="@dimen/_15sdp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="@dimen/_4sdp"
+                            android:layout_marginEnd="@dimen/_4sdp"
+                            android:src="@drawable/image" />
+
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+            </ScrollView>
 
         </LinearLayout>
 
@@ -258,12 +407,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:clickable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardBackgroundColor="@color/cardbgcolor"
                 app:cardCornerRadius="5dp"
@@ -274,77 +420,44 @@
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="@dimen/_26sdp"
-                        android:layout_height="@dimen/_26sdp"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:src="@drawable/policy" />
-
                     <TextView
                         android:id="@+id/setpasswordtext"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="@dimen/_35sdp"
+                        android:layout_weight="1"
                         android:gravity="center|start"
                         android:paddingStart="@dimen/_8sdp"
                         android:paddingEnd="@dimen/_8sdp"
                         android:text="Set Encryption Password"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="#000" />
+
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="@dimen/_20sdp"
+                        android:layout_height="@dimen/_20sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="@dimen/_8sdp"
+                        app:cardBackgroundColor="@color/cardbgcolor"
+                        app:cardCornerRadius="@dimen/_10sdp"
+                        app:cardElevation="8dp">
+
+                        <TextView
+                            android:id="@+id/encryptionpasstips"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="serif"
+                            android:gravity="center"
+                            android:text="i"
+                            android:textColor="@color/notificationnotifier"
+                            android:textSize="20sp"
+                            android:textStyle="italic" />
+
+
+                    </androidx.cardview.widget.CardView>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-<!--            <androidx.cardview.widget.CardView-->
-<!--                android:id="@+id/policy"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:layout_marginBottom="8dp"-->
-<!--                android:clickable="true"-->
-<!--                android:focusable="true"-->
-<!--                android:focusableInTouchMode="true"-->
-<!--                android:foreground="?android:attr/selectableItemBackground"-->
-<!--                app:cardBackgroundColor="@color/cardbgcolor"-->
-<!--                app:cardCornerRadius="5dp"-->
-<!--                app:cardElevation="8dp">-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:orientation="horizontal">-->
-
-<!--                    <ImageView-->
-<!--                        android:layout_width="@dimen/_26sdp"-->
-<!--                        android:layout_height="@dimen/_26sdp"-->
-<!--                        android:layout_gravity="center"-->
-<!--                        android:layout_marginStart="@dimen/_8sdp"-->
-<!--                        android:src="@drawable/policy" />-->
-
-<!--                    <TextView-->
-<!--                        android:id="@+id/policytext"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="@dimen/_35sdp"-->
-
-<!--                        android:gravity="center|start"-->
-
-<!--                        android:paddingStart="@dimen/_8sdp"-->
-<!--                        android:paddingEnd="@dimen/_8sdp"-->
-<!--                        android:text="Policy"-->
-<!--                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"-->
-<!--                        android:textColor="#000" />-->
-<!--                </LinearLayout>-->
-<!--            </androidx.cardview.widget.CardView>-->
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:text="The Encryption Password encrypts your data so that any middle man or people without tha password can not see your Messages.\nNote: If your friend don't know or sets the same password as yours he/she will see only encrypted characters. So you must inform your friend about your message password and he must set it in your inbox. "
-                android:layout_marginStart="@dimen/_4sdp"
-                android:layout_marginEnd="@dimen/_4sdp"
-                android:textColor="#000"/>
 
 
             <androidx.cardview.widget.CardView
@@ -354,9 +467,6 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardBackgroundColor="@color/cardbgcolor"
                 app:cardCornerRadius="5dp"
@@ -367,36 +477,43 @@
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="@dimen/_26sdp"
-                        android:layout_height="@dimen/_26sdp"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:src="@drawable/policy" />
-
                     <TextView
                         android:id="@+id/boundagetext"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="@dimen/_35sdp"
-
+                        android:layout_weight="1"
                         android:gravity="center|start"
-
                         android:paddingStart="@dimen/_8sdp"
                         android:paddingEnd="@dimen/_8sdp"
                         android:text="Boundage"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="#000" />
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="@dimen/_20sdp"
+                        android:layout_height="@dimen/_20sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="@dimen/_8sdp"
+                        app:cardBackgroundColor="@color/cardbgcolor"
+                        app:cardCornerRadius="@dimen/_10sdp"
+                        app:cardElevation="8dp">
+
+
+                        <TextView
+                            android:id="@+id/boundagetips"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="serif"
+                            android:gravity="center"
+                            android:text="i"
+                            android:textColor="@color/notificationnotifier"
+                            android:textSize="20sp"
+                            android:textStyle="italic" />
+
+
+                    </androidx.cardview.widget.CardView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:text="The Boundage option is for your privacy. If you don't want your friend to record or take screenshot of your message or data turn this on and your friend will not be able to take screenshot or record screen video. "
-                android:layout_marginStart="@dimen/_4sdp"
-                android:layout_marginEnd="@dimen/_4sdp"
-                android:textColor="#000"/>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/tiemrview"
@@ -405,9 +522,6 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardBackgroundColor="@color/cardbgcolor"
                 app:cardCornerRadius="5dp"
@@ -418,42 +532,169 @@
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="@dimen/_26sdp"
-                        android:layout_height="@dimen/_26sdp"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_8sdp"
-                        android:src="@drawable/policy" />
-
                     <TextView
                         android:id="@+id/tiemrtext"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="@dimen/_35sdp"
-
+                        android:layout_weight="1"
                         android:gravity="center|start"
-
                         android:paddingStart="@dimen/_8sdp"
                         android:paddingEnd="@dimen/_8sdp"
                         android:text="Expiry Time"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="#000" />
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="@dimen/_20sdp"
+                        android:layout_height="@dimen/_20sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="@dimen/_8sdp"
+                        app:cardBackgroundColor="@color/cardbgcolor"
+                        app:cardCornerRadius="@dimen/_10sdp"
+                        app:cardElevation="8dp">
+
+
+                        <TextView
+                            android:id="@+id/expirytips"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="serif"
+                            android:gravity="center"
+                            android:text="i"
+                            android:textColor="@color/notificationnotifier"
+                            android:textSize="20sp"
+                            android:textStyle="italic" />
+
+
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/unfriendview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="@color/cardbgcolor"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/unfriend"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/_35sdp"
+                        android:layout_weight="1"
+                        android:gravity="center|start"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
+                        android:text="Unfriend"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="#000" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <TextView
+            <androidx.cardview.widget.CardView
+                android:id="@+id/ignoreview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:text="You can set your message Expiry time. that message will expire from you and your friend at that exact moment you want."
-                android:layout_marginStart="@dimen/_4sdp"
-                android:layout_marginEnd="@dimen/_4sdp"
-                android:textColor="#000"/>
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="@color/cardbgcolor"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/ignore"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/_35sdp"
+                        android:layout_weight="1"
+                        android:gravity="center|start"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
+                        android:text="Ignore"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/blockfriend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="@color/cardbgcolor"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/block"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/_35sdp"
+                        android:layout_weight="1"
+                        android:gravity="center|start"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
+                        android:text="Block"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/reportview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="@color/cardbgcolor"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/report"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/_35sdp"
+                        android:layout_weight="1"
+                        android:gravity="center|start"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingEnd="@dimen/_8sdp"
+                        android:text="Report"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
-
-
     </com.google.android.material.navigation.NavigationView>
-
-
 </androidx.drawerlayout.widget.DrawerLayout>

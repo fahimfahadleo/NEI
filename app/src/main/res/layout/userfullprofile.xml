@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    app:contentPadding="@dimen/_4sdp"
+    app:cardCornerRadius="5dp"
+    app:cardBackgroundColor="@color/colorPrimaryDark"
+    app:cardElevation="8dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/titlelayout"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimaryDark"
+            android:orientation="horizontal">
+
+            <ImageView
+
+                android:layout_width="@dimen/_38sdp"
+                android:layout_height="@dimen/_38sdp"
+                android:src="@drawable/backbutton"
+                android:padding="@dimen/_8sdp"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_38sdp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center"
+                android:text=""
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/oceanblue" />
+
+            <ImageView
+                android:id="@+id/search"
+                android:layout_width="@dimen/_38sdp"
+                android:layout_height="@dimen/_38sdp"
+                android:padding="@dimen/_8sdp"
+                android:src="@drawable/menu_white" />
+
+        </LinearLayout>
+
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilepicture"
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="@dimen/_120sdp"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:padding="@dimen/_3sdp"
+            android:src="@drawable/person"
+            app:civ_border_color="@color/oceanblue"
+            app:civ_border_width="1dp" />
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:gravity="center"
+            android:text="Fahim Fahad leo"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/oceanblue"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/userphone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="+8801914616453"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/oceanblue"
+            android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/unfriend"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_gravity="center"
+               android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:background="@drawable/border"
+                android:gravity="center"
+                android:paddingStart="@dimen/_16sdp"
+                android:paddingEnd="@dimen/_16sdp"
+                android:text="Unfriend"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp" />
+
+
+            <TextView
+                android:id="@+id/blockfriend"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_weight="1"
+                android:background="@drawable/border"
+                android:gravity="center"
+                android:paddingStart="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:paddingEnd="@dimen/_16sdp"
+                android:text="Block"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp" />
+
+
+
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_4sdp" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
