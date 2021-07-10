@@ -33,6 +33,24 @@ public class Important {
     protected static String publickey;
     protected static String privatekey;
 
+
+    protected static String updateprofilepassword;
+    protected static String createpagerecoverycode;
+    protected static String chillengepagerecoverycode;
+    protected static String uploadpagerecoveryimage;
+    protected static String deletepagesecurityimage;
+    protected static String downloadpagesecurityimage;
+    protected static String chillengepagesecurityimage;
+    protected static String getpagesecurityquestions;
+    protected static String answerpagesecurityquestion;
+    protected static String viewansweredsecurityquestions;
+    protected static String deleteansweredsecurityquestions;
+    protected static String getchillengerpagesecurityquestions;
+    protected static String chillengerpagesecurityquestions;
+    protected static String cratepageresetcertificate;
+
+
+
     //////////Friend//////////////////
     protected static String search_friend;
     protected static String add_friend;
@@ -90,6 +108,122 @@ public class Important {
     protected static String getNotification;
 
 
+    ////////////Notification////////////
+    protected static String get_notification;
+
+
+
+    public static String getUpdateprofilepassword() {
+        return updateprofilepassword;
+    }
+
+    public static void setUpdateprofilepassword(String updateprofilepassword) {
+        Important.updateprofilepassword = updateprofilepassword;
+    }
+
+    public static String getCreatepagerecoverycode() {
+        return createpagerecoverycode;
+    }
+
+    public static void setCreatepagerecoverycode(String createpagerecoverycode) {
+        Important.createpagerecoverycode = createpagerecoverycode;
+    }
+
+    public static String getChillengepagerecoverycode() {
+        return chillengepagerecoverycode;
+    }
+
+    public static void setChillengepagerecoverycode(String chillengepagerecoverycode) {
+        Important.chillengepagerecoverycode = chillengepagerecoverycode;
+    }
+
+    public static String getUploadpagerecoveryimage() {
+        return uploadpagerecoveryimage;
+    }
+
+    public static void setUploadpagerecoveryimage(String uploadpagerecoveryimage) {
+        Important.uploadpagerecoveryimage = uploadpagerecoveryimage;
+    }
+
+    public static String getDeletepagesecurityimage() {
+        return deletepagesecurityimage;
+    }
+
+    public static void setDeletepagesecurityimage(String deletepagesecurityimage) {
+        Important.deletepagesecurityimage = deletepagesecurityimage;
+    }
+
+    public static String getDownloadpagesecurityimage() {
+        return downloadpagesecurityimage;
+    }
+
+    public static void setDownloadpagesecurityimage(String downloadpagesecurityimage) {
+        Important.downloadpagesecurityimage = downloadpagesecurityimage;
+    }
+
+    public static String getChillengepagesecurityimage() {
+        return chillengepagesecurityimage;
+    }
+
+    public static void setChillengepagesecurityimage(String chillengepagesecurityimage) {
+        Important.chillengepagesecurityimage = chillengepagesecurityimage;
+    }
+
+    public static String getGetpagesecurityquestions() {
+        return getpagesecurityquestions;
+    }
+
+    public static void setGetpagesecurityquestions(String getpagesecurityquestions) {
+        Important.getpagesecurityquestions = getpagesecurityquestions;
+    }
+
+    public static String getAnswerpagesecurityquestion() {
+        return answerpagesecurityquestion;
+    }
+
+    public static void setAnswerpagesecurityquestion(String answerpagesecurityquestion) {
+        Important.answerpagesecurityquestion = answerpagesecurityquestion;
+    }
+
+    public static String getViewansweredsecurityquestions() {
+        return viewansweredsecurityquestions;
+    }
+
+    public static void setViewansweredsecurityquestions(String viewansweredsecurityquestions) {
+        Important.viewansweredsecurityquestions = viewansweredsecurityquestions;
+    }
+
+    public static String getDeleteansweredsecurityquestions() {
+        return deleteansweredsecurityquestions;
+    }
+
+    public static void setDeleteansweredsecurityquestions(String deleteansweredsecurityquestions) {
+        Important.deleteansweredsecurityquestions = deleteansweredsecurityquestions;
+    }
+
+    public static String getGetchillengerpagesecurityquestions() {
+        return getchillengerpagesecurityquestions;
+    }
+
+    public static void setGetchillengerpagesecurityquestions(String getchillengerpagesecurityquestions) {
+        Important.getchillengerpagesecurityquestions = getchillengerpagesecurityquestions;
+    }
+
+    public static String getChillengerpagesecurityquestions() {
+        return chillengerpagesecurityquestions;
+    }
+
+    public static void setChillengerpagesecurityquestions(String chillengerpagesecurityquestions) {
+        Important.chillengerpagesecurityquestions = chillengerpagesecurityquestions;
+    }
+
+    public static String getCratepageresetcertificate() {
+        return cratepageresetcertificate;
+    }
+
+    public static void setCratepageresetcertificate(String cratepageresetcertificate) {
+        Important.cratepageresetcertificate = cratepageresetcertificate;
+    }
 
     public static String getPublickey() {
         return publickey;
@@ -129,8 +263,6 @@ public class Important {
     public static void setXmppResource(String xmppResource) {
         Important.xmppResource = xmppResource;
     }
-
-
 
     public static String getViewprofilepicture() {
         return viewprofilepicture;
@@ -586,7 +718,5 @@ public class Important {
         Important.get_notification = get_notification;
     }
 
-    ////////////Notification////////////
-    protected static String get_notification;
 
 }

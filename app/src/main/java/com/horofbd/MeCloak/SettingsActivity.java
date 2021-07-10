@@ -4,13 +4,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SettingsActivity extends AppCompatActivity {
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
+
+public class SettingsActivity extends AppCompatActivity implements ServerResponse{
 
     CardView premiumview,profilepasswordview,pageresetcodeview,pageresetcrtview,profileresetcrtview,pagerecoveryphotoview,
     pagerecoveryquestionview,logininformationview,blocklistview,prepareforofflineview,vaultview,createnewpageview,deletepageview,
@@ -20,11 +27,65 @@ public class SettingsActivity extends AppCompatActivity {
             pagerecoveryquestion,logininformation,blocklist,prepareforoffline,vault,createnewpage,deletepage,
             about;
 
+    AlertDialog updateprofilepassworddialog;
+
     static{
         System.loadLibrary("native-lib");
     }
     static native void StartActivity(Context context, String activity, String data);
+    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
+    static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
+    static native void InitLinks();
 
+
+
+    void changeProfilePassword(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.resetprofilepassword,null,false);
+        EditText oldpass = view.findViewById(R.id.oldpassword);
+        EditText newpass = view.findViewById(R.id.newpassword);
+        EditText connewpass = view.findViewById(R.id.confirmpassword);
+        TextView submit = view.findViewById(R.id.submitbutton);
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String old = oldpass.getText().toString();
+                String newp = newpass.getText().toString();
+                String conf = connewpass.getText().toString();
+
+                if(TextUtils.isEmpty(old)){
+                    oldpass.setError("Field Can Not Be Empty!");
+                    oldpass.requestFocus();
+                }else if(TextUtils.isEmpty(newp)){
+                    newpass.setError("Field Can Not Be Emptye!");
+                    newpass.requestFocus();
+                }else if(TextUtils.isEmpty(conf)){
+                    connewpass.setError("Field Can Not Be Empty!");
+                    connewpass.requestFocus();
+                }else {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("old_password",old);
+                        jsonObject.put("password",newp);
+                        jsonObject.put("password_confirmation",conf);
+                        globalRequest(SettingsActivity.this,"POST",Important.getUpdateprofilepassword(),jsonObject,23,SettingsActivity.this);
+
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+
+                    updateprofilepassworddialog.dismiss();
+                }
+                builder.setView(view);
+                updateprofilepassworddialog = builder.create();
+                updateprofilepassworddialog.show();
+
+
+            }
+        });
+    }
 
     void init(){
         premium = findViewById(R.id.premium);
@@ -71,26 +132,26 @@ public class SettingsActivity extends AppCompatActivity {
         profilepassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                changeProfilePassword();
             }
         });
 
         profilepasswordview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                changeProfilePassword();
             }
         });
         pageresetcode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                globalRequest(SettingsActivity.this,"GET",Important.getCreatepagerecoverycode(),new JSONObject(),24,SettingsActivity.this);
             }
         });
         pageresetcodeview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                globalRequest(SettingsActivity.this,"GET",Important.getCreatepagerecoverycode(),new JSONObject(),24,SettingsActivity.this);
             }
         });
         pageresetcrt.setOnClickListener(new View.OnClickListener() {
@@ -240,5 +301,19 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         context = this;
+        InitLinks();
+        init();
+
+
+    }
+
+    @Override
+    public void onResponse(String response, int code, int requestcode) throws JSONException {
+        CheckResponse(this,this,response,requestcode);
+    }
+
+    @Override
+    public void onFailure(String failresponse) throws JSONException {
+
     }
 }

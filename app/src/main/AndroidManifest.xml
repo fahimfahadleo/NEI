@@ -36,7 +36,6 @@
         <activity android:name=".VaultActivity" />
         <activity android:name=".BlockListActivity" />
         <activity android:name=".DownloadResetCode" />
-        <activity android:name=".ChangeOrUpdateProfilePassword" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".ReferFriendActivity" />
         <activity android:name=".BuyActivity" />
