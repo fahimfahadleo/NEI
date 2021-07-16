@@ -22,6 +22,7 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
@@ -79,25 +80,25 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
         Log.e("code",code);
 
 
-        //sendVerificationCode(phonenumber);
+        sendVerificationCode(phonenumber);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String verificationcodestr = verificationcode.getText().toString();
-               // verifyCode(verificationcodestr);
+                verifyCode(verificationcodestr);
 
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("code",code);
-
-                    Log.e("tag",Important.getPhone_verification());
-                    RequestPhoneverification(PhoneNumberVerificationActivity.this,"POST",Important.getPhone_verification(),jsonObject,2,PhoneNumberVerificationActivity.this);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Log.e("tag",Important.getPhone_verification());
+//                JSONObject jsonObject = new JSONObject();
+//                try {
+//                    jsonObject.put("code",code);
+//
+//                    Log.e("tag",Important.getPhone_verification());
+//                    RequestPhoneverification(PhoneNumberVerificationActivity.this,"POST",Important.getPhone_verification(),jsonObject,2,PhoneNumberVerificationActivity.this);
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                Log.e("tag",Important.getPhone_verification());
 
             }
         });
@@ -128,6 +129,8 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
     private void signInWithCredential(PhoneAuthCredential credential) {
         // inside this method we are checking if
         // the code entered is correct or not.
+
+
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -145,7 +148,14 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
                             }
                             Functions.isActive = true;
                             FirebaseUser user = mAuth.getCurrentUser();
-                            user.delete();
+                            user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<GetTokenResult> task) {
+                                    Log.e("token",task.getResult().getToken());
+                                }
+                            });
+
+                            //user.delete();
 
                         } else {
                             // if the code is not correct then we are

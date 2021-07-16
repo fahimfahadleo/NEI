@@ -56,6 +56,7 @@ static jmethodID showProgress;
 static jmethodID dismissProgress;
 static jmethodID UploadFile;
 static jmethodID closeActivity;
+static jmethodID isJSONArrayNull;
 
 
 static jmethodID MethodID , MethodID40 , MethodID49 ,
@@ -68,10 +69,10 @@ static jmethodID MethodID , MethodID40 , MethodID49 ,
         MethodID21 , MethodID18 , MethodID1 , MethodID15 , MethodID17 , MethodID16 ,
         MethodID5 , MethodID14 , MethodID13 , MethodID3 , MethodID12 , MethodID11 ,
         MethodID7 , MethodID10 , MethodID9 , MethodID8 , MethodID4 , MethodID2 ,
-        MethodID51 , MethodID52 , MethodID53 , MethodID54 , MethodID55 , MethodID6,
+        MethodID51 , MethodID52 , MethodID53 , MethodID54 , MethodID55 , MethodID6 ,
         MethodID56 , MethodID57 , MethodID58 , MethodID59 , MethodID60 , MethodID61 , MethodID62 , MethodID63 ,
-        MethodID64 , MethodID65 , MethodID66 , MethodID67 , MethodID68 , MethodID69,
-        MethodID70 , MethodID71 , MethodID72 , MethodID73 , MethodID74, MethodID75;
+        MethodID64 , MethodID65 , MethodID66 , MethodID67 , MethodID68 , MethodID69 ,
+        MethodID70 , MethodID71 , MethodID72 , MethodID73 , MethodID74 , MethodID75;
 
 string schema = "http";
 string domain = "192.168.152.9";
@@ -100,7 +101,7 @@ string page_delete = baseUrl + "/auth/page-delete";
 string profile_logout = baseUrl + "/auth/logout";
 string verify_email = baseUrl + "/auth/verify-email";
 string phone_verification = baseUrl + "/auth/verify-phone";
-string forgot_profile_password = baseUrl + "/auth/forget-profile-password";
+string forgot_profile_password = baseUrl + "/auth/forget-password";
 string forgot_page_password = baseUrl + "/auth/forget-page-password";
 string validate_reset_password_otp = baseUrl + "/auth/validate-reset-password-otp";
 string prepare_offline = baseUrl + "/auth/prepare-offline";
@@ -116,7 +117,7 @@ string publickey = baseUrl + "/auth/public-key";
 string updateprofilepassword = baseUrl + "/auth/profile-update-password";
 string createpagerecoverycode = baseUrl + "/auth/create-page-recovery-code";
 string chillengepagerecoverycode = baseUrl + "/auth/challenge-page-recovery-code";
-string uploadpagerecoveryimage = baseUrl + "/auth/upload-page-security-image";
+string uploadpagesecurityimage = baseUrl + "/auth/upload-page-security-image";
 string deletepagesecurityimage = baseUrl + "/auth/delete-page-security-image";
 string downloadpagesecurityimage = baseUrl + "/auth/download-page-security-image?challenge=0";
 string chillengepagesecurityimage = baseUrl + "/auth/challenge-page-security-image";
@@ -207,6 +208,7 @@ string SettingsActivity = "com/horofbd/MeCloak/SettingsActivity";
 string UserVerificationActivity = "com/horofbd/MeCloak/UserVerificationActivity";
 string VaultActivity = "com/horofbd/MeCloak/VaultActivity";
 string WatchVideoActivity = "com/horofbd/MeCloak/WatchVideoActivity";
+string PageresetimageActivity = "com/horofbd/MeCloak/PageResetImage";
 
 string publickeyname;
 
@@ -323,20 +325,34 @@ void initlinks(JNIEnv *env) {
 
     MethodID61 = env->GetStaticMethodID(Important , "setGetNotification" , "(Ljava/lang/String;)V");
 
-    MethodID62 = env->GetStaticMethodID(Important , "setUpdateprofilepassword" , "(Ljava/lang/String;)V");
-    MethodID63 = env->GetStaticMethodID(Important , "setCreatepagerecoverycode" , "(Ljava/lang/String;)V");
-    MethodID64 = env->GetStaticMethodID(Important , "setChillengepagerecoverycode" , "(Ljava/lang/String;)V");
-    MethodID65 = env->GetStaticMethodID(Important , "setUploadpagerecoveryimage" , "(Ljava/lang/String;)V");
-    MethodID66 = env->GetStaticMethodID(Important , "setDeletepagesecurityimage" , "(Ljava/lang/String;)V");
-    MethodID67 = env->GetStaticMethodID(Important , "setDownloadpagesecurityimage" , "(Ljava/lang/String;)V");
-    MethodID68 = env->GetStaticMethodID(Important , "setChillengepagesecurityimage" , "(Ljava/lang/String;)V");
-    MethodID69 = env->GetStaticMethodID(Important , "setGetpagesecurityquestions" , "(Ljava/lang/String;)V");
-    MethodID70 = env->GetStaticMethodID(Important , "setAnswerpagesecurityquestion" , "(Ljava/lang/String;)V");
-    MethodID71 = env->GetStaticMethodID(Important , "setViewansweredsecurityquestions" , "(Ljava/lang/String;)V");
-    MethodID72 = env->GetStaticMethodID(Important , "setDeleteansweredsecurityquestions" , "(Ljava/lang/String;)V");
-    MethodID73 = env->GetStaticMethodID(Important , "setGetchillengerpagesecurityquestions" , "(Ljava/lang/String;)V");
-    MethodID74 = env->GetStaticMethodID(Important , "setChillengerpagesecurityquestions" , "(Ljava/lang/String;)V");
-    MethodID75 = env->GetStaticMethodID(Important , "setCratepageresetcertificate" , "(Ljava/lang/String;)V");
+    MethodID62 = env->GetStaticMethodID(Important , "setUpdateprofilepassword" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID63 = env->GetStaticMethodID(Important , "setCreatepagerecoverycode" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID64 = env->GetStaticMethodID(Important , "setChillengepagerecoverycode" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID65 = env->GetStaticMethodID(Important , "setUploadpagerecoveryimage" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID66 = env->GetStaticMethodID(Important , "setDeletepagesecurityimage" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID67 = env->GetStaticMethodID(Important , "setDownloadpagesecurityimage" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID68 = env->GetStaticMethodID(Important , "setChillengepagesecurityimage" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID69 = env->GetStaticMethodID(Important , "setGetpagesecurityquestions" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID70 = env->GetStaticMethodID(Important , "setAnswerpagesecurityquestion" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID71 = env->GetStaticMethodID(Important , "setViewansweredsecurityquestions" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID72 = env->GetStaticMethodID(Important , "setDeleteansweredsecurityquestions" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID73 = env->GetStaticMethodID(Important , "setGetchillengerpagesecurityquestions" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID74 = env->GetStaticMethodID(Important , "setChillengerpagesecurityquestions" ,
+                                        "(Ljava/lang/String;)V");
+    MethodID75 = env->GetStaticMethodID(Important , "setCratepageresetcertificate" ,
+                                        "(Ljava/lang/String;)V");
 
 }
 
@@ -357,11 +373,12 @@ void initver(JNIEnv *env) {
     JSONObject = (jclass) env->NewGlobalRef(temp3);
     JSONArray = (jclass) env->NewGlobalRef(temp4);
 
+    isJSONArrayNull = env->GetStaticMethodID(Function,"isJSONArrayNull", "(Lorg/json/JSONArray;)Z");
     closeActivity = env->GetStaticMethodID(Function , "CloseActivity" ,
                                            "(Landroid/content/Context;)V");
 
     UploadFile = env->GetStaticMethodID(Function , "UploadFile" ,
-                                        "(Lcom/horofbd/MeCloak/ServerResponse;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lorg/json/JSONObject;I)V");
+                                        "(Lcom/horofbd/MeCloak/ServerResponse;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lorg/json/JSONObject;I)V");
 
     showProgress = env->GetStaticMethodID(Function , "showProgress" ,
                                           "(Landroid/content/Context;)V");
@@ -681,8 +698,8 @@ void SetUpLinks(JNIEnv *env) {
     env->CallStaticVoidMethod(Important , MethodID64 ,
                               env->NewStringUTF(chillengepagerecoverycode.c_str()));
     env->CallStaticVoidMethod(Important , MethodID65 ,
-                              env->NewStringUTF(uploadpagerecoveryimage.c_str()));
-    env->CallStaticVoidMethod(Important , MethodID66,
+                              env->NewStringUTF(uploadpagesecurityimage.c_str()));
+    env->CallStaticVoidMethod(Important , MethodID66 ,
                               env->NewStringUTF(deletepagesecurityimage.c_str()));
     env->CallStaticVoidMethod(Important , MethodID67 ,
                               env->NewStringUTF(downloadpagesecurityimage.c_str()));
@@ -755,14 +772,14 @@ static void request(JNIEnv *env , jobject serverResponse , jstring requestType ,
 
 
 static void request(JNIEnv *env , jobject serverResponse , jstring requestType , jstring Link ,
-                    jobject file , jobject jsonObject ,
+                   jstring filetype, jobject file , jobject jsonObject ,
                     jint requestcode , jobject context) {
 
     showProgressBar(env , context);
 
 
     env->CallStaticVoidMethod(Function , UploadFile , serverResponse , requestType , Link ,
-                              file , jsonObject , requestcode);
+                              filetype,file , jsonObject , requestcode);
 }
 
 void printlogcat(JNIEnv *env , string tag , string message) {
@@ -843,6 +860,10 @@ void startActivity(JNIEnv *env , jobject context , const string &ckey , const st
         acivity = VaultActivity;
     } else if (ckey == "WatchVideo") {
         acivity = WatchVideoActivity;
+    }else if(ckey == "pageresetimage"){
+        acivity = PageresetimageActivity;
+    } else if(ckey == "pagerecoveryquestion"){
+        acivity = EditPageSecurityQuestionActivity;
     }
 
     jclass native_context = env->GetObjectClass(context);
@@ -1821,13 +1842,60 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 }
 
                 break;
-                }case 23:{
-                    //Update Profile Password
+            }
+            case 23: {
+                //Update Profile Password
 
                 break;
-            }case 24:{
+            }
+            case 24: {
                 //Create page reset code
                 break;
+            }
+            case 25:{
+                //forgot profile password
+                jobject jobject1 = env->CallObjectMethod(jsonobject,getJsonObject,env->NewStringUTF("response"));
+                jobject tempobject = env->CallObjectMethod(jobject1,getJsonObject,env->NewStringUTF("forgot-id"));
+
+
+                break;
+            }
+            case 26:{
+                //upload page reset picture
+                break;
+            }
+            case 27:{
+                //delete page security image
+
+                break;
+            }case 28:{
+
+                //parse security questions and answer
+                jobject jsonarray = env->CallObjectMethod(jsonobject,getJSONArray,env->NewStringUTF("response"));
+
+                if(env->CallStaticBooleanMethod(Function,isJSONArrayNull,jsonarray)){
+                    jmethodID newjsonobject = env->GetStaticMethodID(Function,"getInstanse", "()Lorg/json/JSONObject;");
+                    jobject jobject1 = env->CallStaticObjectMethod(Function,newjsonobject);
+                    request(env,ServerResponse,env->NewStringUTF("GET"),env->NewStringUTF(getpagesecurityquestions.c_str()),jobject1,29,context);
+                } else{
+
+                }
+                break;
+            }case 29:{
+                //purse security question
+                jobject jsonarray = env->CallObjectMethod(jsonobject,getJSONArray,env->NewStringUTF("response"));
+                {"id":1,
+                 "question":"What was your childhood nickname?",
+                 "deleted_at":null,
+                 "created_at":"2021-05-19T23:48:33.000000Z","updated_at":"2021-05-19T23:48:33.000000Z"}
+
+                jint length = (jint) env->CallIntMethod(jsonarray , jsonarraylength);
+
+                for(int i=0;i<length;i++){
+                    jobject tempobject = env->CallObjectMethod(jsonarray,jsonarraygetjsonobject,i);
+                    
+                }
+
             }
         }
     } else if (requestcode == 16) {
@@ -2305,10 +2373,11 @@ Java_com_horofbd_MeCloak_UserVerificationActivity_getLoginInfo(JNIEnv *env , jcl
 JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_UserVerificationActivity_UploadFile(JNIEnv *env , jclass clazz ,
                                                              jobject server_response ,
-                                                             jstring requesttype , jstring link ,
+                                                             jstring requesttype , jstring link ,jstring filetype,
                                                              jobject file , jobject json_object ,
                                                              jint requestcode , jobject context) {
-    request(env , server_response , requesttype , link , file , json_object , requestcode ,
+
+    request(env , server_response , requesttype , link ,filetype, file , json_object , requestcode ,
             context);
 }extern "C"
 JNIEXPORT void JNICALL
@@ -2439,6 +2508,91 @@ Java_com_horofbd_MeCloak_SettingsActivity_CheckResponse(JNIEnv *env , jclass cla
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_horofbd_MeCloak_SettingsActivity_InitLinks(JNIEnv *env , jclass clazz) {
+    initver(env);
+    SetUpLinks(env);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_PageResetImage_globalRequest(JNIEnv *env , jclass clazz ,
+                                                      jobject server_response ,
+                                                      jstring requesttype , jstring link ,
+                                                      jobject json_object , jint requestcode ,
+                                                      jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_PageResetImage_InitLinks(JNIEnv *env , jclass clazz , jobject context) {
+    initver(env);
+    SetUpLinks(env);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_PageResetImage_CheckResponse(JNIEnv *env , jclass clazz ,
+                                                      jobject server_response , jobject context ,
+                                                      jstring response , jint requestcode) {
+    CheckResponse(env , server_response , context , response , requestcode);
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_PageResetImage_ImageRequest(JNIEnv *env , jclass clazz ,
+                                                     jobject image_response , jobject image_view ,
+                                                     jstring request_type , jstring link ,
+                                                     jobject json_object , jint requestcode) {
+    jmethodID ImageRequest = env->GetStaticMethodID(Function , "ImageRequest" ,
+                                                    "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
+    env->CallStaticVoidMethod(Function , ImageRequest , image_response , image_view , request_type ,
+                              link , json_object , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ForgotProfilePassword_globalRequest(JNIEnv *env , jclass clazz ,
+                                                             jobject server_response ,
+                                                             jstring requesttype , jstring link ,
+                                                             jobject json_object ,
+                                                             jint requestcode , jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ForgotProfilePassword_InitLinks(JNIEnv *env , jclass clazz) {
+    initver(env);
+    SetUpLinks(env);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ForgotProfilePassword_CheckResponse(JNIEnv *env , jclass clazz ,
+                                                             jobject server_response ,
+                                                             jobject context , jstring response ,
+                                                             jint requestcode) {
+    CheckResponse(env , server_response , context , response , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_PageResetImage_UploadFile(JNIEnv *env , jclass clazz ,
+                                                   jobject server_response , jstring requesttype ,
+                                                   jstring link , jstring filetype , jobject file ,
+                                                   jobject json_object , jint requestcode ,
+                                                   jobject context) {
+    request(env , server_response , requesttype , link ,filetype, file , json_object , requestcode ,
+            context);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_EditPageSecurityQuestionActivity_globalRequest(JNIEnv *env , jclass clazz ,
+                                                                        jobject server_response ,
+                                                                        jstring requesttype ,
+                                                                        jstring link ,
+                                                                        jobject json_object ,
+                                                                        jint requestcode ,
+                                                                        jobject context) {
+    request(env , server_response , requesttype , link , json_object , requestcode , context);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_EditPageSecurityQuestionActivity_CheckResponse(JNIEnv *env , jclass clazz ,
+                                                                        jobject server_response ,
+                                                                        jobject context ,
+                                                                        jstring response ,
+                                                                        jint requestcode) {
+    CheckResponse(env , server_response , context , response , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_EditPageSecurityQuestionActivity_InitLinks(JNIEnv *env , jclass clazz) {
     initver(env);
     SetUpLinks(env);
 }

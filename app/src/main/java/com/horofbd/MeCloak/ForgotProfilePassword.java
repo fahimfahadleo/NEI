@@ -6,16 +6,30 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class ForgotProfilePassword extends AppCompatActivity {
-    LinearLayout toolbar;
-    ImageView backbutton;
-    ImageView menu;
-    TextView titleview;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class ForgotProfilePassword extends AppCompatActivity implements ServerResponse{
+    static {
+        System.loadLibrary("native-lib");
+    }
+
+    static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
+    static native void InitLinks();
+    static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
+
+
+    EditText phone;
+    TextView submitbutton;
+
     static Context context;
     public static void closeActivtiy(){
         Functions.dismissDialogue();
@@ -26,16 +40,42 @@ public class ForgotProfilePassword extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_profile_password);
-        toolbar = findViewById(R.id.toolbar);
-        backbutton = toolbar.findViewById(R.id.backbutton);
         context = this;
-        menu = toolbar.findViewById(R.id.options);
-        titleview = toolbar.findViewById(R.id.title);
-        backbutton.setVisibility(View.GONE);
-        menu.setVisibility(View.GONE);
-        titleview.setText("Forgot Password");
+        phone = findViewById(R.id.phone);
+        submitbutton = findViewById(R.id.proceedbutton);
+        InitLinks();
 
 
+        submitbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("phone_no",phone.getText().toString());
+
+                    jsonObject.put("flag1","0");
+                    Log.e("link",Important.getForgot_profile_password());
+                    globalRequest(ForgotProfilePassword.this,"POST",Important.getForgot_profile_password(),jsonObject,25,ForgotProfilePassword.this);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
+
+
+    }
+
+    @Override
+    public void onResponse(String response, int code, int requestcode) throws JSONException {
+        CheckResponse(this,this,response,requestcode);
+    }
+
+    @Override
+    public void onFailure(String failresponse) throws JSONException {
 
     }
 }

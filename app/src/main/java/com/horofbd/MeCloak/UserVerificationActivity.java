@@ -58,7 +58,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     TextView initialize;
     static CircleImageView profilepicture;
     static TextView username;
-    ImageView editname,editphone;
+    ImageView editname, editphone;
     CircleImageView logout;
     CardView view;
     static PopupWindow popupWindow;
@@ -90,14 +90,13 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
 
     static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
 
-    static native void UploadFile(ServerResponse serverResponse, String requesttype, String link, File file, JSONObject jsonObject, int requestcode, Context context);
+    static native void UploadFile(ServerResponse serverResponse, String requesttype, String link, String filetype, File file, JSONObject jsonObject, int requestcode, Context context);
 
     static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
     static native String getLoginInfo(String key);
 
-    static native void ImageRequest(ImageResponse imageResponse,CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
-
+    static native void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
 
 
     @Override
@@ -108,6 +107,10 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
             if (resultCode == RESULT_OK) {
                 resultUri = result.getUri();
                 File file = new File(resultUri.getPath());
+
+
+                Log.e("path",resultUri.getPath());
+
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
 //Returns null, sizes are in the options variable
@@ -117,12 +120,17 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
 //If you want, the MIME type will also be decoded (if possible)
                 String type = options.outMimeType;
 
-                Log.e("mimetype",type);
+                Log.e("mimetype", type);
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("width", width);
                     jsonObject.put("height", height);
-                    UploadFile(this, "POST", Important.getChangeprofilepicture(), file, jsonObject, 18, context);
+
+
+
+
+
+                    UploadFile(this, "POST", Important.getChangeprofilepicture(), "avatar", file, jsonObject, 18, context);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -245,7 +253,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         logoutview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(UserVerificationActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8,context);
+                globalRequest(UserVerificationActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
 
             }
         });
@@ -253,7 +261,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(UserVerificationActivity.this,"POST",Important.getProfile_logout(),new JSONObject(),8,context);
+                globalRequest(UserVerificationActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
 
             }
         });
@@ -345,76 +353,77 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
             }
         });
         username.setText(getLoginInfo("user_name"));
-        ImageRequest(this,profilepicture, "GET", Important.getViewprofilepicture(), new JSONObject(), 1);
+        ImageRequest(this, profilepicture, "GET", Important.getViewprofilepicture(), new JSONObject(), 1);
 
 
-        String s = "~+8801914616453@MeCloak> auth status\n" +
-                "~+8801914616453@MeCloak> connected to Fahim Fahad Leon\n" +
-                "~+8801914616453@MeCloak> requesting session\n" +
-                "~+8801914616453@MeCloak> accepted with (" + getSaltString() + ")\n" +
-                "~+8801914616453@MeCloak> generating request id\n" +
-                "~+8801914616453@MeCloak> successful!!\n" +
-                "~+8801914616453@MeCloak> loading horoftech crypto\n" +
-                "~+8801914616453@MeCloak> ... ok\n" +
-                "~+8801914616453@MeCloak> loading MeCloak premium icon\n" +
-                "~+8801914616453@MeCloak> failed/... ok\n" +
-                "~+8801914616453@MeCloak> loading boundage policy\n" +
-                "~+8801914616453@MeCloak> ... ok\n" +
-                "~+8801914616453@MeCloak> loading modules\n" +
-                "~+8801914616453@MeCloak> https ... ok\n" +
-                "~+8801914616453@MeCloak> wss ... ok\n" +
-                "~+8801914616453@MeCloak> LDAP ... ok\n" +
-                "~+8801914616453@MeCloak> SqLite ... ok\n" +
-                "~+8801914616453@MeCloak> XML ... ok\n" +
-                "~+8801914616453@MeCloak> bash ... ok\n" +
-                "~+8801914616453@MeCloak> loading certificates ... ok\n" +
-                "~+8801914616453@MeCloak> establishing cryptographic structure ... ok\n" +
-                "~+8801914616453@MeCloak> starting MeCloak\n";
-        String[] chararray = s.split("\n");
+//        String s = "~+8801914616453@MeCloak> auth status\n" +
+//                "~+8801914616453@MeCloak> connected to Fahim Fahad Leon\n" +
+//                "~+8801914616453@MeCloak> requesting session\n" +
+//                "~+8801914616453@MeCloak> accepted with (" + getSaltString() + ")\n" +
+//                "~+8801914616453@MeCloak> generating request id\n" +
+//                "~+8801914616453@MeCloak> successful!!\n" +
+//                "~+8801914616453@MeCloak> loading horoftech crypto\n" +
+//                "~+8801914616453@MeCloak> ... ok\n" +
+//                "~+8801914616453@MeCloak> loading MeCloak premium icon\n" +
+//                "~+8801914616453@MeCloak> failed/... ok\n" +
+//                "~+8801914616453@MeCloak> loading boundage policy\n" +
+//                "~+8801914616453@MeCloak> ... ok\n" +
+//                "~+8801914616453@MeCloak> loading modules\n" +
+//                "~+8801914616453@MeCloak> https ... ok\n" +
+//                "~+8801914616453@MeCloak> wss ... ok\n" +
+//                "~+8801914616453@MeCloak> LDAP ... ok\n" +
+//                "~+8801914616453@MeCloak> SqLite ... ok\n" +
+//                "~+8801914616453@MeCloak> XML ... ok\n" +
+//                "~+8801914616453@MeCloak> bash ... ok\n" +
+//                "~+8801914616453@MeCloak> loading certificates ... ok\n" +
+//                "~+8801914616453@MeCloak> establishing cryptographic structure ... ok\n" +
+//                "~+8801914616453@MeCloak> starting MeCloak\n";
+//        String[] chararray = s.split("\n");
+//
+//
+//        int length = chararray.length - 1;
+//
+//
+//        Timer t = new Timer();
+//        t.scheduleAtFixedRate(
+//                new TimerTask() {
+//                    public void run() {
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//
+//                                autotext.setCursorVisible(true);
+//                                autotext.setText(autotext.getText().toString() + "\n" + chararray[point]);
+//                                autotext.setSelection(autotext.getText().length());
+//
+//                                if (point == length) {
+//                                    t.cancel();
+//                                    new Handler().postDelayed(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            runOnUiThread(new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                    autotext.setVisibility(View.GONE);
+//                                                    passwordfieldlayout.setVisibility(View.VISIBLE);
+//                                                    initialize.setText("Page Login");
+//                                                }
+//                                            });
+//                                        }
+//                                    }, 1000);
+//                                }
+//                                point++;
+//                            }
+//                        });
+//                    }
+//                },
+//                0,      // run first occurrence immediatetly
+//                150); // run every two seconds
 
-
-        int length = chararray.length - 1;
-
-
-        Timer t = new Timer();
-        t.scheduleAtFixedRate(
-                new TimerTask() {
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                autotext.setCursorVisible(true);
-                                autotext.setText(autotext.getText().toString() + "\n" + chararray[point]);
-                                autotext.setSelection(autotext.getText().length());
-
-                                if (point == length) {
-                                    t.cancel();
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    autotext.setVisibility(View.GONE);
-                                                    passwordfieldlayout.setVisibility(View.VISIBLE);
-                                                    initialize.setText("Page Login");
-                                                }
-                                            });
-                                        }
-                                    }, 1000);
-                                }
-                                point++;
-                            }
-                        });
-                    }
-                },
-                0,      // run first occurrence immediatetly
-                150); // run every two seconds
-
-//        autotext.setVisibility(View.GONE);
+        autotext.setVisibility(View.GONE);
 //        passwordfieldlayout.setVisibility(View.VISIBLE);
-
+        passwordfieldlayout.setVisibility(View.VISIBLE);
+        initialize.setText("Page Login");
 
         registernewpage = findViewById(R.id.registernewpage);
 
@@ -458,7 +467,6 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     }
 
 
-
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
         Log.e("Userverification", response);
@@ -486,7 +494,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
                 if (bitmap != null) {
                     Log.e("bitmap", "notnull");
                     setImage(imageView, bitmap);
-                }else {
+                } else {
                     Log.e("bitmap", "null");
                 }
             }
@@ -503,5 +511,5 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         imageView.setImageBitmap(bitmap);
     }
 
-Bitmap bitmap;
+    Bitmap bitmap;
 }

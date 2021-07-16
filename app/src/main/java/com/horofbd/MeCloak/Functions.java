@@ -113,6 +113,9 @@ public class Functions {
         ((Activity) context).finish();
     }
 
+    public static boolean isJSONArrayNull(JSONArray jsonArray){
+        return jsonArray == null;
+    }
 
     static Dialog dialog;
 
@@ -637,8 +640,11 @@ public class Functions {
     }
 
 
-    public static void UploadFile(ServerResponse serverResponse, String requestType, String Link, File file, JSONObject jsonObject, int requestcode) {
+    public static void UploadFile(ServerResponse serverResponse, String requestType, String Link,String filetype, File file, JSONObject jsonObject, int requestcode) {
         OkHttpClient client = getClient();
+
+        Log.e("link",Link);
+        Log.e("jsonobject",jsonObject.toString());
 
         MultipartBody.Builder builder = new MultipartBody.Builder();
         RequestBody body = null;
@@ -648,13 +654,20 @@ public class Functions {
             while (iter.hasNext()) {
                 String key = iter.next();
                 try {
-                    builder.addFormDataPart(key, jsonObject.getString(key));
+                    Object o = jsonObject.get(key);
+                    if(o instanceof JSONArray){
+                        for(int i = 0;i<jsonObject.getJSONArray(key).length();i++){
+                            builder.addFormDataPart(key+"[]",((JSONArray) o).getString(i));
+                        }
+                    }else {
+                        builder.addFormDataPart(key, jsonObject.getString(key));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
             builder.setType(MultipartBody.FORM);
-            builder.addFormDataPart("avatar", file.getName(),
+            builder.addFormDataPart(filetype, file.getName(),
                     RequestBody.create(MediaType.parse("application/octet-stream"),
                             file));
             body = builder.build();
@@ -685,7 +698,8 @@ public class Functions {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    serverResponse.onResponse(response.body().string(), response.code(), requestcode);
+                    String s =response.body().string();
+                    serverResponse.onResponse(s, response.code(), requestcode);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -709,7 +723,43 @@ public class Functions {
                 }
             }
         }
-        request = new Request.Builder().url(httpBuilder.build()).method("GET", null).build();
+
+
+
+
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        RequestBody body = null;
+
+        if (jsonObject.length() != 0) {
+            Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
+            while (iter.hasNext()) {
+                String key = iter.next();
+                try {
+                    builder.addFormDataPart(key, jsonObject.getString(key));
+                    builder.setType(MultipartBody.FORM);
+                    body = builder.build();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            body = RequestBody.create(JSON, "{}");
+        }
+
+
+
+        if (requestType.equals("GET")) {
+            request = new Request.Builder().url(httpBuilder.build()).method("GET", null).build();
+        } else {
+            request = new Request.Builder()
+                    .url(Link)
+                    .method(requestType, body)
+                    .build();
+        }
+
+
+
 
         client.newCall(request).enqueue(new Callback() {
             @Override
