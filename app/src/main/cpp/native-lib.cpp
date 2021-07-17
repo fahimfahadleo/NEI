@@ -728,8 +728,7 @@ static void setSharedPreference(JNIEnv *env , jstring key , jstring value) {
 }
 
 static void finishActivity(JNIEnv *env , jobject context) {
-    jclass Activity = env->FindClass("android/app/Activity");
-    jmethodID finish = env->GetMethodID(Activity , "fileList" , "()[Ljava/lang/String;");
+    CloseActivity(env,context);
 }
 
 static jstring getSharedPreference(JNIEnv *env , jstring key) {
@@ -1871,16 +1870,21 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
             }case 28:{
 
                 //parse security questions and answer
-                jobject jsonarray = env->CallObjectMethod(jsonobject,getJSONArray,env->NewStringUTF("response"));
-
-                if(env->CallStaticBooleanMethod(Function,isJSONArrayNull,jsonarray)){
-                    printlogcat(env,"tag","null");
-                    jmethodID newjsonobject = env->GetStaticMethodID(Function,"getInstanse", "()Lorg/json/JSONObject;");
-                    jobject jobject1 = env->CallStaticObjectMethod(Function,newjsonobject);
-                    request(env,ServerResponse,env->NewStringUTF("GET"),env->NewStringUTF(getpagesecurityquestions.c_str()),jobject1,29,context);
+                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
+                    jobject jsonarray = env->CallObjectMethod(jsonobject,getJSONArray,env->NewStringUTF("response"));
+                    if(env->CallStaticBooleanMethod(Function,isJSONArrayNull,jsonarray)){
+                        printlogcat(env,"tag","null");
+                        jmethodID newjsonobject = env->GetStaticMethodID(Function,"getInstanse", "()Lorg/json/JSONObject;");
+                        jobject jobject1 = env->CallStaticObjectMethod(Function,newjsonobject);
+                        request(env,ServerResponse,env->NewStringUTF("GET"),env->NewStringUTF(getpagesecurityquestions.c_str()),jobject1,29,context);
+                    } else{
+                        printlogcat(env,"tag","not null");
+                    }
                 } else{
-                    printlogcat(env,"tag","not null");
+                    showToast(env,context,env->NewStringUTF("Unauthorised!"));
+                    finishActivity(env,context);
                 }
+
                 break;
             }case 29:{
                 //purse security question

@@ -372,18 +372,33 @@ public class Functions {
             Iterator<String> iter = jsonObject.keys(); //This should be the iterator you want.
             while (iter.hasNext()) {
                 String key = iter.next();
+
+
                 try {
-                    builder.addFormDataPart(key, jsonObject.getString(key));
-                    builder.setType(MultipartBody.FORM);
-                    body = builder.build();
+                    Object o = jsonObject.get(key);
+                    if(o instanceof JSONArray){
+                        for(int i = 0;i<jsonObject.getJSONArray(key).length();i++){
+                            builder.addFormDataPart(key+"[]",((JSONArray) o).getString(i));
+                        }
+                    }else {
+                        builder.addFormDataPart(key, jsonObject.getString(key));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                builder.setType(MultipartBody.FORM);
+                body = builder.build();
+
             }
         } else {
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
             body = RequestBody.create(JSON, "{}");
         }
+
+
+
+
         Request request;
         if (requestType.equals("GET")) {
             request = new Request.Builder().url(Link).method("GET", null).build();

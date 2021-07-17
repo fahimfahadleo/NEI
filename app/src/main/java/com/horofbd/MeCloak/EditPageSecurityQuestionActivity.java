@@ -15,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,26 +40,28 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
 
     static Context context;
     Intent i;
-    public static void closeActivtiy(){
+
+    public static void closeActivtiy() {
         Functions.dismissDialogue();
-        ((Activity)context).finish();
+        ((Activity) context).finish();
     }
 
     static ArrayList<String> questions;
 
-    Spinner questionone,questiontwo,questionthree;
-    TextView answerone,answertwo,answerthree;
+    Spinner questionone, questiontwo, questionthree;
+    TextView answerone, answertwo, answerthree;
+    TextView questiononeview,questiontwoview,questionthreeview;
 
-    static HashMap<String,Integer> idmap;
+    static HashMap<String, Integer> idmap;
 
-    public static void setUpQuestionParse(ArrayList<JSONObject> list){
+    public static void setUpQuestionParse(ArrayList<JSONObject> list) {
 
         for (JSONObject j : list) {
             try {
                 int id = j.getInt("id");
                 String question = j.getString("question");
                 questions.add(question);
-                idmap.put(question,id);
+                idmap.put(question, id);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -80,6 +83,9 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
         answertwo = findViewById(R.id.answertwo);
         answerthree = findViewById(R.id.answerthree);
         action = findViewById(R.id.action);
+        questiononeview = findViewById(R.id.questiononeview);
+        questiontwoview = findViewById(R.id.questiontwoview);
+        questionthreeview = findViewById(R.id.questionthreeview);
         idmap = new HashMap<>();
         questions = new ArrayList<>();
 
@@ -92,12 +98,49 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
         questiontwo.setAdapter(spinnerArrayAdapter);
         questionthree.setAdapter(spinnerArrayAdapter);
 
+        questionone.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Log.e("itemselected",adapterView.getItemAtPosition(i).toString());
+                questiononeview.setText(questionone.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        questiontwo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                questiontwoview.setText(questiontwo.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        questionthree.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                questionthreeview.setText(questionthree.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("password_confirmation",i.getStringExtra("pass"));
-            globalRequest(this,"POST",Important.getViewansweredsecurityquestions(),jsonObject,28,this);
+            jsonObject.put("password_confirmation", i.getStringExtra("pass"));
+            globalRequest(this, "POST", Important.getViewansweredsecurityquestions(), jsonObject, 28, this);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -105,7 +148,25 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
         action.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                JSONObject jsonObject1 = new JSONObject();
+                try {
+                    jsonObject.put("password_confirmation", i.getStringExtra("pass"));
+                    JSONArray array = new JSONArray();
+                    array.put(answerone.getText().toString());
+                    array.put(answertwo.getText().toString());
+                    array.put(answerthree.getText().toString());
+                    JSONArray array1 = new JSONArray();
+                    array1.put(idmap.get(questionone.getSelectedItem().toString()));
+                    array1.put(idmap.get(questiontwo.getSelectedItem().toString()));
+                    array1.put(idmap.get(questionthree.getSelectedItem().toString()));
+                    jsonObject1.put("ids", array1);
+                    jsonObject1.put("value", array);
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                globalRequest(EditPageSecurityQuestionActivity.this, "POST", Important.getUpload_page_security_question(), jsonObject1, 30, EditPageSecurityQuestionActivity.this);
             }
         });
 
@@ -114,8 +175,8 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
-        Log.e("questionresponse",response);
-        CheckResponse(this,this,response,requestcode);
+        Log.e("questionresponse", response);
+        CheckResponse(this, this, response, requestcode);
     }
 
     @Override

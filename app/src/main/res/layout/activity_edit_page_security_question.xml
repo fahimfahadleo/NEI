@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/background"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".EditPageSecurityQuestionActivity">
@@ -52,11 +53,36 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Spinner
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_32sdp"
-                android:layout_margin="@dimen/_8sdp"
-                android:id="@+id/questionone"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/questiononeview"
+                    android:gravity="center|start"
+                    android:paddingStart="@dimen/_8sdp"
+                    android:paddingEnd="@dimen/_4sdp"
+                    android:textColor="#000"
+                    android:text="Choose a question"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:layout_weight="1"/>
+
+
+                <Spinner
+                    android:layout_width="@dimen/_24sdp"
+                    android:layout_height="@dimen/_24sdp"
+                    android:layout_margin="@dimen/_8sdp"
+                    android:gravity="center"
+                    android:id="@+id/questionone"/>
+
+            </LinearLayout>
+
+
 
             <EditText
                 android:id="@+id/answerone"
@@ -75,11 +101,33 @@
                 android:textSize="@dimen/_12sdp"
                 />
 
-            <Spinner
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_32sdp"
-                android:layout_margin="@dimen/_8sdp"
-                android:id="@+id/questiontwo"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/questiontwoview"
+                    android:gravity="center|start"
+                    android:paddingStart="@dimen/_8sdp"
+                    android:paddingEnd="@dimen/_4sdp"
+                    android:textColor="#000"
+                    android:text="Choose a question"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:layout_weight="1"/>
+
+
+                <Spinner
+                    android:layout_width="@dimen/_24sdp"
+                    android:layout_height="@dimen/_24sdp"
+                    android:layout_margin="@dimen/_8sdp"
+                    android:gravity="center"
+                    android:id="@+id/questiontwo"/>
+
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/answertwo"
@@ -99,11 +147,33 @@
                 />
 
 
-            <Spinner
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_32sdp"
-                android:layout_margin="@dimen/_8sdp"
-                android:id="@+id/questionthree"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/questionthreeview"
+                    android:gravity="center|start"
+                    android:paddingStart="@dimen/_8sdp"
+                    android:paddingEnd="@dimen/_4sdp"
+                    android:textColor="#000"
+                    android:text="Choose a question"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:layout_weight="1"/>
+
+
+                <Spinner
+                    android:layout_width="@dimen/_24sdp"
+                    android:layout_height="@dimen/_24sdp"
+                    android:layout_margin="@dimen/_8sdp"
+                    android:gravity="center"
+                    android:id="@+id/questionthree"/>
+
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/answerthree"
