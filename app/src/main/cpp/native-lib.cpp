@@ -1874,28 +1874,38 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 jobject jsonarray = env->CallObjectMethod(jsonobject,getJSONArray,env->NewStringUTF("response"));
 
                 if(env->CallStaticBooleanMethod(Function,isJSONArrayNull,jsonarray)){
+                    printlogcat(env,"tag","null");
                     jmethodID newjsonobject = env->GetStaticMethodID(Function,"getInstanse", "()Lorg/json/JSONObject;");
                     jobject jobject1 = env->CallStaticObjectMethod(Function,newjsonobject);
                     request(env,ServerResponse,env->NewStringUTF("GET"),env->NewStringUTF(getpagesecurityquestions.c_str()),jobject1,29,context);
                 } else{
-
+                    printlogcat(env,"tag","not null");
                 }
                 break;
             }case 29:{
                 //purse security question
                 jobject jsonarray = env->CallObjectMethod(jsonobject,getJSONArray,env->NewStringUTF("response"));
-                {"id":1,
-                 "question":"What was your childhood nickname?",
-                 "deleted_at":null,
-                 "created_at":"2021-05-19T23:48:33.000000Z","updated_at":"2021-05-19T23:48:33.000000Z"}
 
                 jint length = (jint) env->CallIntMethod(jsonarray , jsonarraylength);
 
+                jclass arrayListClass = env->FindClass("java/util/ArrayList");
+                jmethodID arrayListConstructor = env->GetMethodID(arrayListClass , "<init>" ,
+                                                                  "()V");
+                jmethodID addMethod = env->GetMethodID(arrayListClass , "add" ,
+                                                       "(Ljava/lang/Object;)Z");
+
+                jobject list = env->NewObject(arrayListClass , arrayListConstructor);
+
                 for(int i=0;i<length;i++){
                     jobject tempobject = env->CallObjectMethod(jsonarray,jsonarraygetjsonobject,i);
-                    
+                    env->CallBooleanMethod(list , addMethod , tempobject);
+                    if(i == length-1){
+                        jclass jclass1 = env->FindClass("com/horofbd/MeCloak/EditPageSecurityQuestionActivity");
+                        jmethodID setdata = env->GetStaticMethodID(jclass1,"setUpQuestionParse", "(Ljava/util/ArrayList;)V");
+                        env->CallStaticVoidMethod(jclass1,setdata,list);
+                    }
                 }
-
+                break;
             }
         }
     } else if (requestcode == 16) {

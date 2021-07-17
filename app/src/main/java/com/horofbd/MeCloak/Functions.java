@@ -114,7 +114,11 @@ public class Functions {
     }
 
     public static boolean isJSONArrayNull(JSONArray jsonArray){
-        return jsonArray == null;
+        if(jsonArray != null ){
+            return jsonArray.length() == 0;
+        }else {
+            return false;
+        }
     }
 
     static Dialog dialog;
