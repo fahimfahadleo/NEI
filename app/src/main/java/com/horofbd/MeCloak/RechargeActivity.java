@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ public class RechargeActivity extends AppCompatActivity implements ServerRespons
     }
 
     String amountstr;
+    ImageView backbutton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +41,14 @@ public class RechargeActivity extends AppCompatActivity implements ServerRespons
         month6 = findViewById(R.id.month6);
         context = this;
 
+        backbutton = findViewById(R.id.backbutton);
 
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
         month1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

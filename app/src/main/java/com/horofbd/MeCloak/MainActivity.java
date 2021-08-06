@@ -120,8 +120,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     public static final int PICK_IMAGE = 1;
     String number;
     static DrawerLayout drawerLayout;
-    TextView logout, Settings, gopremiumtext, helptext, contactustext, tnctext, policytext, aboutustext;
-    CardView logoutview, SettingsView, gopremiumview, helpview, contactusview, tncview, policyview, aboutusview;
+    TextView logout, Settings, gopremiumtext, helptext, contactustext, tnctext, policytext, aboutustext,pagelogout;
+    CardView logoutview, SettingsView, gopremiumview, helpview, contactusview, tncview, policyview, aboutusview,pagelogoutview;
     ImageView search;
     LinearLayout searchlayout;
     static ServerResponse serverResponse;
@@ -214,9 +214,10 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         options = findViewById(R.id.options);
         drawerLayout = findViewById(R.id.drawer);
         logout = drawerLayout.findViewById(R.id.logout);
-        search = findViewById(R.id.search);
+
         logoutview = drawerLayout.findViewById(R.id.logoutview);
         notification = findViewById(R.id.notification);
+        search = findViewById(R.id.search);
         searchlayout = findViewById(R.id.searchlayout);
         searchlayout.setVisibility(View.GONE);
         recyclerView = findViewById(R.id.recyclerview);
@@ -241,12 +242,14 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         notificationcounter = findViewById(R.id.notificationcounter);
         notificationcounterveiw = findViewById(R.id.notificationcounterview);
         connectinglayout = findViewById(R.id.connectionlayout);
+        pagelogout = findViewById(R.id.pagelogout);
+        pagelogoutview = findViewById(R.id.pagelogoutview);
         helper = new DatabaseHelper(this);
         new Functions(this);
         InitLinks(this);
 
 
-        Cursor c = helper.getNotificationData();
+        Cursor c = DatabaseHelper.getNotificationData();
         if (c != null) {
             for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
                 notificationRead = c.getString(c.getColumnIndex("notificationread"));
@@ -254,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             }
             c.close();
         } else {
-            helper.setNotificationInformation("0", "true");
+            DatabaseHelper.setNotificationInformation("0", "true");
         }
 
 
@@ -386,6 +389,22 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                 });
             }
         });
+
+        pagelogoutview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                globalRequest(MainActivity.this,"POST",Important.getPagelogout(),new JSONObject(),37,context);
+            }
+        });
+
+        pagelogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                globalRequest(MainActivity.this,"POST",Important.getPagelogout(),new JSONObject(),37,context);
+
+            }
+        });
+
         search.setOnClickListener(view -> {
             if (isopen) {
                 TransitionManager.beginDelayedTransition(searchlayout, new AutoTransition());
@@ -537,6 +556,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         @Override
         protected void imageViewSetUp(String id, CircleImageView imageView) {
             if (!id.equals("id")) {
+                Log.e("mainid",id);
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("friend", id);
@@ -997,10 +1017,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     private static String getDate(String expiry) {
         String ourDate;
         try {
-
             SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //this format changeable
-
-
             Calendar date = Calendar.getInstance();
             long t = date.getTimeInMillis();
             Date afterAddingTenMins = new Date(t + (Integer.parseInt(expiry) * 60000));
@@ -1122,8 +1139,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
                         notificationcount = notificationcount + 1;
                         notificationRead = "false";
-                        helper.UpdateNotification("notificationcount", String.valueOf(notificationcount));
-                        helper.UpdateNotification("notificationread", "false");
+                        DatabaseHelper.updateNotification("notificationcount", String.valueOf(notificationcount));
+                        DatabaseHelper.updateNotification("notificationread", "false");
 
                         Log.e("notification count", String.valueOf(notificationcount));
                         Log.e("notification status", String.valueOf(notificationRead));
@@ -1166,7 +1183,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                 view.setBackgroundColor(context.getResources().getColor(R.color.background));
                 FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
                 params.gravity = Gravity.TOP;
-                TextView tv = (TextView) view.findViewById(R.id.snackbar_text);
+                TextView tv = view.findViewById(R.id.snackbar_text);
                 tv.setTextColor(Color.parseColor("#000000"));
                 view.setLayoutParams(params);
                 snack.show();

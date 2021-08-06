@@ -26,7 +26,7 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
     static native void InitLinks();
     static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
-
+    ImageView backbutton;
     EditText phone;
     TextView submitbutton;
 
@@ -44,7 +44,14 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
         phone = findViewById(R.id.phone);
         submitbutton = findViewById(R.id.proceedbutton);
         InitLinks();
+        backbutton = findViewById(R.id.backbutton);
 
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         submitbutton.setOnClickListener(new View.OnClickListener() {
             @Override

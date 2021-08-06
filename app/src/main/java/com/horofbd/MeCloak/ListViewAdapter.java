@@ -233,6 +233,11 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        try {
+            imageViewSetUp(myList.getString("id"),profilepic);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         showDialogue();
         builder.setCancelable(true);
         dialog = builder.create();

@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -20,7 +21,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".PageResetImage"></activity>
+        <activity android:name=".OfflineChatList"></activity>
+        <activity android:name=".OfflineActivity" />
+        <activity android:name=".Report" />
+        <activity android:name=".PremiumCongrats" />
+        <activity android:name=".ExclusiveFeature" />
+        <activity android:name=".LoggedInDevices" />
+        <activity android:name=".WithdrawActivity" />
+        <activity android:name=".WalletActivity" />
+        <activity android:name=".Referral" />
+        <activity android:name=".PageResetImage" />
         <activity
             android:name=".TutorialActivity"
             android:configChanges="orientation" />
@@ -43,7 +53,6 @@
         <activity android:name=".PremiumFeaturesActivity" />
         <activity android:name=".FriendListActivity" />
         <activity android:name=".AddFriend" />
-        <activity android:name=".GetSecretCodeorCertificateActivity" />
         <activity android:name=".AddOrEditPageSecurityImageActivity" />
         <activity android:name=".EditPageSecurityQuestionActivity" />
         <activity android:name=".WatchVideoActivity" />

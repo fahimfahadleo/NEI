@@ -80,25 +80,25 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
         Log.e("code",code);
 
 
-        sendVerificationCode(phonenumber);
+        //sendVerificationCode(phonenumber);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String verificationcodestr = verificationcode.getText().toString();
-                verifyCode(verificationcodestr);
+//                String verificationcodestr = verificationcode.getText().toString();
+//                verifyCode(verificationcodestr);
 
-//                JSONObject jsonObject = new JSONObject();
-//                try {
-//                    jsonObject.put("code",code);
-//
-//                    Log.e("tag",Important.getPhone_verification());
-//                    RequestPhoneverification(PhoneNumberVerificationActivity.this,"POST",Important.getPhone_verification(),jsonObject,2,PhoneNumberVerificationActivity.this);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                Log.e("tag",Important.getPhone_verification());
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("code",code);
+
+                    Log.e("tag",Important.getPhone_verification());
+                    RequestPhoneverification(PhoneNumberVerificationActivity.this,"POST",Important.getPhone_verification(),jsonObject,2,PhoneNumberVerificationActivity.this);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.e("tag",Important.getPhone_verification());
 
             }
         });

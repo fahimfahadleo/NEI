@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,9 +22,11 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Response;
 
 public class FriendListActivity extends AppCompatActivity implements ServerResponse {
     static Context context;
@@ -51,6 +55,9 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
 
     static native String getLoginInfo(String key);
 
+    static native void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
+
+
     static void RequestFriendList() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -60,7 +67,7 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
             e.printStackTrace();
         }
     }
-
+    ImageView backbutton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +81,14 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
 
         RequestFriendList();
 
+        backbutton = findViewById(R.id.backbutton);
 
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
@@ -154,12 +168,25 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
         nextpageurl =next;
     }
 
-    static class ListviewAdapter extends FriendListAdapter {
+    static class ListviewAdapter extends FriendListAdapter implements ImageResponse{
         ArrayList<JSONObject> mylistdata;
 
         public ListviewAdapter(ArrayList<JSONObject> listdata, Context context, int view) {
             super(listdata, context);
             mylistdata = listdata;
+
+        }
+
+        @Override
+        protected void ImageSetUp(CircleImageView imageView, String id) {
+            Log.e("blockedid",id);
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("friend", id);
+                ImageRequest(this, imageView, "GET", Important.getViewprofilepicture(), jsonObject, 1);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -300,6 +327,31 @@ public class FriendListActivity extends AppCompatActivity implements ServerRespo
                     }
                 }
             });
+        }
+
+        @Override
+        public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) throws JSONException {
+
+            Log.e("called","called");
+            InputStream inputStream = response.body().byteStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            ((Activity) context).runOnUiThread(() -> {
+
+
+                if (bitmap != null) {
+                    Log.e("bitmap", "notnull");
+                    Log.e("bitmap", bitmap.toString());
+                    imageView.setImageBitmap(bitmap);
+
+                } else {
+                    Log.e("bitmap", "null");
+                }
+            });
+        }
+
+        @Override
+        public void onImageFailure(String failresponse) throws JSONException {
+
         }
     }
 

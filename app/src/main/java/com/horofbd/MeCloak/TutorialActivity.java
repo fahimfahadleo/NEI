@@ -77,7 +77,7 @@ public class TutorialActivity extends AppCompatActivity implements ServerRespons
     static {
         System.loadLibrary("native-lib");
     }
-
+    ImageView backbutton;
 
     static native void StartActivity(Context context, String activity, String data);
 
@@ -148,7 +148,14 @@ public class TutorialActivity extends AppCompatActivity implements ServerRespons
         text = findViewById(R.id.text);
         textcontainer = findViewById(R.id.textcontainer);
 
+        backbutton = findViewById(R.id.backbutton);
 
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
         name = findViewById(R.id.name);
         serverResponse = this;
 

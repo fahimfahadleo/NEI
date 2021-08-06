@@ -63,7 +63,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     CardView view;
     static PopupWindow popupWindow;
     CardView changeprofilepictureview, logoutview, changeavatarview, changenameveiw, changephonenumberview;
-    TextView changeprofilepicture, changeavatar, changename, changephonenumber;
+    TextView changeprofilepicture, changeavatar, changename, changephonenumber,userphonenumber;
 
 
     String pass;
@@ -89,12 +89,13 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     static native void InitLinks();
 
     static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
-
-    static native void UploadFile(ServerResponse serverResponse, String requesttype, String link, String filetype, File file, JSONObject jsonObject, int requestcode, Context context);
-
     static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
     static native String getLoginInfo(String key);
+
+    static native void UploadFile(ServerResponse serverResponse, String requesttype, String link, String filetype, File file, JSONObject jsonObject, int requestcode, Context context);
+
+
 
     static native void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
 
@@ -231,6 +232,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         passwordfieldlayout = findViewById(R.id.passwordfieldlayout);
         initialize = findViewById(R.id.initialize);
         profilepicture = findViewById(R.id.profile_image);
+        userphonenumber = findViewById(R.id.userphonenumber);
 
         username = findViewById(R.id.username);
         view = findViewById(R.id.view);
@@ -248,6 +250,8 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         context = this;
         InitLinks();
         new Functions(this);
+
+        userphonenumber.setText(getLoginInfo("phone_no"));
 
 
         logoutview.setOnClickListener(new View.OnClickListener() {

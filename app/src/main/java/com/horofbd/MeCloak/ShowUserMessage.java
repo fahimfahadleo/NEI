@@ -168,7 +168,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         timerview = findViewById(R.id.timerview);
         enableboundage = findViewById(R.id.enableboundage);
         enableboundageview = findViewById(R.id.enableboundageview);
-        helper = new DatabaseHelper(this);
+//        helper = new DatabaseHelper(this);
         menubutton = findViewById(R.id.menubutton);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
@@ -197,7 +197,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         String premiumstatus = getLoginInfo("premium");
         userphonenumber = getIntent().getStringExtra("phone_no");
 
-        Cursor c = helper.getData(userphonenumber, getLoginInfo("page_no"));
+        Cursor c = DatabaseHelper.getData(userphonenumber, getLoginInfo("page_no"));
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
             String data2 = c.getString(c.getColumnIndex("phonenumber"));
             passstr = c.getString(c.getColumnIndex("textpass"));
@@ -208,7 +208,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         c.close();
 
         if (!isDatabaseAvailable) {
-            helper.setFriendInformation(userphonenumber, "", "0", "0", getLoginInfo("page_no"));
+            DatabaseHelper.setFriendInformation(userphonenumber, "", "0", "0", getLoginInfo("page_no"));
             passstr = "";
             timerstr = "0";
             boundagestr = "0";
@@ -777,19 +777,19 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         switch (field) {
             case 1: {
                 //update password
-                helper.UpdateFriendInformation(userphonenumber, "textpass", value, getLoginInfo("page_no"));
+                DatabaseHelper.updateFriendInformation(userphonenumber, "textpass", value, getLoginInfo("page_no"));
                 passstr = value;
                 break;
             }
             case 2: {
                 //update timer
-                helper.UpdateFriendInformation(userphonenumber, "timer", value, getLoginInfo("page_no"));
+                DatabaseHelper.updateFriendInformation(userphonenumber, "timer", value, getLoginInfo("page_no"));
                 timerstr = value;
                 break;
             }
             case 3: {
                 //update boundage
-                helper.UpdateFriendInformation(userphonenumber, "boundage", value, getLoginInfo("page_no"));
+                DatabaseHelper.updateFriendInformation(userphonenumber, "boundage", value, getLoginInfo("page_no"));
                 boundagestr = value;
                 break;
             }

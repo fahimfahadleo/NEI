@@ -6,8 +6,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:backgroundTint="@color/background"
     android:layout_height="match_parent"
     tools:context=".RechargeActivity">
+
+
+    <LinearLayout
+        android:id="@+id/titlelayout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/backbutton"
+            android:layout_width="@dimen/_38sdp"
+            android:layout_height="@dimen/_38sdp"
+            android:src="@drawable/backbutton"
+            android:padding="@dimen/_8sdp"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_38sdp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="center"
+            android:text="Recharge"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@color/oceanblue" />
+
+        <ImageView
+            android:id="@+id/search"
+            android:layout_width="@dimen/_38sdp"
+            android:visibility="invisible"
+            android:layout_height="@dimen/_38sdp"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/menu_white" />
+
+    </LinearLayout>
 
 
 

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class PremiumFeaturesActivity extends AppCompatActivity {
@@ -16,7 +17,7 @@ public class PremiumFeaturesActivity extends AppCompatActivity {
         Functions.dismissDialogue();
         ((Activity)context).finish();
     }
-
+    ImageView backbutton;
 
     CardView tutorialview;
     TextView tutorial;
@@ -29,7 +30,14 @@ public class PremiumFeaturesActivity extends AppCompatActivity {
         tutorialview =findViewById(R.id.tuorialview);
         tutorial =findViewById(R.id.tutorial);
 
+        backbutton = findViewById(R.id.backbutton);
 
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         tutorial.setOnClickListener(new View.OnClickListener() {
             @Override

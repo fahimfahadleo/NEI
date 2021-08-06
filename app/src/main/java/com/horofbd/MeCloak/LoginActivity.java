@@ -2,6 +2,7 @@ package com.horofbd.MeCloak;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.function.Function;
 
@@ -28,6 +30,10 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         System.loadLibrary("native-lib");
     }
 
+
+
+
+
     static native void LoginRequest(Context context, ServerResponse serverResponse, String phone, String passwrod, int requestcode);
 
     static native void SaveLogindata(String response, Context context);
@@ -36,13 +42,17 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
 
     static native void StartActivity(Context context, String classname);
 
+    static native JSONObject getData(String method);
+
+    static native void InitLinks();
+
 
     @Override
     protected void onPause() {
         super.onPause();
         Functions.dismissDialogue();
     }
-
+    JSONObject jsonObject;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,13 +65,28 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         donthaveaccount = findViewById(R.id.donthaveaccount);
         forgotpassword = findViewById(R.id.forgotpassword);
         new Functions(this);
+        context = this;
 
+        InitLinks();
 
+        jsonObject = getData("gui");
+        Log.e("gui",jsonObject.toString());
+        if(jsonObject.length()!=0){
+            if(Functions.isInternetAvailable()) {
+                try {
+                    if (jsonObject.getString("loginstatus").equals("true")) {
+                        LoginRequest(this,this,jsonObject.getString("userphone"),jsonObject.getString("userpass"),1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
-        AppCompatDelegate
-                .setDefaultNightMode(
-                        AppCompatDelegate
-                                .MODE_NIGHT_NO);
+//        AppCompatDelegate
+//                .setDefaultNightMode(
+//                        AppCompatDelegate
+//                                .MODE_NIGHT_NO);
 
 
         forgotpassword.setOnClickListener(new View.OnClickListener() {
@@ -86,7 +111,22 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
                     if (!phonestr.contains("+88")) {
                         phonestr = "+88" + phonestr;
                     }
-                    LoginRequest(LoginActivity.this, LoginActivity.this, phonestr, passwordstr, 1);
+
+                    if(Functions.isInternetAvailable()){
+                        Log.e("internet","available");
+                        LoginRequest(LoginActivity.this, LoginActivity.this, phonestr, passwordstr, 1);
+                    }else {
+                        Log.e("internet","not available");
+                        if(jsonObject.length()!=0){
+                            try {
+                                if(jsonObject.getString("userphone").equals(phonestr) && jsonObject.getString("userpass").equals(passwordstr)){
+                                    startActivity(new Intent(LoginActivity.this,OfflineChatList.class));
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -98,7 +138,7 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
             }
         });
 
-        context = this;
+
     }
 
     static Context context;

@@ -9,42 +9,115 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GetPremiumActivity extends AppCompatActivity {
-//    ExpandableTextView expandableTextView,expandableTextView2,expandableTextView3;
-//    CircleImageView wv,ref;
     static Context context;
     public static void closeActivtiy(){
         Functions.dismissDialogue();
         ((Activity)context).finish();
     }
-//
-//    CardView cardView,premiumcongrats;
-//    LinearLayout hiddenView,hiddenview2;
-//    ImageButton arrow,arrow2;
 
-    CardView premiumfeaturesview;
-    TextView premiumfeatures;
+    TextView buy;
+    
+
+    CardView premiumfeaturesview,gopremiumview,premiumexclusivefeatureview,premiumcongratsview,watchvideoview,reportview;
+    TextView premiumfeatures,premiumexclusivefeature,premiumcongrats,watchvideo,report;
+
+
+
+
+    public void callClass(View view) {
+        startActivity(new Intent(GetPremiumActivity.this,BuyActivity.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_go_premium);
-//        expandableTextView = findViewById(R.id.expandabletextview);
-//        expandableTextView2 = findViewById(R.id.expandabletextview2);
-//        expandableTextView3 = findViewById(R.id.expandabletextview3);
-//        recharge = findViewById(R.id.recharge);
-//        wv = findViewById(R.id.watchvideo);
-//        ref = findViewById(R.id.referfriend);
+        buy = findViewById(R.id.buy);
+        gopremiumview   = findViewById(R.id.premiumview);
+        premiumexclusivefeatureview = findViewById(R.id.exclusivefeaturesview);
+        premiumexclusivefeature = findViewById(R.id.exclusivefeatures);
+        premiumcongrats = findViewById(R.id.premiumcongrats);
+        premiumcongratsview = findViewById(R.id.premiumcongratsview);
+        watchvideo = findViewById(R.id.watchvideo);
+        watchvideoview = findViewById(R.id.wachvideoview);
+        report = findViewById(R.id.report);
+        reportview = findViewById(R.id.reportview);
+
 
         premiumfeatures = findViewById(R.id.premiumfeatures);
         premiumfeaturesview = findViewById(R.id.premiumfeaturesview);
+        gopremiumview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GetPremiumActivity.this,BuyActivity.class));
+            }
+        });
+
+
+
+
+        reportview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GetPremiumActivity.this,Report.class));
+            }
+        });
+
+        watchvideoview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GetPremiumActivity.this,WatchVideoActivity.class));
+            }
+        });
+        watchvideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GetPremiumActivity.this,WatchVideoActivity.class));
+            }
+        });
+
+        premiumcongratsview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GetPremiumActivity.this,PremiumCongrats.class));
+            }
+        });
+        premiumcongrats.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GetPremiumActivity.this,PremiumCongrats.class));
+            }
+        });
+
+        premiumexclusivefeature.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GetPremiumActivity.this,ExclusiveFeature.class));
+            }
+        });
+        premiumexclusivefeatureview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GetPremiumActivity.this,ExclusiveFeature.class));
+            }
+        });
+
+
+        buy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
 
         premiumfeaturesview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,4 +230,5 @@ public class GetPremiumActivity extends AppCompatActivity {
 //        });
 
     }
+
 }

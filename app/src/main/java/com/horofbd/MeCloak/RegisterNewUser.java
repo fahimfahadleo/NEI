@@ -187,10 +187,10 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
             public void onClick(View view) {
 
                 String phonestr = phone.getText().toString();
-                String namestr = name.getText().toString().trim();
-                String passwordstr = password.getText().toString().trim();
-                String referencestr = referral.getText().toString().trim();
-                String confirmpasswrodstr = confirmpassword.getText().toString().trim();
+                String namestr = name.getText().toString();
+                String passwordstr = password.getText().toString();
+                String referencestr = referral.getText().toString();
+                String confirmpasswrodstr = confirmpassword.getText().toString();
 
                 if (TextUtils.isEmpty(referencestr)) {
                     referencestr = "";

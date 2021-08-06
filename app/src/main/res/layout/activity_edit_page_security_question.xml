@@ -20,7 +20,7 @@
             android:layout_height="@dimen/_38sdp"
             android:padding="@dimen/_8sdp"
             android:src="@drawable/backbutton"
-            android:visibility="invisible" />
+            />
 
         <TextView
             android:layout_width="0dp"
@@ -208,6 +208,9 @@
                 android:text="Save"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
+
+
+
 
         </LinearLayout>
     </ScrollView>

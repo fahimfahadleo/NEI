@@ -49,12 +49,6 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
         ((Activity)context).finish();
     }
 
-
-
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
     static native void InitLinks();
     static native void CheckResponse(ServerResponse serverResponse,Context context, String response,int requestcode);
     static native void StartActivity(Context context, String activity,String data);
@@ -179,7 +173,7 @@ public class AddFriend extends AppCompatActivity implements ServerResponse {
         backbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AddFriend.super.onBackPressed();
+               onBackPressed();
             }
         });
 

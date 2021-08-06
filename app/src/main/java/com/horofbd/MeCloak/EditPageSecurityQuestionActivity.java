@@ -12,8 +12,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +31,7 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
 
 
     static ServerResponse serverResponse;
-    TextView action;
+    static TextView action;
 
 
     static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
@@ -45,12 +47,14 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
         Functions.dismissDialogue();
         ((Activity) context).finish();
     }
-
+    ImageView backbutton;
     static ArrayList<String> questions;
 
-    Spinner questionone, questiontwo, questionthree;
-    TextView answerone, answertwo, answerthree;
-    TextView questiononeview,questiontwoview,questionthreeview;
+    static Spinner questionone, questiontwo, questionthree;
+    static TextView answerone, answertwo, answerthree;
+    static TextView questiononeview, questiontwoview, questionthreeview;
+    static int id1 = 0, id2 = 0, id3 = 0;
+    static String q1 = "", q2 = "", q3 = "";
 
     static HashMap<String, Integer> idmap;
 
@@ -66,6 +70,128 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
                 e.printStackTrace();
             }
         }
+
+        ((Activity) context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
+                        (context, android.R.layout.simple_spinner_item,
+                                questions); //selected item will look like a spinner set from XML
+                spinnerArrayAdapter.setDropDownViewResource(android.R.layout
+                        .simple_spinner_dropdown_item);
+                questionone.setAdapter(spinnerArrayAdapter);
+                questiontwo.setAdapter(spinnerArrayAdapter);
+                questionthree.setAdapter(spinnerArrayAdapter);
+
+                Log.e("Questions", questions.toString());
+
+
+                questionone.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        if (!q1.equals("")) {
+                            questiononeview.setText(q1);
+                            id1 = idmap.get(q1);
+                            q1 = "";
+                        } else {
+                            questiononeview.setText(questionone.getSelectedItem().toString());
+                            id1 = idmap.get(questionone.getSelectedItem().toString());
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+                        questiononeview.setText("Choose a question.");
+                    }
+                });
+
+
+                questiontwo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                        if(!q2.equals("")){
+                            questiontwoview.setText(q2);
+                            id2 = idmap.get(q2);
+                            q2 = "";
+                        }else {
+                            questiontwoview.setText(questiontwo.getSelectedItem().toString());
+                            id2 = idmap.get(questiontwo.getSelectedItem().toString());
+                        }
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+                        questiontwoview.setText("Choose a question.");
+                    }
+                });
+
+                questionthree.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                       if(!q3.equals("")){
+                           questionthreeview.setText(q3);
+                           id3 = idmap.get(q3);
+                           q3 = "";
+                       }else {
+                           questionthreeview.setText(questionthree.getSelectedItem().toString());
+                           id3 = idmap.get(questionthree.getSelectedItem().toString());
+                       }
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+                        questionthreeview.setText("Choose a question.");
+                    }
+                });
+
+
+            }
+        });
+
+    }
+
+
+    static ArrayList<JSONObject> questionobject;
+
+
+    public static void setUpAnsweredQuestions(ArrayList<JSONObject> someobjec) {
+        questionobject = someobjec;
+
+        ((Activity) context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    q1 = someobjec.get(0).getString("question");
+                    questiononeview.setText(someobjec.get(0).getString("question"));
+                    answerone.setText(someobjec.get(0).getString("answer"));
+                    questionone.setVisibility(View.INVISIBLE);
+
+                    q2 = someobjec.get(1).getString("question");
+                    questiontwoview.setText(someobjec.get(1).getString("question"));
+                    answertwo.setText(someobjec.get(1).getString("answer"));
+                    questiontwo.setVisibility(View.INVISIBLE);
+
+                    q3 = someobjec.get(2).getString("question");
+                    questionthreeview.setText(someobjec.get(2).getString("question"));
+                    answerthree.setText(someobjec.get(2).getString("answer"));
+                    questionthree.setVisibility(View.INVISIBLE);
+
+                    globalRequest(serverResponse, "GET", Important.getGetpagesecurityquestions(), new JSONObject(), 29, context);
+
+
+                    action.setText("Edit");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     @Override
@@ -89,50 +215,12 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
         idmap = new HashMap<>();
         questions = new ArrayList<>();
 
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_spinner_item,
-                        questions); //selected item will look like a spinner set from XML
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout
-                .simple_spinner_dropdown_item);
-        questionone.setAdapter(spinnerArrayAdapter);
-        questiontwo.setAdapter(spinnerArrayAdapter);
-        questionthree.setAdapter(spinnerArrayAdapter);
+        backbutton = findViewById(R.id.backbutton);
 
-        questionone.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        backbutton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                Log.e("itemselected",adapterView.getItemAtPosition(i).toString());
-                questiononeview.setText(questionone.getSelectedItem().toString());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        questiontwo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                questiontwoview.setText(questiontwo.getSelectedItem().toString());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        questionthree.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                questionthreeview.setText(questionthree.getSelectedItem().toString());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
 
@@ -148,25 +236,38 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
         action.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                JSONObject jsonObject1 = new JSONObject();
-                try {
-                    jsonObject.put("password_confirmation", i.getStringExtra("pass"));
-                    JSONArray array = new JSONArray();
-                    array.put(answerone.getText().toString());
-                    array.put(answertwo.getText().toString());
-                    array.put(answerthree.getText().toString());
-                    JSONArray array1 = new JSONArray();
-                    array1.put(idmap.get(questionone.getSelectedItem().toString()));
-                    array1.put(idmap.get(questiontwo.getSelectedItem().toString()));
-                    array1.put(idmap.get(questionthree.getSelectedItem().toString()));
-                    jsonObject1.put("ids", array1);
-                    jsonObject1.put("value", array);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (action.getText().equals("Edit")) {
+                    questionone.setVisibility(View.VISIBLE);
+                    questiontwo.setVisibility(View.VISIBLE);
+                    questionthree.setVisibility(View.VISIBLE);
+                    action.setText("Save");
+                } else {
+                    if (id1 == id2 || id2 == id3 || id1 == id3) {
+                        Toast.makeText(EditPageSecurityQuestionActivity.this, "Can no use same question twice.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        JSONObject jsonObject1 = new JSONObject();
+                        try {
+                            jsonObject1.put("password_confirmation", i.getStringExtra("pass"));
+                            JSONArray array = new JSONArray();
+                            array.put(answerone.getText().toString());
+                            array.put(answertwo.getText().toString());
+                            array.put(answerthree.getText().toString());
+                            JSONArray array1 = new JSONArray();
+                            array1.put(id1);
+                            array1.put(id2);
+                            array1.put(id3);
+                            jsonObject1.put("ids", array1);
+                            jsonObject1.put("value", array);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        globalRequest(EditPageSecurityQuestionActivity.this, "POST", Important.getAnswerpagesecurityquestion(), jsonObject1, 30, EditPageSecurityQuestionActivity.this);
+
+                    }
                 }
-
-                globalRequest(EditPageSecurityQuestionActivity.this, "POST", Important.getUpload_page_security_question(), jsonObject1, 30, EditPageSecurityQuestionActivity.this);
             }
         });
 

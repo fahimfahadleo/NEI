@@ -60,6 +60,7 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
     public static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode,Context context);
 
     public static native String getLoginInfo(String key);
+    ImageView backbutton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +74,20 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
         helper = new DatabaseHelper(this);
         new Functions(this);
 
+        backbutton = findViewById(R.id.backbutton);
+
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
 
         MainActivity.notificationcount = 0;
         MainActivity.notificationRead = "true";
-        helper.UpdateNotification("notificationcount", "0");
-        helper.UpdateNotification("notificationread", "true");
+        DatabaseHelper.updateNotification("notificationcount", "0");
+        DatabaseHelper.updateNotification("notificationread", "true");
         ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -152,7 +162,7 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
 
     public class MyAdapter extends FragmentPagerAdapter {
 
-        private Context myContext;
+        private final Context myContext;
         int totalTabs;
 
         public MyAdapter(Context context, FragmentManager fm, int totalTabs) {

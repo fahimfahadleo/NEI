@@ -5,7 +5,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
@@ -106,6 +109,26 @@ public class Functions {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 
+    }
+
+    public static JSONObject pc(Cursor c){
+        JSONObject jsonObject = new JSONObject();
+        if (c != null) {
+            int i = 0;
+            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                try {
+                    int length = c.getColumnCount();
+                    for(int p = 0;p<length;p++){
+                        jsonObject.put(c.getColumnName(p),c.getString(p));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            c.close();
+            return jsonObject;
+        }
+        return new JSONObject();
     }
 
 
@@ -212,14 +235,10 @@ public class Functions {
     }
 
     public static boolean isInternetAvailable() {
-        try {
-            InetAddress ipAddr = InetAddress.getByName("google.com");
-            //You can replace it with your name
-            return !ipAddr.equals("");
-
-        } catch (Exception e) {
-            return false;
-        }
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 
@@ -365,6 +384,7 @@ public class Functions {
     public static void Request(ServerResponse serverResponse, String requestType, String Link, JSONObject jsonObject, int requestcode) {
         OkHttpClient client = getClient();
 
+        Log.e("link",Link);
         MultipartBody.Builder builder = new MultipartBody.Builder();
         RequestBody body = null;
 
@@ -374,7 +394,9 @@ public class Functions {
                 String key = iter.next();
 
 
+
                 try {
+                    Log.e("formdata",key+" : "+jsonObject.getString(key));
                     Object o = jsonObject.get(key);
                     if(o instanceof JSONArray){
                         for(int i = 0;i<jsonObject.getJSONArray(key).length();i++){
@@ -555,6 +577,8 @@ public class Functions {
         if (!reference.equals("")) {
             builder.addFormDataPart("ref", reference);
         }
+
+        Log.e("reference",reference);
 
 
         builder.setType(MultipartBody.FORM);

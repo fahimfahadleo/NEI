@@ -82,6 +82,8 @@ public class PageResetImage extends AppCompatActivity implements ServerResponse,
 //    }
 
 
+    ImageView backbutton;
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -178,7 +180,14 @@ public class PageResetImage extends AppCompatActivity implements ServerResponse,
                 break;
             }
         }
+      backbutton = findViewById(R.id.backbutton);
 
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
 
         deletephoto.setOnClickListener(new View.OnClickListener() {

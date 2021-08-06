@@ -32,6 +32,9 @@ public class Important {
     protected static String token_refresh;
     protected static String publickey;
     protected static String privatekey;
+    protected static String pagelogout;
+    protected static String logininformation;
+
 
 
     protected static String updateprofilepassword;
@@ -111,8 +114,21 @@ public class Important {
     ////////////Notification////////////
     protected static String get_notification;
 
+    public static String getLogininformation() {
+        return logininformation;
+    }
 
+    public static void setLogininformation(String logininformation) {
+        Important.logininformation = logininformation;
+    }
 
+    public static String getPagelogout() {
+        return pagelogout;
+    }
+
+    public static void setPagelogout(String pagelogout) {
+        Important.pagelogout = pagelogout;
+    }
     public static String getUpdateprofilepassword() {
         return updateprofilepassword;
     }

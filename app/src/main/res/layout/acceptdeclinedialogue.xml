@@ -12,8 +12,7 @@
     android:orientation="vertical"
     app:cardBackgroundColor="#80030A25"
     app:cardCornerRadius="5dp"
-    app:cardElevation="8dp"
-    app:contentPadding="@dimen/_4sdp">
+    app:cardElevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,25 +28,25 @@
             <ImageButton
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="match_parent"
-                android:background="@color/skyblue" />
+                android:background="@color/colorPrimaryDark" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@color/skyblue"
+                android:background="@color/colorPrimaryDark"
                 android:gravity="center"
                 android:paddingTop="@dimen/_4sdp"
                 android:paddingBottom="@dimen/_4sdp"
                 android:text="Friend Request"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="@color/colorPrimaryDark" />
+                android:textColor="@color/skyblue" />
 
             <ImageButton
                 android:id="@+id/closedialogue"
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="match_parent"
-                android:background="@color/skyblue"
+                android:background="@color/colorPrimaryDark"
                 android:src="@drawable/close" />
 
         </LinearLayout>

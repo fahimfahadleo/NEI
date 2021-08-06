@@ -72,10 +72,15 @@ public abstract class FriendListAdapter extends RecyclerView.Adapter<FriendListA
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initDialogue(listdata.get(position),position);
+                initDialogue(listdata.get(position), position);
             }
         });
 
+        try {
+            ImageSetUp(holder.imageView,String.valueOf(myListData.getInt("id")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         holder.information.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -142,8 +147,9 @@ public abstract class FriendListAdapter extends RecyclerView.Adapter<FriendListA
 
 
     protected JSONObject mylistdata;
+    protected abstract void ImageSetUp(CircleImageView imageView,String id);
 
-    private void initDialogue(JSONObject myList,int position) {
+    private void initDialogue(JSONObject myList, int position) {
         mylistdata = myList;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);

@@ -1,7 +1,10 @@
 package com.horofbd.MeCloak;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,7 +15,10 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,22 +30,27 @@ import org.w3c.dom.Text;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SettingsActivity extends AppCompatActivity implements ServerResponse {
 
     CardView premiumview, profilepasswordview, pageresetcodeview, pageresetcrtview, profileresetcrtview, pagerecoveryphotoview,
-            pagerecoveryquestionview, logininformationview, blocklistview, prepareforofflineview, vaultview, createnewpageview, deletepageview,
+            pagerecoveryquestionview, logininformationview, blocklistview, vaultview, createnewpageview, deletepageview,
             aboutview;
 
     TextView premium, profilepassword, pageresetcode, pageresetcrt, profileresetcrt, pagerecoveryphoto,
-            pagerecoveryquestion, logininformation, blocklist, prepareforoffline, vault, createnewpage, deletepage,
+            pagerecoveryquestion, logininformation, blocklist, vault, createnewpage, deletepage,
             about;
 
-    AlertDialog updateprofilepassworddialog, passwordconfirmation;
+    AlertDialog updateprofilepassworddialog, passwordconfirmation,resetcodedialog;
 
     static {
         System.loadLibrary("native-lib");
     }
+
+    ImageView backbutton;
 
     static native void StartActivity(Context context, String activity, String data);
 
@@ -92,13 +103,53 @@ public class SettingsActivity extends AppCompatActivity implements ServerRespons
 
                     updateprofilepassworddialog.dismiss();
                 }
-                builder.setView(view);
-                updateprofilepassworddialog = builder.create();
-                updateprofilepassworddialog.show();
-
-
             }
         });
+
+        builder.setView(view);
+        updateprofilepassworddialog = builder.create();
+        updateprofilepassworddialog.show();
+    }
+
+
+    void getResetCode() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View vi = getLayoutInflater().inflate(R.layout.requireprofilepassword,null,false);
+        EditText passfield = vi.findViewById(R.id.password);
+        TextView cancel = vi.findViewById(R.id.cancelbutton);
+        TextView proceed = vi.findViewById(R.id.sealbutton);
+        proceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String pass = passfield.getText().toString();
+                if(TextUtils.isEmpty(pass)){
+                    passfield.setError("Field Can Not Be Empty!");
+                    passfield.requestFocus();
+                }else {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("password_confirmation", pass);
+                        globalRequest(SettingsActivity.this, "POST", Important.getCreatepagerecoverycode(), jsonObject, 21, SettingsActivity.this);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    resetcodedialog.dismiss();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetcodedialog.dismiss();
+            }
+        });
+
+        builder.setView(vi);
+        resetcodedialog = builder.create();
+        resetcodedialog.show();
+
     }
 
     void movetoPageResetQuestion(){
@@ -170,6 +221,79 @@ public class SettingsActivity extends AppCompatActivity implements ServerRespons
     }
 
 
+    void movetoCreateNewPage(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View vi = getLayoutInflater().inflate(R.layout.requireprofilepassword,null,false);
+        EditText passfield = vi.findViewById(R.id.password);
+        TextView cancel = vi.findViewById(R.id.cancelbutton);
+        TextView proceed = vi.findViewById(R.id.sealbutton);
+        proceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String pass = passfield.getText().toString();
+                if(TextUtils.isEmpty(pass)){
+                    passfield.setError("Field Can Not Be Empty!");
+                    passfield.requestFocus();
+                }else {
+                    Intent i = new Intent(SettingsActivity.this,RegisterVerifiedUser.class);
+                    i.putExtra("pass",pass);
+                    i.putExtra("newpage","createnewpage");
+                    startActivity(i);
+                    passwordconfirmation.dismiss();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                passwordconfirmation.dismiss();
+            }
+        });
+        builder.setView(vi);
+        passwordconfirmation = builder.create();
+        passwordconfirmation.show();
+
+    }
+
+
+    void DeletePage(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View vi = getLayoutInflater().inflate(R.layout.requireprofilepassword,null,false);
+        EditText passfield = vi.findViewById(R.id.password);
+        TextView cancel = vi.findViewById(R.id.cancelbutton);
+        TextView proceed = vi.findViewById(R.id.sealbutton);
+        proceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String pass = passfield.getText().toString();
+                if(TextUtils.isEmpty(pass)){
+                    passfield.setError("Field Can Not Be Empty!");
+                    passfield.requestFocus();
+                }else {
+
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("password_confirmation", pass);
+                        globalRequest(SettingsActivity.this,"POST",Important.getPage_delete(),jsonObject,36,SettingsActivity.this);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    passwordconfirmation.dismiss();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                passwordconfirmation.dismiss();
+            }
+        });
+        builder.setView(vi);
+        passwordconfirmation = builder.create();
+        passwordconfirmation.show();
+
+    }
 
     void init() {
 
@@ -202,13 +326,13 @@ public class SettingsActivity extends AppCompatActivity implements ServerRespons
         pageresetcode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(SettingsActivity.this, "GET", Important.getCreatepagerecoverycode(), new JSONObject(), 24, SettingsActivity.this);
+                getResetCode();
             }
         });
         pageresetcodeview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(SettingsActivity.this, "GET", Important.getCreatepagerecoverycode(), new JSONObject(), 24, SettingsActivity.this);
+                getResetCode();
             }
         });
         pageresetcrt.setOnClickListener(new View.OnClickListener() {
@@ -272,85 +396,75 @@ public class SettingsActivity extends AppCompatActivity implements ServerRespons
         logininformation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                startActivity(new Intent(SettingsActivity.this,LoggedInDevices.class));
             }
         });
         logininformationview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                startActivity(new Intent(SettingsActivity.this,LoggedInDevices.class));
 
             }
         });
         blocklist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                StartActivity(SettingsActivity.this,"BlockList","");
             }
         });
         blocklistview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                StartActivity(SettingsActivity.this,"BlockList","");
             }
         });
-        prepareforoffline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-            }
-        });
-        prepareforofflineview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
         vault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Toast.makeText(SettingsActivity.this, "vault er link", Toast.LENGTH_SHORT).show();
             }
         });
         vaultview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Toast.makeText(SettingsActivity.this, "vault er link", Toast.LENGTH_SHORT).show();
             }
         });
         createnewpage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                movetoCreateNewPage();
             }
         });
         createnewpageview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                movetoCreateNewPage();
             }
         });
         deletepage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                DeletePage();
             }
         });
         deletepageview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                DeletePage();
             }
         });
         aboutview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                StartActivity(SettingsActivity.this,"About","");
             }
         });
         about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                StartActivity(SettingsActivity.this,"About","");
             }
         });
     }
@@ -386,8 +500,6 @@ public class SettingsActivity extends AppCompatActivity implements ServerRespons
         logininformationview = findViewById(R.id.logininfoview);
         blocklist = findViewById(R.id.blocklist);
         blocklistview = findViewById(R.id.blocklistview);
-        prepareforoffline = findViewById(R.id.prepareforoffline);
-        prepareforofflineview = findViewById(R.id.prepareforofflineview);
         vault = findViewById(R.id.vault);
         vaultview = findViewById(R.id.vaultview);
         createnewpage = findViewById(R.id.createnewpage);
@@ -399,6 +511,15 @@ public class SettingsActivity extends AppCompatActivity implements ServerRespons
         InitLinks();
         init();
 
+
+        backbutton = findViewById(R.id.backbutton);
+
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
     }
 

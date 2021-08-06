@@ -10,9 +10,12 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
@@ -24,12 +27,22 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ProfileActivity extends AppCompatActivity implements ServerResponse {
+import java.io.InputStream;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Response;
+
+public class ProfileActivity extends AppCompatActivity implements ServerResponse,ImageResponse {
 
     TextView premium, mainbalancetext, refbalance,accountcreationtime,accountupdatetime,friendlist;
     ImageView toggolmainstartopen, toggolmainopen, toggolrefstartopen, toggolrefopen;
     LinearLayout friendlistlayout;
     RelativeLayout rootview, rootview2;
+    CircleImageView profile_image;
+    TextView username;
+    TextView userphonenumber,referral,wallet;
+    TextView mystuff;
+
 
 
     public static final int ANIMATION_SPEED = 750;
@@ -57,6 +70,9 @@ public class ProfileActivity extends AppCompatActivity implements ServerResponse
 
     static native String getLoginInfo(String key);
 
+    static native void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +92,48 @@ public class ProfileActivity extends AppCompatActivity implements ServerResponse
         accountupdatetime = findViewById(R.id.accountupdatetime);
         friendlist = findViewById(R.id.friendlist);
         friendlistlayout = findViewById(R.id.firendlistlayout);
+        username = findViewById(R.id.username);
+        userphonenumber = findViewById(R.id.userphonenumber);
+        profile_image = findViewById(R.id.profile_image);
+        mystuff = findViewById(R.id.mystuff);
+        referral = findViewById(R.id.referral);
+        wallet = findViewById(R.id.wallet);
+        InitLinks();
 
+        ImageRequest(this, profile_image, "GET", Important.getViewprofilepicture(), new JSONObject(), 1);
+
+
+
+        wallet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ProfileActivity.this,WalletActivity.class));
+            }
+        });
+
+        if(getLoginInfo("premium").equals("Null")){
+            premium.setText("Go Premium");
+        }else {
+            //set Premium Data
+
+            premium.setText("Set Premium Data");
+        }
+
+        referral.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StartActivity(ProfileActivity.this,"Referral","");
+            }
+        });
+
+        mystuff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StartActivity(ProfileActivity.this,"MyStuff","");
+            }
+        });
+        userphonenumber.setText(getLoginInfo("phone_no"));
+        username.setText(getLoginInfo("user_name"));
 
         friendlistlayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -240,7 +297,7 @@ public class ProfileActivity extends AppCompatActivity implements ServerResponse
                 toggolmainopen.setVisibility(View.VISIBLE);
                 toggolmainstartopen.setVisibility(View.INVISIBLE);
                 mainbalancetext.setVisibility(View.VISIBLE);
-                mainbalancetext.setText(getLoginInfo("main_balance"));
+                mainbalancetext.setText(getLoginInfo("recharge_balance"));
                 mainbalancetext.setGravity(GravityCompat.START);
             }
 
@@ -394,4 +451,33 @@ public class ProfileActivity extends AppCompatActivity implements ServerResponse
             }
         });
     }
+
+    @Override
+    public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) throws JSONException {
+        InputStream inputStream = response.body().byteStream();
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (bitmap != null) {
+                    Log.e("bitmap", "notnull");
+                    setImage(imageView, bitmap);
+                } else {
+                    Log.e("bitmap", "null");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onImageFailure(String failresponse) throws JSONException {
+
+    }
+
+    void setImage(ImageView imageView, Bitmap bitmap) {
+        this.bitmap = bitmap;
+        imageView.setImageBitmap(bitmap);
+    }
+
+    Bitmap bitmap;
 }
