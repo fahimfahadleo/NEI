@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,7 +43,7 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
 
     static native void StartActivity(Context context, String classname);
 
-    static native JSONObject getData(String method);
+    static native JSONArray getData(String method);
 
     static native void InitLinks();
 
@@ -52,7 +53,7 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         super.onPause();
         Functions.dismissDialogue();
     }
-    JSONObject jsonObject;
+    JSONArray jsonArray;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,13 +70,13 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
 
         InitLinks();
 
-        jsonObject = getData("gui");
-        Log.e("gui",jsonObject.toString());
-        if(jsonObject.length()!=0){
+        jsonArray = getData("gui");
+        Log.e("gui",jsonArray.toString());
+        if(jsonArray.length()!=0){
             if(Functions.isInternetAvailable()) {
                 try {
-                    if (jsonObject.getString("loginstatus").equals("true")) {
-                        LoginRequest(this,this,jsonObject.getString("userphone"),jsonObject.getString("userpass"),1);
+                    if (jsonArray.getJSONObject(0).getString("loginstatus").equals("true")) {
+                        LoginRequest(this,this,jsonArray.getJSONObject(0).getString("userphone"),jsonArray.getJSONObject(0).getString("userpass"),1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -116,11 +117,13 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
                         Log.e("internet","available");
                         LoginRequest(LoginActivity.this, LoginActivity.this, phonestr, passwordstr, 1);
                     }else {
+
                         Log.e("internet","not available");
-                        if(jsonObject.length()!=0){
+                        if(jsonArray.length()!=0){
                             try {
-                                if(jsonObject.getString("userphone").equals(phonestr) && jsonObject.getString("userpass").equals(passwordstr)){
+                                if(jsonArray.getJSONObject(0).getString("userphone").equals(phonestr) && jsonArray.getJSONObject(0).getString("userpass").equals(passwordstr)){
                                     startActivity(new Intent(LoginActivity.this,OfflineChatList.class));
+                                    finish();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();

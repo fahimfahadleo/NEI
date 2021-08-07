@@ -461,147 +461,12 @@
             </androidx.cardview.widget.CardView>
 
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/boundageview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/cardbgcolor"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/boundagetext"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/_35sdp"
-                        android:layout_weight="1"
-                        android:gravity="center|start"
-                        android:paddingStart="@dimen/_8sdp"
-                        android:paddingEnd="@dimen/_8sdp"
-                        android:text="Boundage"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="#000" />
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="@dimen/_20sdp"
-                        android:layout_height="@dimen/_20sdp"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="@dimen/_8sdp"
-                        app:cardBackgroundColor="@color/cardbgcolor"
-                        app:cardCornerRadius="@dimen/_10sdp"
-                        app:cardElevation="8dp">
 
 
-                        <TextView
-                            android:id="@+id/boundagetips"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:fontFamily="serif"
-                            android:gravity="center"
-                            android:text="i"
-                            android:textColor="@color/notificationnotifier"
-                            android:textSize="20sp"
-                            android:textStyle="italic" />
 
 
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/tiemrview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/cardbgcolor"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/tiemrtext"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/_35sdp"
-                        android:layout_weight="1"
-                        android:gravity="center|start"
-                        android:paddingStart="@dimen/_8sdp"
-                        android:paddingEnd="@dimen/_8sdp"
-                        android:text="Expiry Time"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="#000" />
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="@dimen/_20sdp"
-                        android:layout_height="@dimen/_20sdp"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="@dimen/_8sdp"
-                        app:cardBackgroundColor="@color/cardbgcolor"
-                        app:cardCornerRadius="@dimen/_10sdp"
-                        app:cardElevation="8dp">
 
 
-                        <TextView
-                            android:id="@+id/expirytips"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:fontFamily="serif"
-                            android:gravity="center"
-                            android:text="i"
-                            android:textColor="@color/notificationnotifier"
-                            android:textSize="20sp"
-                            android:textStyle="italic" />
-
-
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/unfriendview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/cardbgcolor"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/unfriend"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/_35sdp"
-                        android:layout_weight="1"
-                        android:gravity="center|start"
-                        android:paddingStart="@dimen/_8sdp"
-                        android:paddingEnd="@dimen/_8sdp"
-                        android:text="Unfriend"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="#000" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/ignoreview"
@@ -634,8 +499,10 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+
+
             <androidx.cardview.widget.CardView
-                android:id="@+id/blockfriend"
+                android:id="@+id/removeview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -652,45 +519,14 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/block"
+                        android:id="@+id/remove"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/_35sdp"
                         android:layout_weight="1"
                         android:gravity="center|start"
                         android:paddingStart="@dimen/_8sdp"
                         android:paddingEnd="@dimen/_8sdp"
-                        android:text="Block"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="#000" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/reportview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/cardbgcolor"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/report"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/_35sdp"
-                        android:layout_weight="1"
-                        android:gravity="center|start"
-                        android:paddingStart="@dimen/_8sdp"
-                        android:paddingEnd="@dimen/_8sdp"
-                        android:text="Report"
+                        android:text="Remove"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="#000" />
                 </LinearLayout>

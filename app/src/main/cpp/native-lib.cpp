@@ -46,6 +46,7 @@ static jmethodID updateDatabaseUserNotification;
 static jmethodID setDatabaseUserOfflineChatList;
 static jmethodID getDatabaseUserOfflineChatList;
 static jmethodID updateDatabaseUserOfflineChatList;
+static jmethodID deleteofflinefriend;
 
 
 static jmethodID SetSharedPreference;
@@ -429,7 +430,7 @@ void initver(JNIEnv *env) {
 
 
     parseCursor = env->GetStaticMethodID(Function , "pc" ,
-                                         "(Landroid/database/Cursor;)Lorg/json/JSONObject;");
+                                         "(Landroid/database/Cursor;)Lorg/json/JSONArray;");
 
     DatabaseHelperConstractor = env->GetMethodID(DatabaseHelper , "<init>" ,
                                                  "(Landroid/content/Context;)V");
@@ -439,7 +440,7 @@ void initver(JNIEnv *env) {
 
 
     setDatabaseUserInformation = env->GetStaticMethodID(DatabaseHelper , "setUserInformation" ,
-                                                        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+                                                        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
     getDatabaseUserInformation = env->GetStaticMethodID(DatabaseHelper , "getUserInformation" ,
                                                         "()Landroid/database/Cursor;");
     updateDatabaseUserInformation = env->GetStaticMethodID(DatabaseHelper ,
@@ -476,7 +477,10 @@ void initver(JNIEnv *env) {
                                                             "()Landroid/database/Cursor;");
     updateDatabaseUserOfflineChatList = env->GetStaticMethodID(DatabaseHelper ,
                                                                "updateOfflineChatList" ,
-                                                               "(Ljava/lang/String;Ljava/lang/String;)Z");
+                                                               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+    deleteofflinefriend = env->GetStaticMethodID(DatabaseHelper,"deleteofflinefriend", "(Ljava/lang/String;)Z");
+
+
 
 
     isJSONArrayNull = env->GetStaticMethodID(Function , "isJSONArrayNull" ,
@@ -1076,6 +1080,12 @@ jobject getCursor(JNIEnv *env , string method , jstring phoneno , jstring pageno
     }
 }
 
+
+void deleteOfflineFriend(JNIEnv *env , jstring phoneno) {
+    env->CallStaticBooleanMethod(DatabaseHelper,deleteofflinefriend,phoneno);
+}
+
+
 void setUpDatabase(JNIEnv *env , jstring method , jobjectArray values) {
     string cmethod = jstring2string(env , method);
 
@@ -1088,7 +1098,7 @@ void setUpDatabase(JNIEnv *env , jstring method , jobjectArray values) {
         env->CallStaticBooleanMethod(DatabaseHelper , setDatabaseUserInformation , env->GetObjectArrayElement(values, 0) ,
                                      env->GetObjectArrayElement(values, 1)  , env->GetObjectArrayElement(values, 2) ,
                                      env->GetObjectArrayElement(values, 3)  , env->GetObjectArrayElement(values, 4),
-                                     env->GetObjectArrayElement(values, 5));
+                                     env->GetObjectArrayElement(values, 5),env->GetObjectArrayElement(values, 6));
     } else if (cmethod == "sfi") {
         //String phonenumber,String textpass, String boundage,String timer,String pageno
         env->CallStaticBooleanMethod(DatabaseHelper , setDatabaseFriendInformation , env->GetObjectArrayElement(values, 0) ,
@@ -1105,7 +1115,7 @@ void setUpDatabase(JNIEnv *env , jstring method , jobjectArray values) {
     }
 }
 
-void updateDatabse(JNIEnv *env , jstring method , jstring key , jstring value) {
+void updateDatabse(JNIEnv *env , jstring method , jstring position,jstring key , jstring value) {
     string cmethod = jstring2string(env , method);
 
     if (cmethod == "sui") {
@@ -1120,7 +1130,7 @@ void updateDatabse(JNIEnv *env , jstring method , jstring key , jstring value) {
         env->CallStaticBooleanMethod(DatabaseHelper , updateDatabaseUserNotification , key , value);
     } else if (cmethod == "soi") {
         //String number,String isignored
-        env->CallStaticBooleanMethod(DatabaseHelper , updateDatabaseUserOfflineChatList , key ,
+        env->CallStaticBooleanMethod(DatabaseHelper , updateDatabaseUserOfflineChatList , position,key ,
                                      value);
     }
 }
@@ -1256,7 +1266,7 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                                                                                                "") ,
                                                                                        env->NewStringUTF(
                                                                                                "")));
-                        jint jsonlength = env->CallIntMethod(cursorjsonobject , jsonobjectlength);
+                        jint jsonlength = env->CallIntMethod(cursorjsonobject , jsonarraylength);
 
                         if (jsonlength == 0) {
                             env->CallStaticBooleanMethod(DatabaseHelper ,
@@ -1265,7 +1275,7 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                                                                                         env->NewStringUTF(
                                                                                                 "password")) ,
                                                          user_id , user_ref ,
-                                                         env->NewStringUTF("true"));
+                                                         env->NewStringUTF("true"),premium);
                         }
                         startActivity(env , context , "UserVerification" , "");
                         CloseActivity(env , context);
@@ -3272,6 +3282,8 @@ Java_com_horofbd_MeCloak_BuyActivity_InitLinks(JNIEnv *env , jclass clazz) {
 JNIEXPORT jobject JNICALL
 Java_com_horofbd_MeCloak_LoginActivity_getData(JNIEnv *env , jclass clazz , jstring method) {
 
+    printlogcat(env,"sometag","somemessage");
+
     return ParseDatabaseCursor(env , getCursor(env , jstring2string(env , method) ,
                                                env->NewStringUTF("") , env->NewStringUTF("")));
 }extern "C"
@@ -3288,11 +3300,40 @@ Java_com_horofbd_MeCloak_OfflineChatList_loaddata(JNIEnv *env , jclass clazz , j
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_horofbd_MeCloak_OfflineChatList_updateloaddata(JNIEnv *env , jclass clazz , jstring field ,
+Java_com_horofbd_MeCloak_OfflineChatList_updateloaddata(JNIEnv *env , jclass clazz , jstring position,jstring field ,
                                                         jstring value) {
-    updateDatabse(env , env->NewStringUTF("soi") , field , value);
+    updateDatabse(env , env->NewStringUTF("soi") , position,field , value);
 }extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_horofbd_MeCloak_OfflineChatList_getData(JNIEnv *env , jclass clazz) {
-    return getCursor(env,"goi",env->NewStringUTF(""),env->NewStringUTF(""));
+    return ParseDatabaseCursor(env,getCursor(env,"goi",env->NewStringUTF(""),env->NewStringUTF("")));
+}extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_horofbd_MeCloak_OfflineChatList_deleteFriend(JNIEnv *env , jclass clazz,jstring phonenumber) {
+    deleteOfflineFriend(env,phonenumber);
+}extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_horofbd_MeCloak_OfflineActivity_EncrytpAndDecrypt(JNIEnv *env , jclass clazz ,
+                                                           jstring message , jstring type ,
+                                                           jstring password) {
+
+    std::wstring wstr = jstring2wstring(env , message);
+
+
+    std::string pass = jstring2string(env , password);
+    std::string typ = jstring2string(env , type);
+    jstring encoded = getJstringFromWstring(env , textHash(wstr , pass , typ));
+    return encoded;
 }
+//extern "C"
+//JNIEXPORT jstring JNICALL
+//Java_com_horofbd_MeCloak_OfflineActivity_DefaultED(JNIEnv *env , jclass clazz , jstring message ,
+//                                                   jstring type) {
+//    std::wstring wstr = jstring2wstring(env , message);
+//
+//    std::string pass = jstring2string(env , env->NewStringUTF("password"));
+//    std::string typ = jstring2string(env , type);
+//    jstring encoded = getJstringFromWstring(env , textHash(wstr , pass , typ));
+//
+//    return encoded;
+//}

@@ -17,15 +17,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,8 +43,9 @@ public class OfflineChatList extends AppCompatActivity {
     }
 
     static native void loaddata(String [] value);
-    static native void updateloaddata(String field,String value);
-    static native JSONObject getData();
+    static native void updateloaddata(String position,String field,String value);
+    static native JSONArray getData();
+    static native void deleteFriend(String phonenumber);
 
 
     ImageView search;
@@ -50,7 +55,7 @@ public class OfflineChatList extends AppCompatActivity {
     SwipeRefreshLayout swipeRefreshLayout;
     CircleImageView newmessage;
     String number;
-    ArrayList<String> chatlist;
+    ArrayList<JSONObject> chatlist;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -74,8 +79,22 @@ public class OfflineChatList extends AppCompatActivity {
                 if(number.contains(" ")){
                     number = number.replaceAll(" ","");
                 }
-                chatlist.add(number);
+                if(!number.contains("+88")){
+                    number = "+88"+number;
+                }
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("number",number);
+                    jsonObject.put("isignored","false");
+                    chatlist.add(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
                 loaddata(new String[]{number,"false"});
+
+                updateChatlist();
 
             }
 
@@ -87,10 +106,27 @@ public class OfflineChatList extends AppCompatActivity {
     }
 
     void updateChatlist(){
+       chatlist = new ArrayList<>();
+        JSONArray jsonArray = getData();
+        Log.e("JSOnObject",jsonArray.toString());
+        for(int i=0;i<jsonArray.length();i++){
+            try {
+                chatlist.add(jsonArray.getJSONObject(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        adapter = new offlinechatlistadapter(chatlist, this);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        adapter.notifyDataSetChanged();
 
     }
 
-
+    offlinechatlistadapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +139,24 @@ public class OfflineChatList extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.swipelayout);
         newmessage = findViewById(R.id.newmessage);
         chatlist = new ArrayList<>();
+
+        JSONArray jsonArray = getData();
+        Log.e("JSOnObject",jsonArray.toString());
+        for(int i=0;i<jsonArray.length();i++){
+            try {
+                chatlist.add(jsonArray.getJSONObject(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+         adapter = new offlinechatlistadapter(chatlist,this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+
+
 
 
         newmessage.setOnClickListener(view -> {
@@ -131,18 +185,17 @@ public class OfflineChatList extends AppCompatActivity {
 
         swipeRefreshLayout.setOnRefreshListener(() -> new Handler().postDelayed(() -> {
             recyclerView.setAdapter(null);
-
-
+            updateChatlist();
             swipeRefreshLayout.setRefreshing(false);
         }, 2000));
 
     }
     class offlinechatlistadapter extends  RecyclerView.Adapter<offlinechatlistadapter.ViewHolder>{
-        ArrayList<String> listdata;
+        ArrayList<JSONObject> listdata;
         Context context;
 
 
-        public offlinechatlistadapter(ArrayList<String> listdata, Context context) {
+        public offlinechatlistadapter(ArrayList<JSONObject> listdata, Context context) {
             Log.e("listview", listdata.toString());
             this.listdata = listdata;
             this.context = context;
@@ -160,17 +213,28 @@ public class OfflineChatList extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            final String data = listdata.get(position);
+            final JSONObject data = listdata.get(position);
+            holder.relativeLayout.setVisibility(View.GONE);
+            holder.phonenumber.setVisibility(View.GONE);
 
 
-                holder.textView.setText(data);
+            try {
+                holder.textView.setText(data.getString("number"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
 
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent i = new Intent(OfflineChatList.this,OfflineActivity.class);
-                    i.putExtra("data",data);
+                    try {
+                        i.putExtra("data",data.getString("number"));
+                        i.putExtra("boundage","0");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     startActivity(i);
                 }
             });
@@ -191,21 +255,34 @@ public class OfflineChatList extends AppCompatActivity {
                         @Override
                         public void onClick(View view) {
                             Intent i =new Intent(context,OfflineActivity.class);
-                            i.putExtra("data",data);
+                            try {
+                                i.putExtra("data",data.getString("number"));
+                                i.putExtra("boundage","0");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                             startActivity(i);
                         }
                     });
                     remove.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-
+                            try {
+                                deleteFriend(data.getString("number"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
 
                     ignore.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-
+                            try {
+                                updateloaddata(data.getString("number"),"isignored","true");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
 
@@ -226,19 +303,25 @@ public class OfflineChatList extends AppCompatActivity {
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            public CircleImageView imageView;
+            public CircleImageView imageView,activestatus;
             public TextView textView;
             public CardView cardView;
             public TextView phonenumber;
+            public RelativeLayout relativeLayout;
             public TextView information;
 
             public ViewHolder(View itemView) {
                 super(itemView);
-
+//inv
                 this.imageView = (CircleImageView) itemView.findViewById(R.id.profile_image);
+                //inv
+                this.activestatus = (CircleImageView) itemView.findViewById(R.id.activestatus);
+                this.relativeLayout = itemView.findViewById(R.id.relaitvelayout);
+
                 this.textView = (TextView) itemView.findViewById(R.id.name);
                 this.cardView = (CardView) itemView.findViewById(R.id.singlecardview);
-                this.phonenumber = (TextView) itemView.findViewById(R.id.text);
+                //inv
+                this.phonenumber = (TextView) itemView.findViewById(R.id.mutualfirend);
                 this.information = (TextView) itemView.findViewById(R.id.options);
 
             }

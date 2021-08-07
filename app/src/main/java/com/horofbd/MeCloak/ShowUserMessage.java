@@ -106,7 +106,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     EditText typepassword;
     ImageView timer, enableboundage;
     CardView timerview, enableboundageview, boundageview;
-    TextView boundagetext, boundagetip;
+    TextView boundagetext, boundagetip,passwordtip,timertip;
     DatabaseHelper helper;
     ImageView menubutton;
     static boolean isboundageitemavailable = false;
@@ -132,8 +132,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static native void StartActivity(Context context, String activity, String data);
 
     static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
-
-    static native void publicKeyRequest(ServerResponse serverResponse, String name, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
 
     static native void InitLinks();
 
@@ -193,6 +191,11 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         timerbelowview = findViewById(R.id.belowtimerview);
         timerside = findViewById(R.id.tiemrtext);
         timersideview = findViewById(R.id.tiemrview);
+        passwordtip = findViewById(R.id.encryptionpasstips);
+        timertip = findViewById(R.id.expirytips);
+
+
+
 
         String premiumstatus = getLoginInfo("premium");
         userphonenumber = getIntent().getStringExtra("phone_no");
@@ -273,6 +276,19 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             @Override
             public void onClick(View view) {
                 showTips(getResources().getString(R.string.boundagetip));
+            }
+        });
+        timertip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTips(getString(R.string.timertip));
+            }
+        });
+
+        passwordtip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTips(getString(R.string.passwordtip));
             }
         });
 
@@ -595,6 +611,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 }
             };
 
+
+            Log.e("data",getIntent().getStringExtra("phone_no"));
             MessageEventManager messageEventManager = MessageEventManager.getInstanceFor(connection);
             messageEventManager.addMessageEventNotificationListener(listener);
             DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);

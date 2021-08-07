@@ -17,5 +17,6 @@
     <string name="enctyptionpasstip">The Encryption Password encrypts your data so that any middle man or people without tha password can not see your Messages.\nNote: If your friend don\'t know or sets the same password as yours he/she will see only encrypted characters. So you must inform your friend about your message password and he must set it in your inbox.</string>
     <string name="boundagetip">The Boundage option is for your privacy. If you don\'t want your friend to record or take screenshot of your message or data turn this on and your friend will not be able to take screenshot or record screen video.</string>
     <string name="timertip">You can set your message Expiry time. that message will expire from you and your friend at that exact moment you want.</string>
+    <string name="passwordtip">Set a password for your message to protect it from third person. Note that without that password none can see your message and there is no way to recover your password.</string>
 
 </resources>

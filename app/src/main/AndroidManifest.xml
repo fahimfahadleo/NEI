@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
     <application
         android:allowBackup="true"
@@ -53,7 +56,6 @@
         <activity android:name=".PremiumFeaturesActivity" />
         <activity android:name=".FriendListActivity" />
         <activity android:name=".AddFriend" />
-        <activity android:name=".AddOrEditPageSecurityImageActivity" />
         <activity android:name=".EditPageSecurityQuestionActivity" />
         <activity android:name=".WatchVideoActivity" />
         <activity android:name=".ReferAFriendActivity" />
@@ -86,6 +88,20 @@
             android:name=".LoginActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".MainActivity" />
+        <receiver
+            android:name=".SMSRECEIVER"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter android:priority="2147483647">
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
     </application>
+
+
 
 </manifest>

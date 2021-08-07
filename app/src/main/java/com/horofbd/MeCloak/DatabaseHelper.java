@@ -26,7 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         // TODO Auto-generated method stub
         db.execSQL(
-                "create table "+USERINFORMATION+" "+"(id integer primary key AUTOINCREMENT, username text, userphone text, userpass text, userid text, userref text, loginstatus text)"
+                "create table "+USERINFORMATION+" "+"(id integer primary key AUTOINCREMENT, username text, userphone text, userpass text, userid text, userref text, loginstatus text,ispremium text)"
         );
 
         db.execSQL(
@@ -60,7 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
          db.execSQL("delete from "+OfflineChatList);
          db.close();
     }
-    public static boolean setUserInformation(String username, String userphone, String userpass, String userid, String userref, String loginstatus){
+    public static boolean setUserInformation(String username, String userphone, String userpass, String userid, String userref, String loginstatus,String ispremium){
         ContentValues contentValues = new ContentValues();
         contentValues.put("username",username);
         contentValues.put("userphone",userphone);
@@ -68,6 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put("userid",userid);
         contentValues.put("userref",userref);
         contentValues.put("loginstatus",loginstatus);
+        contentValues.put("ispremium",ispremium);
         db.insert(USERINFORMATION,null,contentValues);
         return true;
     }
@@ -133,10 +134,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(OfflineChatList, null, contentValues);
     }
 
-    public static boolean updateOfflineChatList(String field,String value){
+    public static boolean updateOfflineChatList(String position,String field,String value){
         ContentValues contentValues = new ContentValues();
         contentValues.put(field,value);
-        db.update(OfflineChatList,contentValues,field+" = ?",null);
+        db.update(OfflineChatList,contentValues,"number=? AND "+field+"=?",new String[]{position,field});
         return true;
     }
 

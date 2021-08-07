@@ -111,11 +111,13 @@ public class Functions {
 
     }
 
-    public static JSONObject pc(Cursor c){
-        JSONObject jsonObject = new JSONObject();
+    public static JSONArray pc(Cursor c){
+
+        JSONArray array = new JSONArray();
         if (c != null) {
             int i = 0;
             for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                JSONObject jsonObject = new JSONObject();
                 try {
                     int length = c.getColumnCount();
                     for(int p = 0;p<length;p++){
@@ -124,11 +126,12 @@ public class Functions {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                array.put(jsonObject);
             }
             c.close();
-            return jsonObject;
+            return array;
         }
-        return new JSONObject();
+        return new JSONArray();
     }
 
 
