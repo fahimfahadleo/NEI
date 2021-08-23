@@ -224,14 +224,23 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
             }
         });
 
+        if(getIntent().getStringExtra("action").equals("challenge")){
+            JSONObject jsonObject = new JSONObject();
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("password_confirmation", i.getStringExtra("pass"));
-            globalRequest(this, "POST", Important.getViewansweredsecurityquestions(), jsonObject, 28, this);
-        } catch (JSONException e) {
-            e.printStackTrace();
+            globalRequest(this, "POST", Important.getGetchillengerpagesecurityquestions(), jsonObject, 28, this);
+
+
+        }else {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("password_confirmation", i.getStringExtra("pass"));
+                globalRequest(this, "POST", Important.getViewansweredsecurityquestions(), jsonObject, 28, this);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
+
 
         action.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -384,8 +384,17 @@ public class Functions {
     }
 
 
+  public static boolean athenticationRequired = true;
+
     public static void Request(ServerResponse serverResponse, String requestType, String Link, JSONObject jsonObject, int requestcode) {
-        OkHttpClient client = getClient();
+        OkHttpClient client;
+        if(athenticationRequired){
+             client = getClient();
+        }else {
+            client = new OkHttpClient()
+                    .newBuilder()
+                    .build();
+        }
 
         Log.e("link",Link);
         MultipartBody.Builder builder = new MultipartBody.Builder();

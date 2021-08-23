@@ -71,7 +71,7 @@ public class OfflineActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     static Context context;
     DrawerLayout drawerLayout;
-    Intent i;
+    public static Intent i;
     public static boolean isActivityVisible = false;
     public static List<JSONObject> messagelist;
 
@@ -94,6 +94,11 @@ public class OfflineActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
     int me = 0;
     int him = 0;

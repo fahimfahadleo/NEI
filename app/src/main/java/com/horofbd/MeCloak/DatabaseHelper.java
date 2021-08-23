@@ -52,7 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+OfflineChatList);
         onCreate(db);
     }
-    public static void deleteAllData(){
+    public void deleteAllData(){
 
          db.execSQL("delete from "+USERINFORMATION);
          db.execSQL("delete from "+FRIENDINFORMATION);
@@ -60,7 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
          db.execSQL("delete from "+OfflineChatList);
          db.close();
     }
-    public static boolean setUserInformation(String username, String userphone, String userpass, String userid, String userref, String loginstatus,String ispremium){
+    public boolean setUserInformation(String username, String userphone, String userpass, String userid, String userref, String loginstatus,String ispremium){
         ContentValues contentValues = new ContentValues();
         contentValues.put("username",username);
         contentValues.put("userphone",userphone);
@@ -72,16 +72,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(USERINFORMATION,null,contentValues);
         return true;
     }
-    public static Cursor getUserInformation(){
+    public Cursor getUserInformation(){
         return db.rawQuery( "select * from "+USERINFORMATION, null );
     }
-    public static boolean updateUserInformation(String field,String value){
+    public boolean updateUserInformation(String field,String value){
         ContentValues contentValues = new ContentValues();
         contentValues.put(field,value);
         db.update(USERINFORMATION,contentValues,field+" = ?",null);
         return true;
     }
-    public static boolean setFriendInformation(String phonenumber,String textpass, String boundage,String timer,String pageno){
+    public  boolean setFriendInformation(String phonenumber,String textpass, String boundage,String timer,String pageno){
         ContentValues contentValues = new ContentValues();
         contentValues.put("phonenumber",phonenumber);
         contentValues.put("textpass",textpass);
@@ -93,59 +93,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public static Cursor getData(String phonenu,String pageno) {
+    public  Cursor getData(String phonenu,String pageno) {
         return db.rawQuery( "SELECT * FROM "+FRIENDINFORMATION+" WHERE phonenumber=? AND pageno=?",new String[]{phonenu,pageno});
     }
 
-    public static boolean updateFriendInformation(String phonenumber,String field,String value,String phoneno){
+    public  boolean updateFriendInformation(String phonenumber,String field,String value,String phoneno){
         ContentValues contentValues = new ContentValues();
         contentValues.put(field,value);
         db.update(FRIENDINFORMATION,contentValues,"phonenumber=? AND pageno=?",new String[]{phonenumber,phoneno});
         return true;
     }
 
-    public static boolean deleteFriend(String phonenumber,String pageno){
+    public  boolean deleteFriend(String phonenumber,String pageno){
         return db.delete(FRIENDINFORMATION, "phonenumber=? AND pageno=?", new String[]{phonenumber,pageno}) > 0;
     }
 
 
-    public static void setNotificationInformation(String notification,String notificationread){
+    public  void setNotificationInformation(String notification,String notificationread){
         ContentValues contentValues = new ContentValues();
         contentValues.put("notificationcount",notification);
         contentValues.put("notificationread",notificationread);
         db.insert(NOTIFICATION, null, contentValues);
     }
 
-    public static boolean updateNotification(String field,String value){
+    public  boolean updateNotification(String field,String value){
         ContentValues contentValues = new ContentValues();
         contentValues.put(field,value);
-        db.update(NOTIFICATION,contentValues,field+" = ?",null);
+        db.update(NOTIFICATION,contentValues,null,null);
         return true;
     }
 
-    public static Cursor getNotificationData(){
+    public  Cursor getNotificationData(){
         return db.rawQuery( "SELECT * FROM "+NOTIFICATION+"",null);
     }
 
-    public static void setOfflineChatListnInformation(String number,String isignored){
+    public  void setOfflineChatListnInformation(String number,String isignored){
         ContentValues contentValues = new ContentValues();
         contentValues.put("number",number);
         contentValues.put("isignored",isignored);
         db.insert(OfflineChatList, null, contentValues);
     }
 
-    public static boolean updateOfflineChatList(String position,String field,String value){
+    public  boolean updateOfflineChatList(String position,String field,String value){
         ContentValues contentValues = new ContentValues();
         contentValues.put(field,value);
         db.update(OfflineChatList,contentValues,"number=? AND "+field+"=?",new String[]{position,field});
         return true;
     }
 
-    public static boolean deleteofflinefriend(String number){
+    public  boolean deleteofflinefriend(String number){
         return db.delete(OfflineChatList, "number=?", new String[]{number}) > 0;
     }
 
-    public static Cursor getOfflineChatList(){
+    public  Cursor getOfflineChatList(){
         return db.rawQuery( "SELECT * FROM "+OfflineChatList+"",null);
     }
 

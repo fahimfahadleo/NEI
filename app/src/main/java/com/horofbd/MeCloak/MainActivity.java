@@ -133,6 +133,13 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     static CardView notificationcounterveiw;
     static LinearLayout connectinglayout;
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        active = true;
+    }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -249,27 +256,27 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         InitLinks(this);
 
 
-        Cursor c = DatabaseHelper.getNotificationData();
-        if (c != null) {
-            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-                notificationRead = c.getString(c.getColumnIndex("notificationread"));
-                notificationcount = Integer.parseInt(c.getString(c.getColumnIndex("notificationcount")));
-            }
-            c.close();
-        } else {
-            DatabaseHelper.setNotificationInformation("0", "true");
-        }
-
-
-        if (notificationcount != 0) {
-            if (notificationRead.equals("false")) {
-                notificationcounter.setText(String.valueOf(notificationcount));
-                notificationcounterveiw.setVisibility(View.VISIBLE);
-            }
-        } else {
-            notificationcounter.setText(null);
-            notificationcounterveiw.setVisibility(View.INVISIBLE);
-        }
+//        Cursor c = DatabaseHelper.getNotificationData();
+//        if (c != null) {
+//            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+//                notificationRead = c.getString(c.getColumnIndex("notificationread"));
+//                notificationcount = Integer.parseInt(c.getString(c.getColumnIndex("notificationcount")));
+//            }
+//            c.close();
+//        } else {
+//            DatabaseHelper.setNotificationInformation("0", "true");
+//        }
+//
+//
+//        if (notificationcount != 0) {
+//            if (notificationRead.equals("false")) {
+//                notificationcounter.setText(String.valueOf(notificationcount));
+//                notificationcounterveiw.setVisibility(View.VISIBLE);
+//            }
+//        } else {
+//            notificationcounter.setText(null);
+//            notificationcounterveiw.setVisibility(View.INVISIBLE);
+//        }
 
 
         if (connection != null) {
@@ -1139,8 +1146,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
                         notificationcount = notificationcount + 1;
                         notificationRead = "false";
-                        DatabaseHelper.updateNotification("notificationcount", String.valueOf(notificationcount));
-                        DatabaseHelper.updateNotification("notificationread", "false");
+                        helper.updateNotification("notificationcount", String.valueOf(notificationcount));
+                        helper.updateNotification("notificationread", "false");
 
                         Log.e("notification count", String.valueOf(notificationcount));
                         Log.e("notification status", String.valueOf(notificationRead));
@@ -1196,6 +1203,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        active = false;
         new Thread(new Runnable() {
             @Override
             public void run() {

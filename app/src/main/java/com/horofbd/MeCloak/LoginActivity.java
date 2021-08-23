@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
             if(Functions.isInternetAvailable()) {
                 try {
                     if (jsonArray.getJSONObject(0).getString("loginstatus").equals("true")) {
-                        LoginRequest(this,this,jsonArray.getJSONObject(0).getString("userphone"),jsonArray.getJSONObject(0).getString("userpass"),1);
+                        //LoginRequest(this,this,jsonArray.getJSONObject(0).getString("userphone"),jsonArray.getJSONObject(0).getString("userpass"),1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

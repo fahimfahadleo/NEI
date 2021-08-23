@@ -10,13 +10,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,9 +73,15 @@ import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -95,7 +104,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     String boundageposition;
 
     EditText typemessage;
-    ImageView send;
+    ImageView send,sendimage;
     List<Message> messages;
     ChatManager chatManager;
     RecyclerView messagerecyclerview;
@@ -149,6 +158,75 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                return;
+            }
+
+            Uri imageUri = data.getData();
+
+            try {
+//               Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+//                uploadedImage.setImageBitmap(bitmap);
+//                uploadimage.setVisibility(View.GONE);
+//                uploadedImage.buildDrawingCache();
+//                Bitmap temp = Bitmap.createBitmap(uploadedImage.getDrawingCache(), 0, 0, uploadedImage.getWidth(), uploadedImage.getHeight());
+//                mutableBitmap = temp.copy(Bitmap.Config.ARGB_8888, true);
+//                Uri tempUri = getImageUri(getApplicationContext(), mutableBitmap);
+//                Log.e("path",getRealPathFromURI(tempUri));
+//                // CALL THIS METHOD TO GET THE ACTUAL PATH
+//                file = new File(getRealPathFromURI(tempUri));
+//                Log.e("mimetype",getMimeType(getRealPathFromURI(tempUri)));
+
+
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                Uri tempUri = getImageUri(getApplicationContext(), bitmap);
+                Log.e("path",getRealPathFromURI(tempUri));
+                // CALL THIS METHOD TO GET THE ACTUAL PATH
+               File file = new File(getRealPathFromURI(tempUri));
+                //Log.e("mimetype",getMimeType(getRealPathFromURI(tempUri)));
+
+                FileInputStream importdb = new FileInputStream(getContentResolver().openFileDescriptor(imageUri, "r").getFileDescriptor());
+                DataInputStream di = new DataInputStream(importdb);
+
+                byte[] b = new byte[10];
+                new DataInputStream(new FileInputStream(di.readUTF())).readFully(b);
+
+                Log.e("data", Arrays.toString(b));
+
+
+
+
+
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, String.valueOf(System.currentTimeMillis()), null);
+        return Uri.parse(path);
+    }
+
+    public String getRealPathFromURI(Uri uri) {
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        return cursor.getString(idx);
+    }
+
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         boundageposition = getIntent().getStringExtra("boundage");
@@ -166,7 +244,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         timerview = findViewById(R.id.timerview);
         enableboundage = findViewById(R.id.enableboundage);
         enableboundageview = findViewById(R.id.enableboundageview);
-//        helper = new DatabaseHelper(this);
+       helper = new DatabaseHelper(this);
         menubutton = findViewById(R.id.menubutton);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
@@ -185,6 +263,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         boundagebelowview = findViewById(R.id.enablebelowboundageview);
         passwordview = findViewById(R.id.security).findViewById(R.id.passwordview);
         passwordbutton = findViewById(R.id.security).findViewById(R.id.password);
+        sendimage = findViewById(R.id.image);
         passwordbelowbutton = findViewById(R.id.belowpassword);
         passwordbelowview = findViewById(R.id.belowpasswordview);
         timerbelow = findViewById(R.id.belowtimer);
@@ -200,7 +279,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         String premiumstatus = getLoginInfo("premium");
         userphonenumber = getIntent().getStringExtra("phone_no");
 
-        Cursor c = DatabaseHelper.getData(userphonenumber, getLoginInfo("page_no"));
+        Cursor c = helper.getData(userphonenumber, getLoginInfo("page_no"));
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
             String data2 = c.getString(c.getColumnIndex("phonenumber"));
             passstr = c.getString(c.getColumnIndex("textpass"));
@@ -211,7 +290,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         c.close();
 
         if (!isDatabaseAvailable) {
-            DatabaseHelper.setFriendInformation(userphonenumber, "", "0", "0", getLoginInfo("page_no"));
+            helper.setFriendInformation(userphonenumber, "", "0", "0", getLoginInfo("page_no"));
             passstr = "";
             timerstr = "0";
             boundagestr = "0";
@@ -343,6 +422,18 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
         });
 
+        sendimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                getIntent.setType("image/*");
+                Intent pickIntent = new Intent(Intent.ACTION_PICK);
+                pickIntent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
+                startActivityForResult(chooserIntent, 1);
+            }
+        });
 
 
         Log.e("pass", passstr);
@@ -696,19 +787,30 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                                             ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
                                             for (int i = firstVisiblePosition; i <= lastvisiblePosition; i++) {
                                                 String s = DefaultED(adapter.getItem(i).getBody(), "decode");
-                                                ChatModel model = new Gson().fromJson(s, ChatModel.class);
-                                                if (model.getBoundage().equals("1")) {
-                                                    if (!boundageposition.equals("1")) {
-                                                        RestartActivity("type1");
+
+
+                                                try {
+                                                    JSONObject jsonObject = new JSONObject(s);
+
+                                                    if (jsonObject.getString("boundage").equals("1")) {
+                                                        if (!boundageposition.equals("1")) {
+                                                            RestartActivity("type1");
+                                                        }
+                                                        isboundageitemavailable = true;
+                                                        break;
+                                                    } else if (i == lastvisiblePosition) {
+                                                        if (!boundageposition.equals("0")) {
+                                                            RestartActivity("type0");
+                                                            isboundageitemavailable = false;
+                                                        }
                                                     }
-                                                    isboundageitemavailable = true;
-                                                    break;
-                                                } else if (i == lastvisiblePosition) {
-                                                    if (!boundageposition.equals("0")) {
-                                                        RestartActivity("type0");
-                                                        isboundageitemavailable = false;
-                                                    }
+
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
                                                 }
+
+
+
                                             }
                                         }
                                     }
@@ -764,8 +866,16 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             public void onClick(View view) {
                 String password = setpassword.getText().toString();
                 if (TextUtils.isEmpty(password)) {
-                    setpassword.setError("Field Can Not be empty!");
-                    setpassword.requestFocus();
+                    password = "";
+                    try {
+                        updateUserInfo(1, password);
+                        setpasswordview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                        passwordview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                        passwordbelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
+                        setUpData();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     try {
                         updateUserInfo(1, password);
@@ -795,19 +905,19 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         switch (field) {
             case 1: {
                 //update password
-                DatabaseHelper.updateFriendInformation(userphonenumber, "textpass", value, getLoginInfo("page_no"));
+                helper.updateFriendInformation(userphonenumber, "textpass", value, getLoginInfo("page_no"));
                 passstr = value;
                 break;
             }
             case 2: {
                 //update timer
-                DatabaseHelper.updateFriendInformation(userphonenumber, "timer", value, getLoginInfo("page_no"));
+                helper.updateFriendInformation(userphonenumber, "timer", value, getLoginInfo("page_no"));
                 timerstr = value;
                 break;
             }
             case 3: {
                 //update boundage
-                DatabaseHelper.updateFriendInformation(userphonenumber, "boundage", value, getLoginInfo("page_no"));
+                helper.updateFriendInformation(userphonenumber, "boundage", value, getLoginInfo("page_no"));
                 boundagestr = value;
                 break;
             }
@@ -914,6 +1024,31 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             e.printStackTrace();
         }
 
+
+
+
+        try {
+            String s = DefaultED(message.getBody(), "decode");
+            JSONObject jsonObject  = null;
+
+            jsonObject = new JSONObject(s);
+
+            String encodec;
+
+            encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+
+            Log.e("encodeasdlfkdsaflkdsa",encodec );
+
+            Log.e("odvudmessage", Base64.encodeToString(encodec.getBytes(),Base64.DEFAULT));
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+
         addNewMessage(message);
 
     }
@@ -921,7 +1056,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     @Override
     public void newOutgoingMessage(EntityBareJid to, MessageBuilder messageBuilder, Chat chat) {
         Message message = messageBuilder.build();
-        Log.e("messageincomming", message.getBody());
+        Log.e("messageoutgoing", message.getBody());
         try {
             message.setFrom(JidCreate.entityBareFrom(getLoginInfo("phone_no") + "@" + Important.getXmppHost()));
         } catch (XmppStringprepException e) {
@@ -944,7 +1079,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 sb.append(c);
             }
 
-            ChatModel model = new ChatModel();
+           JSONObject jsonObject = new JSONObject();
+
 
             String encodec;
 
@@ -955,17 +1091,18 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             String userexpiry = timerstr;
 
 
-            model.setBody(encodec);
-            model.setBoundage(userboundage);
-            model.setHash1(Functions.md5(userpassword));
-            model.setHash2(Functions.Sha1(userpassword));
-            model.setTimestamp(getDate("0"));
+            jsonObject.put("body",encodec);
+            jsonObject.put("boundage",userboundage);
+            jsonObject.put("hash1",Functions.md5(userpassword));
+            jsonObject.put("hash2",Functions.Sha1(userpassword));
+            jsonObject.put("timestamp",getDate("0"));
+            jsonObject.put("expiry",getDate(userexpiry));
 
-            model.setExpiry(getDate(userexpiry));
 
 
-            Gson gson = new Gson();
-            String finalbody = gson.toJson(model);
+            Log.e("message",body);
+
+            String finalbody = jsonObject.toString();
 
             Message message = new Message();
             message.setBody(DefaultED(finalbody, "encode"));
@@ -990,6 +1127,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             Log.e("exception2", e.getMessage());
         } catch (XmppStringprepException e) {
             Log.e("exception3", e.getMessage());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -1075,19 +1214,22 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                         e.printStackTrace();
                     }
                 }
-                Message messageModel = list.get(position);
-                Gson gson = new Gson();
-                String s = DefaultED(messageModel.getBody(), "decode");
 
-                final ChatModel chatModel = gson.fromJson(s, ChatModel.class);
+                try {
+                    Message messageModel = list.get(position);
+
+                    String s = DefaultED(messageModel.getBody(), "decode");
+                    JSONObject jsonObject  = new JSONObject(s);
+
 
                 String encodec;
 
-                encodec = EncrytpAndDecrypt(chatModel.getBody(), "decode", passstr);
+                encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    Log.e("messageinaaaaaa",encodec);
 
-                String timestamp = chatModel.getTimestamp();
-                String expirytime = chatModel.getExpiry();
-                String boundagetime = chatModel.getBoundage();
+                String timestamp = jsonObject.getString("timestamp");
+                String expirytime = jsonObject.getString("expiry");
+                String boundagetime =jsonObject.getString("boundage");
                 if (!boundagetime.equals("0")) {
                     if (list.size() - 1 == position) {
                         if (!boundageposition.equals("1")) {
@@ -1100,8 +1242,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                     }
                 }
 
+
+
                 message.setText(encodec);
-                time.setText(chatModel.getTimestamp());
+                time.setText(jsonObject.getString("timestamp"));
 
                 if (!expirytime.equals(timestamp)) {
                     SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
@@ -1141,7 +1285,9 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
                 }
 
-
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -1163,16 +1309,24 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 him = 0;
                 profilepicture.setVisibility(View.INVISIBLE);
                 Message messageModel = list.get(position);
-                Gson gson = new Gson();
+
                 String mode = DefaultED(messageModel.getBody(), "deocode");
-                final ChatModel chatModel = gson.fromJson(mode, ChatModel.class);
-                String encodec;
-                encodec = EncrytpAndDecrypt(chatModel.getBody(), "decode", passstr);
-                String timestamp = chatModel.getTimestamp();
-                String expirytime = chatModel.getExpiry();
-                String boundagetime = chatModel.getBoundage();
+
+
+
+                try {
+                    JSONObject jsonObject = new JSONObject(mode);
+
+
+
+                    String encodec;
+                encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                Log.e("messageoutaaaa",encodec);
+                String timestamp = jsonObject.getString("timestamp");
+                String expirytime = jsonObject.getString("expiry");
+                String boundagetime = jsonObject.getString("boundage");
                 message.setText(encodec);
-                time.setText(chatModel.getTimestamp());
+                time.setText(jsonObject.getString("timestamp"));
 
                 if (!boundagetime.equals("0")) {
                     if (list.size() - 1 == position) {
@@ -1226,6 +1380,11 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 }
 
             }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
         }
 
         @Override

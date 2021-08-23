@@ -38,6 +38,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,7 +52,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     EditText code;
     TextView proceedbutton;
     DatabaseHelper helper;
-    TextView registernewpage;
+    TextView registernewpage,forgotpagepassword;
     String userpass;
     EditText autotext;
     LinearLayout passwordfieldlayout;
@@ -233,6 +234,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         initialize = findViewById(R.id.initialize);
         profilepicture = findViewById(R.id.profile_image);
         userphonenumber = findViewById(R.id.userphonenumber);
+        forgotpagepassword = findViewById(R.id.forgotpassword);
 
         username = findViewById(R.id.username);
         view = findViewById(R.id.view);
@@ -252,6 +254,14 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         new Functions(this);
 
         userphonenumber.setText(getLoginInfo("phone_no"));
+
+
+        forgotpagepassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(UserVerificationActivity.this,ForgotPagePassword.class));
+            }
+        });
 
 
         logoutview.setOnClickListener(new View.OnClickListener() {

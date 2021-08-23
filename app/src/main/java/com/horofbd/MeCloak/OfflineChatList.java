@@ -55,7 +55,26 @@ public class OfflineChatList extends AppCompatActivity {
     SwipeRefreshLayout swipeRefreshLayout;
     CircleImageView newmessage;
     String number;
-    ArrayList<JSONObject> chatlist;
+    public static ArrayList<JSONObject> chatlist;
+    public static boolean isChatListActive = false;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isChatListActive = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isChatListActive = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isChatListActive = true;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -139,6 +158,7 @@ public class OfflineChatList extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.swipelayout);
         newmessage = findViewById(R.id.newmessage);
         chatlist = new ArrayList<>();
+
 
         JSONArray jsonArray = getData();
         Log.e("JSOnObject",jsonArray.toString());

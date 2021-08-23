@@ -34,6 +34,11 @@ public class Important {
     protected static String privatekey;
     protected static String pagelogout;
     protected static String logininformation;
+    protected static String checkfirebaseotp;
+
+
+    protected static String changeforgottenpassword;
+    protected static String resetpassword;
 
 
 
@@ -113,6 +118,32 @@ public class Important {
 
     ////////////Notification////////////
     protected static String get_notification;
+
+
+    public static String getChangeforgottenpassword() {
+        return changeforgottenpassword;
+    }
+
+    public static void setChangeforgottenpassword(String changeforgottenpassword) {
+        Important.changeforgottenpassword = changeforgottenpassword;
+    }
+
+    public static String getResetpassword() {
+        return resetpassword;
+    }
+
+    public static void setResetpassword(String resetpassword) {
+        Important.resetpassword = resetpassword;
+    }
+
+    public static String getCheckfirebaseotp() {
+        return checkfirebaseotp;
+    }
+
+    public static void setCheckfirebaseotp(String checkfirebaseotp) {
+        Important.checkfirebaseotp = checkfirebaseotp;
+    }
+
 
     public static String getLogininformation() {
         return logininformation;
@@ -221,13 +252,7 @@ public class Important {
         return getchillengerpagesecurityquestions;
     }
 
-    public static void setGetchillengerpagesecurityquestions(String getchillengerpagesecurityquestions) {
-        Important.getchillengerpagesecurityquestions = getchillengerpagesecurityquestions;
-    }
 
-    public static String getChillengerpagesecurityquestions() {
-        return chillengerpagesecurityquestions;
-    }
 
     public static void setChillengerpagesecurityquestions(String chillengerpagesecurityquestions) {
         Important.chillengerpagesecurityquestions = chillengerpagesecurityquestions;

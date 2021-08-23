@@ -86,8 +86,8 @@ public class NotificationActivity extends AppCompatActivity implements ServerRes
 
         MainActivity.notificationcount = 0;
         MainActivity.notificationRead = "true";
-        DatabaseHelper.updateNotification("notificationcount", "0");
-        DatabaseHelper.updateNotification("notificationread", "true");
+        helper.updateNotification("notificationcount", "0");
+        helper.updateNotification("notificationread", "true");
         ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
