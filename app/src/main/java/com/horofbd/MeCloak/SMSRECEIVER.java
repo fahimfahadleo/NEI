@@ -62,8 +62,8 @@ public class SMSRECEIVER extends BroadcastReceiver {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.appicon))
-                        .setSmallIcon(R.drawable.appicon)
+                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.applogo))
+                        .setSmallIcon(R.drawable.applogo)
                         .setContentTitle("MeCloak")
                         .setContentText("New Message Received from "+address);
         mBuilder.setContentIntent(contentIntent);

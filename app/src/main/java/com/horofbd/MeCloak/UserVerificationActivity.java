@@ -11,10 +11,15 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.text.method.PasswordTransformationMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -53,32 +58,21 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     TextView proceedbutton;
     DatabaseHelper helper;
     TextView registernewpage,forgotpagepassword;
-    String userpass;
-    EditText autotext;
     LinearLayout passwordfieldlayout;
-    TextView initialize;
     static CircleImageView profilepicture;
     static TextView username;
-    ImageView editname, editphone;
-    CircleImageView logout;
-    CardView view;
-    static PopupWindow popupWindow;
-    CardView changeprofilepictureview, logoutview, changeavatarview, changenameveiw, changephonenumberview;
-    TextView changeprofilepicture, changeavatar, changename, changephonenumber,userphonenumber;
 
 
     String pass;
     static Context context;
-    ImageView imageView;
-    int point = 0;
-    int count = 0;
     static Uri resultUri;
-    Dialog avatardialog;
     Dialog dialog2;
     ImageView pro;
 
-    static String newnam;
-    DrawerLayout drawerLayout;
+    TextView userphonenumber;
+    ImageView passunhide;
+    boolean ispasshidden = false;
+    TextView signout;
 
 
     static {
@@ -142,83 +136,6 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         }
     }
 
-    protected String getSaltString() {
-        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        StringBuilder salt = new StringBuilder();
-        Random rnd = new Random();
-        while (salt.length() < 40) { // length of the random string.
-            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-            salt.append(SALTCHARS.charAt(index));
-        }
-        String saltStr = salt.toString();
-        return saltStr;
-
-    }
-
-    public static void showAvatarDialog() {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.showavatardialog, null, false);
-        RecyclerView recyclerView = view.findViewById(R.id.avaratrecyclerview);
-
-
-    }
-
-    private void ChangeName() {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View VI = inflater.inflate(R.layout.changename, null, false);
-        EditText namefield = VI.findViewById(R.id.profilename);
-        TextView save = VI.findViewById(R.id.save);
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String newname = namefield.getText().toString();
-                if (TextUtils.isEmpty(newname)) {
-                    namefield.setError("New name can not be empty!");
-                    namefield.requestFocus();
-                } else {
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("new_name", newname);
-                        newnam = newname;
-                        globalRequest(UserVerificationActivity.this, "POST", Important.getChangeprofilename(), jsonObject, 17, context);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        int width = LinearLayout.LayoutParams.MATCH_PARENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true;
-        popupWindow = new PopupWindow(VI, width, height, focusable);
-        popupWindow.showAsDropDown(username);
-    }
-
-    public static void setNewName() {
-        ((Activity) context).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                username.setText(newnam);
-                if (popupWindow.isShowing())
-                    popupWindow.dismiss();
-            }
-        });
-
-    }
-
-    public static void setProfilePicture() {
-        ((Activity) context).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                profilepicture.setImageURI(resultUri);
-            }
-        });
-
-    }
-
-    void changeNumber() {
-
-    }
 
 
     @Override
@@ -229,26 +146,16 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         registernewpage = findViewById(R.id.registernewpage);
         proceedbutton = findViewById(R.id.proceedbutton);
         helper = new DatabaseHelper(this);
-        autotext = findViewById(R.id.autotext);
         passwordfieldlayout = findViewById(R.id.passwordfieldlayout);
-        initialize = findViewById(R.id.initialize);
-        profilepicture = findViewById(R.id.profile_image);
         userphonenumber = findViewById(R.id.userphonenumber);
+        passunhide = findViewById(R.id.showpass);
+        signout = findViewById(R.id.signout);
+
+        profilepicture = findViewById(R.id.profile_image);
         forgotpagepassword = findViewById(R.id.forgotpassword);
 
         username = findViewById(R.id.username);
-        view = findViewById(R.id.view);
-        changename = findViewById(R.id.changename);
-        changenameveiw = findViewById(R.id.changenameview);
-        changeprofilepicture = findViewById(R.id.changeprifilepicture);
-        changeprofilepictureview = findViewById(R.id.profilepictrechangeview);
-        changeavatar = findViewById(R.id.changeavatar);
-        changeavatarview = findViewById(R.id.changeavatarview);
-        logout = findViewById(R.id.profilelogout);
-        logoutview = findViewById(R.id.logoutview);
-        drawerLayout = findViewById(R.id.drawer);
-        changephonenumber = findViewById(R.id.changenumber);
-        changephonenumberview = findViewById(R.id.changenumberview);
+
         context = this;
         InitLinks();
         new Functions(this);
@@ -263,81 +170,43 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
             }
         });
 
-
-        logoutview.setOnClickListener(new View.OnClickListener() {
+        signout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 globalRequest(UserVerificationActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
 
             }
         });
-
-        logout.setOnClickListener(new View.OnClickListener() {
+        passunhide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(UserVerificationActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
-
-            }
-        });
-        changephonenumberview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeNumber();
-            }
-        });
-        changephonenumber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeNumber();
+                if (ispasshidden) {
+                    passunhide.setImageDrawable(getResources().getDrawable(R.drawable.eye_blocked));
+                    code.setTransformationMethod(new PasswordTransformationMethod());
+                    ispasshidden = false;
+                } else {
+                    passunhide.setImageDrawable(getResources().getDrawable(R.drawable.eye));
+                    code.setTransformationMethod(null);
+                    ispasshidden = true;
+                }
             }
         });
 
-
-        changename.setOnClickListener(new View.OnClickListener() {
+        code.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                ChangeName();
-                drawerLayout.closeDrawer(GravityCompat.END);
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                passunhide.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
             }
         });
 
-        changenameveiw.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ChangeName();
-                drawerLayout.closeDrawer(GravityCompat.END);
-            }
-        });
-
-
-        changeprofilepictureview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .setMultiTouchEnabled(true)
-                        .setAllowFlipping(false)
-                        .setAspectRatio(1, 1)
-
-                        .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
-                        .setOutputCompressQuality(90)
-                        .start(UserVerificationActivity.this);
-            }
-        });
-        changeprofilepicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .setMultiTouchEnabled(true)
-                        .setAllowFlipping(false)
-                        .setAspectRatio(1, 1)
-
-                        .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
-                        .setOutputCompressQuality(90)
-                        .start(UserVerificationActivity.this);
-            }
-        });
 
         profilepicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -369,75 +238,6 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         username.setText(getLoginInfo("user_name"));
         ImageRequest(this, profilepicture, "GET", Important.getViewprofilepicture(), new JSONObject(), 1);
 
-
-//        String s = "~+8801914616453@MeCloak> auth status\n" +
-//                "~+8801914616453@MeCloak> connected to Fahim Fahad Leon\n" +
-//                "~+8801914616453@MeCloak> requesting session\n" +
-//                "~+8801914616453@MeCloak> accepted with (" + getSaltString() + ")\n" +
-//                "~+8801914616453@MeCloak> generating request id\n" +
-//                "~+8801914616453@MeCloak> successful!!\n" +
-//                "~+8801914616453@MeCloak> loading horoftech crypto\n" +
-//                "~+8801914616453@MeCloak> ... ok\n" +
-//                "~+8801914616453@MeCloak> loading MeCloak premium icon\n" +
-//                "~+8801914616453@MeCloak> failed/... ok\n" +
-//                "~+8801914616453@MeCloak> loading boundage policy\n" +
-//                "~+8801914616453@MeCloak> ... ok\n" +
-//                "~+8801914616453@MeCloak> loading modules\n" +
-//                "~+8801914616453@MeCloak> https ... ok\n" +
-//                "~+8801914616453@MeCloak> wss ... ok\n" +
-//                "~+8801914616453@MeCloak> LDAP ... ok\n" +
-//                "~+8801914616453@MeCloak> SqLite ... ok\n" +
-//                "~+8801914616453@MeCloak> XML ... ok\n" +
-//                "~+8801914616453@MeCloak> bash ... ok\n" +
-//                "~+8801914616453@MeCloak> loading certificates ... ok\n" +
-//                "~+8801914616453@MeCloak> establishing cryptographic structure ... ok\n" +
-//                "~+8801914616453@MeCloak> starting MeCloak\n";
-//        String[] chararray = s.split("\n");
-//
-//
-//        int length = chararray.length - 1;
-//
-//
-//        Timer t = new Timer();
-//        t.scheduleAtFixedRate(
-//                new TimerTask() {
-//                    public void run() {
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//
-//                                autotext.setCursorVisible(true);
-//                                autotext.setText(autotext.getText().toString() + "\n" + chararray[point]);
-//                                autotext.setSelection(autotext.getText().length());
-//
-//                                if (point == length) {
-//                                    t.cancel();
-//                                    new Handler().postDelayed(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//                                            runOnUiThread(new Runnable() {
-//                                                @Override
-//                                                public void run() {
-//                                                    autotext.setVisibility(View.GONE);
-//                                                    passwordfieldlayout.setVisibility(View.VISIBLE);
-//                                                    initialize.setText("Page Login");
-//                                                }
-//                                            });
-//                                        }
-//                                    }, 1000);
-//                                }
-//                                point++;
-//                            }
-//                        });
-//                    }
-//                },
-//                0,      // run first occurrence immediatetly
-//                150); // run every two seconds
-
-        autotext.setVisibility(View.GONE);
-//        passwordfieldlayout.setVisibility(View.VISIBLE);
-        passwordfieldlayout.setVisibility(View.VISIBLE);
-        initialize.setText("Page Login");
 
         registernewpage = findViewById(R.id.registernewpage);
 
@@ -526,4 +326,12 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
     }
 
     Bitmap bitmap;
+
+
+
+
+
+
+
+
 }

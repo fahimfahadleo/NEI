@@ -159,6 +159,36 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
     static ArrayList<JSONObject> questionobject;
 
 
+    public static void setUpChallengeQuestions(ArrayList<JSONObject> list){
+
+
+        Log.e("data",list.toString());
+
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                 //   id1 = Integer.parseInt(list.get(0).getString("id"));
+                    questiononeview.setText("What is your page name?");
+                    questionone.setVisibility(View.INVISIBLE);
+
+                    id2 = Integer.parseInt(list.get(0).getString("id"));
+                    questiontwoview.setText(list.get(0).getString("question"));
+                    questiontwo.setVisibility(View.INVISIBLE);
+
+                    id3 = Integer.parseInt(list.get(1).getString("id"));
+                    questionthreeview.setText(list.get(1).getString("question"));
+                    questionthree.setVisibility(View.INVISIBLE);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+
+
     public static void setUpAnsweredQuestions(ArrayList<JSONObject> someobjec) {
         questionobject = someobjec;
 
@@ -227,7 +257,7 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
         if(getIntent().getStringExtra("action").equals("challenge")){
             JSONObject jsonObject = new JSONObject();
 
-            globalRequest(this, "POST", Important.getGetchillengerpagesecurityquestions(), jsonObject, 28, this);
+            globalRequest(this, "GET", Important.getGetchillengerpagesecurityquestions(), jsonObject, 41, this);
 
 
         }else {
@@ -246,35 +276,60 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
             @Override
             public void onClick(View view) {
 
-                if (action.getText().equals("Edit")) {
-                    questionone.setVisibility(View.VISIBLE);
-                    questiontwo.setVisibility(View.VISIBLE);
-                    questionthree.setVisibility(View.VISIBLE);
-                    action.setText("Save");
-                } else {
-                    if (id1 == id2 || id2 == id3 || id1 == id3) {
-                        Toast.makeText(EditPageSecurityQuestionActivity.this, "Can no use same question twice.", Toast.LENGTH_SHORT).show();
+                if(getIntent().getStringExtra("action").equals("challenge")){
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("page_name",answerone.getText().toString());
+
+                        JSONArray array = new JSONArray();
+                        array.put(answertwo.getText().toString());
+                        array.put(answerthree.getText().toString());
+                        JSONArray array1 = new JSONArray();
+                        array1.put(id2);
+                        array1.put(id3);
+                        jsonObject.put("ids", array1);
+                        jsonObject.put("ans", array);
+
+                        globalRequest(EditPageSecurityQuestionActivity.this, "POST", Important.getChillengerpagesecurityquestions(), jsonObject, 42, EditPageSecurityQuestionActivity.this);
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }else {
+
+
+                    if (action.getText().equals("Edit")) {
+                        questionone.setVisibility(View.VISIBLE);
+                        questiontwo.setVisibility(View.VISIBLE);
+                        questionthree.setVisibility(View.VISIBLE);
+                        action.setText("Save");
                     } else {
-                        JSONObject jsonObject1 = new JSONObject();
-                        try {
-                            jsonObject1.put("password_confirmation", i.getStringExtra("pass"));
-                            JSONArray array = new JSONArray();
-                            array.put(answerone.getText().toString());
-                            array.put(answertwo.getText().toString());
-                            array.put(answerthree.getText().toString());
-                            JSONArray array1 = new JSONArray();
-                            array1.put(id1);
-                            array1.put(id2);
-                            array1.put(id3);
-                            jsonObject1.put("ids", array1);
-                            jsonObject1.put("value", array);
+                        if (id1 == id2 || id2 == id3 || id1 == id3) {
+                            Toast.makeText(EditPageSecurityQuestionActivity.this, "Can no use same question twice.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            JSONObject jsonObject1 = new JSONObject();
+                            try {
+                                jsonObject1.put("password_confirmation", i.getStringExtra("pass"));
+                                JSONArray array = new JSONArray();
+                                array.put(answerone.getText().toString());
+                                array.put(answertwo.getText().toString());
+                                array.put(answerthree.getText().toString());
+                                JSONArray array1 = new JSONArray();
+                                array1.put(id1);
+                                array1.put(id2);
+                                array1.put(id3);
+                                jsonObject1.put("ids", array1);
+                                jsonObject1.put("value", array);
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            globalRequest(EditPageSecurityQuestionActivity.this, "POST", Important.getAnswerpagesecurityquestion(), jsonObject1, 30, EditPageSecurityQuestionActivity.this);
+
                         }
-
-                        globalRequest(EditPageSecurityQuestionActivity.this, "POST", Important.getAnswerpagesecurityquestion(), jsonObject1, 30, EditPageSecurityQuestionActivity.this);
-
                     }
                 }
             }
@@ -292,5 +347,14 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
     @Override
     public void onFailure(String failresponse) throws JSONException {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(getIntent().getStringExtra("action").equals("challenge")){
+            startActivity(new Intent(this,ForgotPagePassword.class));
+            finish();
+        }
     }
 }

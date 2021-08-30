@@ -1,114 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@drawable/mainbackground"
     android:orientation="vertical"
     android:theme="@style/AppTheme.NoActionBar"
     tools:context=".LoginActivity">
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/gopremiumview"
+    <LinearLayout
+        android:id="@+id/topimageview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="-10dp"
-        android:layout_marginBottom="@dimen/_16sdp"
-        android:layout_weight="2"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardBackgroundColor="@color/colorPrimaryDark"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp">
+        app:layout_constraintVertical_weight="2"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/parent"
+        app:layout_constraintEnd_toEndOf="@id/parent"
+        app:layout_constraintBottom_toTopOf="@id/scrollview">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@color/colorPrimaryDark"
             android:orientation="vertical">
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+            <ImageView
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/applogo" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <ImageView
-                    android:id="@+id/imageview"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:background="@color/colorPrimaryDark"
-                    android:src="@drawable/appicon" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:src="@drawable/app_name" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/app_name" />
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/_20sdp"
-        android:gravity="center"
-        android:text="Profile Login"
-        android:textColor="@color/colorPrimaryDarktext"
-        android:textSize="@dimen/_16sdp"
-        android:textStyle="bold" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3">
+        android:id="@+id/scrollview"
+        app:layout_constraintStart_toStartOf="@id/parent"
+        app:layout_constraintEnd_toEndOf="@id/parent"
+        app:layout_constraintTop_toBottomOf="@id/topimageview"
+        app:layout_constraintBottom_toBottomOf="@id/copywrite"
+        app:layout_constraintVertical_weight="3">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -122,11 +75,22 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Profile Login"
+                    android:textColor="@color/createnewaccountcolor"
+                    android:textSize="@dimen/_16sdp"
+                    android:textStyle="bold" />
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/_8sdp"
+
                     android:orientation="horizontal">
 
                     <View
@@ -135,36 +99,48 @@
                         android:layout_weight="1" />
 
 
-                    <RelativeLayout
+                    <com.hbb20.CountryCodePicker
+                        android:id="@+id/countryNameHolder"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="7">
+                        android:layout_height="@dimen/_32sdp"
+                        android:layout_marginTop="@dimen/_8sdp"
+                        android:layout_marginEnd="3dp"
+                        android:layout_weight="2"
+                        android:background="@drawable/edtshapewhite"
+                        android:gravity="center_vertical"
+                        app:ccpDialog_allowSearch="true"
+                        app:ccpDialog_keyboardAutoPopup="true"
 
-                        <EditText
-                            android:id="@+id/phone"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/_32sdp"
-                            android:layout_marginTop="@dimen/_8sdp"
-                            android:background="@drawable/edtshapewhite"
-                            android:gravity="start|center"
-                            android:paddingStart="16dp"
-                            android:paddingTop="8dp"
-                            android:paddingEnd="16dp"
-                            android:paddingBottom="@dimen/_4sdp"
-                            android:textSize="@dimen/_12sdp"
-                            android:text="01914616453"
-                            android:textColor="@color/textcolor" />
+                        app:ccpDialog_showFlag="true"
+                        app:ccpDialog_showPhoneCode="true"
+                        app:ccpDialog_showTitle="true"
+                        app:ccp_autoDetectCountry="true"
+                        app:ccp_autoDetectLanguage="false"
+                        app:ccp_countryAutoDetectionPref="SIM_ONLY"
+                        app:ccp_defaultNameCode="BD"
+                        app:ccp_showArrow="true"
+                        app:ccp_showNameCode="true"
+                        app:ccp_showPhoneCode="false"
+                        tools:ignore="RtlSymmetry" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/_15sdp"
-                            android:background="@color/background"
-                            android:paddingStart="@dimen/_2sdp"
-                            android:paddingEnd="@dimen/_2sdp"
-                            android:text="Phone"
-                            android:textColor="@color/black" />
-                    </RelativeLayout>
+
+                    <EditText
+                        android:id="@+id/phone"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/_32sdp"
+                        android:layout_marginTop="@dimen/_8sdp"
+                        android:layout_weight="5"
+                        android:background="@drawable/edtshapewhite"
+                        android:gravity="start|center"
+                        android:hint="Phone"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="@dimen/_4sdp"
+                        android:text="01914616453"
+                        android:textColor="@color/textcolor"
+                        android:textSize="@dimen/_12sdp" />
+
 
                     <View
                         android:layout_width="0dp"
@@ -185,37 +161,19 @@
                         android:layout_weight="1" />
 
 
-                    <RelativeLayout
+                    <EditText
+                        android:id="@+id/password"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="7">
-
-                        <EditText
-                            android:id="@+id/password"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/_32sdp"
-                            android:layout_marginTop="@dimen/_8sdp"
-                            android:layout_marginBottom="@dimen/_8sdp"
-                            android:background="@drawable/edtshapewhite"
-                            android:gravity="start|center"
-                            android:paddingStart="16dp"
-                            android:text="64742812"
-                            android:inputType="textPassword"
-                            android:paddingTop="8dp"
-                            android:paddingEnd="16dp"
-                            android:paddingBottom="8dp"
-                            android:textColor="@color/textcolor" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/_15sdp"
-                            android:background="@color/background"
-                            android:paddingStart="@dimen/_2sdp"
-                            android:paddingEnd="@dimen/_2sdp"
-                            android:text="Password"
-                            android:textColor="@color/black" />
-                    </RelativeLayout>
+                        android:layout_height="@dimen/_32sdp"
+                        android:layout_marginBottom="@dimen/_4sdp"
+                        android:layout_weight="7"
+                        android:background="@drawable/edtshapewhite"
+                        android:gravity="start|center"
+                        android:hint="Password"
+                        android:inputType="textPassword"
+                        android:paddingStart="16dp"
+                        android:text="64742812"
+                        android:textColor="@color/textcolor" />
 
 
                     <View
@@ -224,21 +182,6 @@
                         android:layout_weight="1" />
 
                 </LinearLayout>
-
-
-                <TextView
-                    android:id="@+id/proceedbutton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/_26sdp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/buttonbackgroundoceanblue"
-                    android:gravity="center"
-                    android:paddingStart="@dimen/_16sdp"
-                    android:paddingEnd="@dimen/_16sdp"
-                    android:paddingBottom="@dimen/_2sdp"
-                    android:text="Login"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_14sdp" />
 
 
                 <LinearLayout
@@ -246,31 +189,70 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/_16sdp"
-                    android:layout_marginBottom="@dimen/_8sdp"
+                    android:layout_marginBottom="@dimen/_10sdp"
                     android:gravity="center"
                     android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/forgotpasstext"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="@dimen/_4sdp"
-                        android:text="Forgot Your Password?"
-                        android:textColor="@color/red"
-                        android:textSize="@dimen/_12sdp" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="7" />
 
                     <TextView
                         android:id="@+id/forgotpassword"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="Click Here."
-                        android:textColor="@color/oceanblue"
-                        android:textSize="@dimen/_14sdp" />
+                        android:text="Forgot Password?"
+                        android:textStyle="bold"
+                        android:textColor="@color/forgotpasswordcolor"
+                        android:textSize="@dimen/_9sdp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="@dimen/_8sdp"
+                        android:layout_weight="1" />
+
+
 
                 </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_6sdp"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+
+                    <TextView
+                        android:id="@+id/proceedbutton"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/_32sdp"
+                        android:layout_gravity="center"
+                        android:layout_weight="7"
+                        android:background="@drawable/buttonshapetp"
+                        android:gravity="center"
+                        android:text="Sign in"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_14sdp" />
+
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+
 
 
             </LinearLayout>
@@ -278,6 +260,7 @@
             <LinearLayout
                 android:id="@+id/textlayout"
                 android:layout_width="match_parent"
+                android:layout_marginBottom="@dimen/_14sdp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
@@ -286,8 +269,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Don't have an account?"
-                    android:textColor="@color/textcolor"
+                    android:text="or"
+                    android:textStyle="bold"
+                    android:textColor="@color/orcolor"
                     android:textSize="@dimen/_12sdp" />
 
                 <TextView
@@ -295,61 +279,135 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Register here"
-                    android:textColor="@color/oceanblue"
+                    android:text="Create new account"
+                    android:textStyle="bold"
+                    android:textColor="@color/createnewaccountcolor"
                     android:textSize="@dimen/_14sdp" />
 
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/termsandconditions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/terms_conditions"
+                    android:layout_marginEnd="@dimen/_4sdp"
+                    android:textColor="@color/termsandconditionscolor"
+                    android:textSize="@dimen/_10sdp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="and"
+                    android:layout_marginEnd="@dimen/_4sdp"
+
+                    android:textColor="#000"
+                    android:textSize="@dimen/_10sdp" />
+                <TextView
+                    android:id="@+id/privacypolicy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_gravity="center"
+                    android:text="@string/privacy_policy"
+                    android:textColor="@color/termsandconditionscolor"
+                    android:textSize="@dimen/_10sdp" />
+
+
+
+
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
-        android:id="@+id/extra"
-        android:layout_width="match_parent"
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/background"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/scrollview"
+        app:layout_constraintStart_toStartOf="@id/parent"
+        app:layout_constraintEnd_toEndOf="@id/parent"
+        app:layout_constraintBottom_toBottomOf="@id/parent"
+        android:id="@+id/copywrite"
+        android:text="@string/copyright"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:textColor="@color/copyrightcolor"
+        android:textSize="@dimen/_8sdp" />
 
 
-        <TextView
-            android:id="@+id/contactus"
+    <LinearLayout
+        android:id="@+id/invisiblelayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_110sdp"
+        app:layout_constraintBottom_toBottomOf="@id/parent"
+        app:layout_constraintStart_toStartOf="@id/parent"
+        app:layout_constraintEnd_toEndOf="@id/parent"
+        android:orientation="horizontal">
+
+
+        <View
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/_16sdp"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:layout_marginEnd="@dimen/_16sdp"
-            android:layout_marginBottom="@dimen/_4sdp"
-            android:layout_weight="1"
-            android:background="@drawable/buttonbackgroundoceanblue"
-            android:gravity="center"
-            android:paddingTop="@dimen/_6sdp"
-            android:paddingBottom="@dimen/_6sdp"
-            android:text="Contact Us"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
 
         <TextView
             android:id="@+id/vault"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/_16sdp"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:layout_marginEnd="@dimen/_16sdp"
-            android:layout_marginBottom="@dimen/_4sdp"
-            android:layout_weight="1"
-            android:background="@drawable/buttonbackgroundoceanblue"
+            android:layout_height="@dimen/_32sdp"
+            android:layout_weight="3"
+            android:background="@drawable/vaultandcontactusshape"
             android:gravity="center"
-            android:paddingTop="@dimen/_6sdp"
-            android:paddingBottom="@dimen/_6sdp"
-
             android:text="Vault"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:textStyle="bold"
+            android:textColor="#fff" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/contactus"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_32sdp"
+            android:layout_weight="3"
+            android:textStyle="bold"
+            android:background="@drawable/vaultandcontactusshape"
+            android:gravity="center"
+            android:text="Contact us"
+            android:textColor="#fff" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
     </LinearLayout>
-</LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

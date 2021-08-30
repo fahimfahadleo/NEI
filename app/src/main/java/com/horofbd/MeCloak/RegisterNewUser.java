@@ -19,6 +19,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.hbb20.CountryCodePicker;
+
 import org.json.JSONException;
 
 public class RegisterNewUser extends AppCompatActivity implements ServerResponse {
@@ -32,6 +34,7 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
     ImageView passunhide, conpassunhide;
     boolean ispasshidden = false;
     boolean isconpasshidden = false;
+    CountryCodePicker countryCodePicker;
 
     static {
         System.loadLibrary("native-lib");
@@ -65,6 +68,7 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
         proceed = findViewById(R.id.proceedbutton);
         termsandconditions = findViewById(R.id.termsandconditions);
         policy = findViewById(R.id.policy);
+        countryCodePicker = findViewById(R.id.countryNameHolder);
         context = this;
 
         password.addTextChangedListener(new TextWatcher() {
@@ -127,7 +131,7 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
         });
 
         proceed.setEnabled(false);
-        proceed.setBackground(ContextCompat.getDrawable(this, R.drawable.buttonbackgroundgrey));
+        proceed.setBackground(ContextCompat.getDrawable(this, R.drawable.buttonshapetpgray));
 
         termsandconditions.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,7 +141,7 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
                     termsandconditions.setChecked(false);
                     istandcchecked = false;
                     proceed.setEnabled(false);
-                    proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundgrey));
+                    proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonshapetpgray));
 
                 } else {
                     termsandconditions.setChecked(true);
@@ -145,10 +149,10 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
 
                     if (ispolicyischecked) {
                         proceed.setEnabled(true);
-                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundoceanblue));
+                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonshapetp));
                     } else {
                         proceed.setEnabled(false);
-                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundgrey));
+                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonshapetpgray));
                     }
                 }
             }
@@ -163,17 +167,17 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
                     ispolicyischecked = false;
 
                     proceed.setEnabled(false);
-                    proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundgrey));
+                    proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonshapetpgray));
 
                 } else {
                     policy.setChecked(true);
                     ispolicyischecked = true;
                     if (istandcchecked) {
                         proceed.setEnabled(true);
-                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundoceanblue));
+                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonshapetp));
                     } else {
                         proceed.setEnabled(false);
-                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonbackgroundgrey));
+                        proceed.setBackground(ContextCompat.getDrawable(RegisterNewUser.this, R.drawable.buttonshapetpgray));
                     }
 
                 }
@@ -195,8 +199,9 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
                 if (TextUtils.isEmpty(referencestr)) {
                     referencestr = "";
                 }else {
-                    if(!referencestr.contains("+88")){
-                        referencestr = "+88"+referencestr;
+                    if(!referencestr.contains("+")){
+                       referral.setError("Phone number must contain country code!");
+                       referral.requestFocus();
                     }
                 }
                 boolean isOk = false;
@@ -236,8 +241,11 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
                     isOk = true;
                 }
 
-                if (!phonestr.contains("+88")) {
-                    phonestr = "+88" + phonestr;
+                if (!phonestr.contains("+")) {
+                    phone.setError("Phone must contain country code!");
+                    phone.requestFocus();
+                    isOk = true;
+
                 }
                 if (!isOk) {
 

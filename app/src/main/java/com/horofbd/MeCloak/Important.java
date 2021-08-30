@@ -252,12 +252,19 @@ public class Important {
         return getchillengerpagesecurityquestions;
     }
 
+    public static void setGetchillengerpagesecurityquestions(String s){
+        Important.getchillengerpagesecurityquestions = s;
+    }
+
 
 
     public static void setChillengerpagesecurityquestions(String chillengerpagesecurityquestions) {
         Important.chillengerpagesecurityquestions = chillengerpagesecurityquestions;
     }
 
+    public static String getChillengerpagesecurityquestions(){
+        return Important.chillengerpagesecurityquestions;
+    }
     public static String getCratepageresetcertificate() {
         return cratepageresetcertificate;
     }

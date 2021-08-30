@@ -8,12 +8,17 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.hbb20.CountryCodePicker;
+
+import org.jivesoftware.smackx.fallback_indication.element.FallbackIndicationElement;
+import org.jivesoftware.smackx.muc.InvitationListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,8 +36,9 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         System.loadLibrary("native-lib");
     }
 
-
-
+    CountryCodePicker CountryCodePicker;
+    LinearLayout invisiblelayout;
+    TextView vault, contactus;
 
 
     static native void LoginRequest(Context context, ServerResponse serverResponse, String phone, String passwrod, int requestcode);
@@ -53,7 +59,9 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         super.onPause();
         Functions.dismissDialogue();
     }
+
     JSONArray jsonArray;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,15 +73,22 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         register = findViewById(R.id.register);
         donthaveaccount = findViewById(R.id.donthaveaccount);
         forgotpassword = findViewById(R.id.forgotpassword);
+        CountryCodePicker = findViewById(R.id.countryNameHolder);
+        invisiblelayout = findViewById(R.id.invisiblelayout);
+        vault = findViewById(R.id.vault);
+        contactus = findViewById(R.id.contactus);
         new Functions(this);
         context = this;
+        vault.setVisibility(View.INVISIBLE);
+        contactus.setVisibility(View.INVISIBLE);
+
 
         InitLinks();
 
         jsonArray = getData("gui");
-        Log.e("gui",jsonArray.toString());
-        if(jsonArray.length()!=0){
-            if(Functions.isInternetAvailable()) {
+        Log.e("gui", jsonArray.toString());
+        if (jsonArray.length() != 0) {
+            if (Functions.isInternetAvailable()) {
                 try {
                     if (jsonArray.getJSONObject(0).getString("loginstatus").equals("true")) {
                         //LoginRequest(this,this,jsonArray.getJSONObject(0).getString("userphone"),jsonArray.getJSONObject(0).getString("userpass"),1);
@@ -84,11 +99,19 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
             }
         }
 
+        invisiblelayout.setOnTouchListener(new OnSwipeTouchListener(this, "T", invisiblelayout));
+
 //        AppCompatDelegate
 //                .setDefaultNightMode(
 //                        AppCompatDelegate
 //                                .MODE_NIGHT_NO);
 
+        CountryCodePicker.setOnCountryChangeListener(new CountryCodePicker.OnCountryChangeListener() {
+            @Override
+            public void onCountrySelected() {
+                phone.setText(CountryCodePicker.getSelectedCountryCodeWithPlus());
+            }
+        });
 
         forgotpassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,21 +131,17 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
                 } else if (TextUtils.isEmpty(passwordstr)) {
                     password.setError("Phone can not be empty!");
                     password.requestFocus();
+                } else if (!phonestr.contains("+")) {
+                    phone.setError("Phone number must contain country code!");
+                    phone.requestFocus();
                 } else {
-                    if (!phonestr.contains("+88")) {
-                        phonestr = "+88" + phonestr;
-                    }
-
-                    if(Functions.isInternetAvailable()){
-                        Log.e("internet","available");
+                    if (Functions.isInternetAvailable()) {
                         LoginRequest(LoginActivity.this, LoginActivity.this, phonestr, passwordstr, 1);
-                    }else {
-
-                        Log.e("internet","not available");
-                        if(jsonArray.length()!=0){
+                    } else {
+                        if (jsonArray.length() != 0) {
                             try {
-                                if(jsonArray.getJSONObject(0).getString("userphone").equals(phonestr) && jsonArray.getJSONObject(0).getString("userpass").equals(passwordstr)){
-                                    startActivity(new Intent(LoginActivity.this,OfflineChatList.class));
+                                if (jsonArray.getJSONObject(0).getString("userphone").equals(phonestr) && jsonArray.getJSONObject(0).getString("userpass").equals(passwordstr)) {
+                                    startActivity(new Intent(LoginActivity.this, OfflineChatList.class));
                                     finish();
                                 }
                             } catch (JSONException e) {

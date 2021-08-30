@@ -19,4 +19,8 @@
     <string name="timertip">You can set your message Expiry time. that message will expire from you and your friend at that exact moment you want.</string>
     <string name="passwordtip">Set a password for your message to protect it from third person. Note that without that password none can see your message and there is no way to recover your password.</string>
 
+    <string name="terms_conditions"><u>Terms &amp; Conditions</u></string>
+    <string name="privacy_policy"><u>Privacy Policy</u></string>
+    <string name="copyright">Copyright © 2021, Horof tech, Bangladesh, All rights reserved</string>
+
 </resources>

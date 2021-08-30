@@ -55,7 +55,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:background="@color/colorPrimaryDark"
-                    android:src="@drawable/appicon" />
+                    android:src="@drawable/applogo" />
 
                 <View
                     android:layout_width="0dp"

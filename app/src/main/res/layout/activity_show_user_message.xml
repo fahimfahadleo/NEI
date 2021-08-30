@@ -381,7 +381,7 @@
                     android:layout_height="100dp"
                     android:layout_gravity="center"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/appicon" />
+                    android:src="@drawable/applogo" />
 
                 <TextView
                     android:id="@+id/navbartitletext"

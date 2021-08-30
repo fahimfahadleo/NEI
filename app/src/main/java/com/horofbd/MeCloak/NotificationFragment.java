@@ -132,7 +132,7 @@ public class NotificationFragment extends Fragment {
         protected void imageViewSetUp(String id, CircleImageView imageView) {
             switch (id) {
                 case "alert": {
-                    imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.appicon));
+                    imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.applogo));
                     break;
                 }
                 case "new_friend_request": {

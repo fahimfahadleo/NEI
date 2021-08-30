@@ -20,7 +20,8 @@
     <color name="cardbgdeepcolor">#C3CAFD</color>
     <color name="oceanblue">#00A3E6</color>
     <color name="shadow">#4548F3</color>
-    <color name="background">#E3E8FF</color>
+<!--    <color name="background">#E3E8FF</color>-->
+    <color name="background">#f5f5f5</color>
     <color name="textcolor">#000</color>
     <color name="inverttextcolor">#0b7cfe</color>
     <color name="skyblue">#60B6FF</color>
@@ -32,5 +33,22 @@
     <color name="hintcolor">#BCB6B6</color>
 
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#201F1F</color>
+
+
+    <color name="maincolor">#0060AE</color>
+    <color name="forgotpasswordcolor">#737373</color>
+    <color name="orcolor">#C40000</color>
+    <color name="createnewaccountcolor">#005192</color>
+    <color name="termsandconditionscolor">#CE0000</color>
+    <color name="copyrightcolor">#8D8D8D</color>
+
+
+
+
+
+
+
+
+
 
 </resources>
