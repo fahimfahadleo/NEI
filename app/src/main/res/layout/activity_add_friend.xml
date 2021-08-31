@@ -37,6 +37,7 @@
         <ImageView
             android:id="@+id/menubutton"
             android:layout_width="@dimen/_38sdp"
+            android:visibility="invisible"
             android:layout_height="@dimen/_38sdp"
             android:padding="@dimen/_8sdp"
             android:src="@drawable/menu_white" />

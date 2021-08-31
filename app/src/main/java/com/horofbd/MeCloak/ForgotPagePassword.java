@@ -39,7 +39,7 @@ public class ForgotPagePassword extends AppCompatActivity implements ServerRespo
     }
 
     EditText pagename, password, confirmpassword;
-    TextView pagenamesubmit, recoverbycode, recoverbyquestion, recoverbyimage, setpasswordsubmit;
+    TextView pagenamesubmit, recoverbycode,  recoverbyimage, setpasswordsubmit;
 
     AlertDialog passwordconfirmation;
 
@@ -51,41 +51,9 @@ public class ForgotPagePassword extends AppCompatActivity implements ServerRespo
         ((Activity) context).finish();
     }
 
-//    void movetoPageResetQuestion() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        View vi = getLayoutInflater().inflate(R.layout.requireprofilepassword, null, false);
-//        EditText passfield = vi.findViewById(R.id.password);
-//        TextView cancel = vi.findViewById(R.id.cancelbutton);
-//        TextView proceed = vi.findViewById(R.id.sealbutton);
-//        proceed.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String pass = passfield.getText().toString();
-//                if (TextUtils.isEmpty(pass)) {
-//                    passfield.setError("Field Can Not Be Empty!");
-//                    passfield.requestFocus();
-//                } else {
-//                    Intent i = new Intent(context, EditPageSecurityQuestionActivity.class);
-//                    i.putExtra("pass", pass);
-//                    i.putExtra("action", "challenge");
-//                    startActivity(i);
-//                    passwordconfirmation.dismiss();
-//                }
-//            }
-//        });
-//        cancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                passwordconfirmation.dismiss();
-//            }
-//        });
-//        builder.setView(vi);
-//        passwordconfirmation = builder.create();
-//        passwordconfirmation.show();
-//    }
 
 
-    ImageView backbutton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,32 +65,13 @@ public class ForgotPagePassword extends AppCompatActivity implements ServerRespo
         password = findViewById(R.id.password);
         confirmpassword = findViewById(R.id.confirmpassword);
         recoverbycode = findViewById(R.id.recoverycode);
-        recoverbyimage = findViewById(R.id.securityimage);
-        recoverbyquestion = findViewById(R.id.securityquestion);
+        recoverbyimage = findViewById(R.id.challengeimage);
         setpasswordsubmit = findViewById(R.id.setnewpassword);
         serverResponse = this;
         InitLinks();
 
-        backbutton = findViewById(R.id.backbutton);
-        backbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
 
-//        pagenamesubmit.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String pagenamestr = pagename.getText().toString();
-//                if(TextUtils.isEmpty(pagenamestr)){
-//                    pagename.setError("Field Can Not be empty!");
-//                    pagename.requestFocus();
-//                }else {
-////request for page password reset;
-//                }
-//            }
-//        });
+
 
 
         setpasswordsubmit.setOnClickListener(new View.OnClickListener() {
@@ -145,18 +94,6 @@ public class ForgotPagePassword extends AppCompatActivity implements ServerRespo
             }
         });
 
-        recoverbyquestion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //movetoPageResetQuestion();
-                Intent i = new Intent(context, EditPageSecurityQuestionActivity.class);
-                //i.putExtra("pass", pass);
-                i.putExtra("action", "challenge");
-                startActivity(i);
-
-                finish();
-            }
-        });
 
 
     }

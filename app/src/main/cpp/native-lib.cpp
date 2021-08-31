@@ -2106,7 +2106,10 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                     jint tempobject = env->CallIntMethod(jobject1 , getInt ,
                                                                env->NewStringUTF("forgot-id"));
 
+
                     jclass Forgotprofilepass = env->FindClass("com/horofbd/MeCloak/ForgotProfilePassword");
+                    jmethodID showverification = env->GetStaticMethodID(Forgotprofilepass,"showPhoneVerificationlayout","()V");
+                    env->CallStaticVoidMethod(Forgotprofilepass,showverification);
                     jmethodID sendOtp = env->GetStaticMethodID(Forgotprofilepass,"sendOtp", "(I)V");
                     env->CallStaticVoidMethod(Forgotprofilepass,sendOtp,tempobject);
                 }
@@ -2484,13 +2487,20 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
             }
             case 39:{
                 //check firebase otp
-
-
+                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
+                    jclass Forgotprofilepass = env->FindClass("com/horofbd/MeCloak/ForgotProfilePassword");
+                    jmethodID showverification = env->GetStaticMethodID(Forgotprofilepass,"showResetPasswordLayout","()V");
+                    env->CallStaticVoidMethod(Forgotprofilepass,showverification);
+                }
                 break;
             }
 
             case 40:{
                 //change profile password after all verification
+                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
+                    showToast(env,context,env->NewStringUTF("Password Reset Successfull!"));
+                    finishActivity(env,context);
+                }
                 break;
             }
 

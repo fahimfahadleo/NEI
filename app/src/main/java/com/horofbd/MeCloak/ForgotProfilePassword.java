@@ -7,8 +7,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,35 +35,65 @@ import com.hbb20.CountryCodePicker;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class ForgotProfilePassword extends AppCompatActivity implements ServerResponse{
+public class ForgotProfilePassword extends AppCompatActivity implements ServerResponse {
     static {
         System.loadLibrary("native-lib");
     }
 
     static native void globalRequest(ServerResponse serverResponse, String requesttype, String link, JSONObject jsonObject, int requestcode, Context context);
+
     static native void InitLinks();
+
     static native void CheckResponse(ServerResponse serverResponse, Context context, String response, int requestcode);
 
-    ImageView backbutton;
-    EditText phone,password,confirmpassword;
-    static EditText phoneverificationcode;
-    TextView submitbutton,submitphoneverificationcode,submitnewpassword;
+
+    EditText phone, password, confirmpassword;
+    static EditText code1, code2, code3, code4, code5, code6;
+    TextView submitbutton, submitphoneverificationcode, submitnewpassword;
     CheckBox accesstophone;
 
     CountryCodePicker picker;
 
     static Context context;
-    public static void closeActivtiy(){
-        Functions.dismissDialogue();
-        ((Activity)context).finish();
+    static LinearLayout layout1,phoneverify,setnewpasswordview;
+
+
+    public static void showPhoneVerificationlayout(){
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                layout1.setVisibility(View.INVISIBLE);
+                phoneverify.setVisibility(View.VISIBLE);
+            }
+        });
+
     }
+
+    public static void showResetPasswordLayout(){
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                phoneverify.setVisibility(View.INVISIBLE);
+                setnewpasswordview.setVisibility(View.VISIBLE);
+            }
+        });
+
+    }
+
+    public static void closeActivtiy() {
+        Functions.dismissDialogue();
+        ((Activity) context).finish();
+    }
+
     static String phonenumber;
     static String forgotid;
+    LinearLayout invisiblecrtupload;
 
-    public static void sendOtp(int forgot){
+    public static void sendOtp(int forgot) {
         forgotid = String.valueOf(forgot);
         sendVerificationCode(phonenumber);
     }
@@ -74,34 +108,137 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
         phone = findViewById(R.id.phone);
         submitbutton = findViewById(R.id.proceedbutton);
         InitLinks();
-        backbutton = findViewById(R.id.backbutton);
         accesstophone = findViewById(R.id.accesstophone);
         picker = findViewById(R.id.countryNameHolder);
         submitphoneverificationcode = findViewById(R.id.submitphoneverificationcode);
-        phoneverificationcode = findViewById(R.id.phoneverificationcode);
         mAuth = FirebaseAuth.getInstance();
         serverResponse = this;
         password = findViewById(R.id.password);
         confirmpassword = findViewById(R.id.confirmpassword);
-        submitnewpassword = findViewById(R.id.setnewpassword);
+        submitnewpassword = findViewById(R.id.submitnewpassword);
+        code1 = findViewById(R.id.code1);
+        code2 = findViewById(R.id.code2);
+        code3 = findViewById(R.id.code3);
+        code4 = findViewById(R.id.code4);
+        code5 = findViewById(R.id.code5);
+        code6 = findViewById(R.id.code6);
+        invisiblecrtupload = findViewById(R.id.invisiblecrtupload);
+        layout1 = findViewById(R.id.layout1);
+        phoneverify = findViewById(R.id.phoneverify);
+        setnewpasswordview = findViewById(R.id.setnewpasswordview);
 
 
+        code1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code2.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        code2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code3.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        code3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code4.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        code4.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code5.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        code5.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code6.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         phone.setText(picker.getSelectedCountryCodeWithPlus());
 
 
-        backbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
-
         picker.setOnCountryChangeListener(new CountryCodePicker.OnCountryChangeListener() {
             @Override
             public void onCountrySelected() {
-                phone.setText(picker.getSelectedCountryCodeWithPlus());
+                if(TextUtils.isEmpty(phone.getText().toString())){
+                    phone.setText(picker.getSelectedCountryCodeWithPlus());
+                }else {
+                    if(!phone.getText().toString().contains("+")){
+                        phone.setText(picker.getSelectedCountryCodeWithPlus()+phone.getText().toString());
+                    }else {
+                        phone.setText(picker.getSelectedCountryCodeWithPlus());
+                    }
+                }
 
+            }
+        });
+
+        accesstophone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(accesstophone.isChecked()){
+                    invisiblecrtupload.setVisibility(View.VISIBLE);
+                }else {
+                    invisiblecrtupload.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -114,14 +251,13 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
                 JSONObject jsonObject = new JSONObject();
 
                 try {
-                    jsonObject.put("forgot_id",forgotid);
-                    jsonObject.put("password",passwordstr);
-                    jsonObject.put("password_confirmation",conpasswordstr);
-                    globalRequest(serverResponse,"POST",Important.getChangeforgottenpassword(),jsonObject,40,context);
+                    jsonObject.put("forgot_id", forgotid);
+                    jsonObject.put("password", passwordstr);
+                    jsonObject.put("password_confirmation", conpasswordstr);
+                    globalRequest(serverResponse, "POST", Important.getChangeforgottenpassword(), jsonObject, 40, context);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
 
 
             }
@@ -131,7 +267,9 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
         submitphoneverificationcode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String code = phoneverificationcode.getText().toString();
+                String code = code1.getText().toString() + code2.getText().toString() +
+                        code3.getText().toString() + code4.getText().toString() +
+                        code5.getText().toString() + code6.getText().toString();
                 verifyCode(code);
             }
         });
@@ -140,38 +278,37 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
         submitbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 phonenumber = phone.getText().toString();
+                if(!TextUtils.isEmpty(phonenumber)){
+                    Functions.athenticationRequired = false;
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("phone_no", phonenumber);
+                        jsonObject.put("flag1", (accesstophone.isChecked() ? "1" : "0"));
+                        jsonObject.put("country_code", picker.getSelectedCountryNameCode());
+                        jsonObject.put("type", "profile");
+                        Log.e("link", Important.getForgot_profile_password());
+                        globalRequest(ForgotProfilePassword.this, "POST", Important.getForgot_profile_password(), jsonObject, 25, ForgotProfilePassword.this);
 
-                Log.e("countrycode",picker.getSelectedCountryCodeWithPlus());
-                Log.e("countryname",picker.getSelectedCountryNameCode());
-                Functions.athenticationRequired = false;
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("phone_no",phonenumber);
-                    jsonObject.put("flag1",(accesstophone.isChecked()?"1":"0"));
-                    jsonObject.put("country_code",picker.getSelectedCountryNameCode());
-                    jsonObject.put("type","profile");
-                    Log.e("link",Important.getForgot_profile_password());
-                    globalRequest(ForgotProfilePassword.this,"POST",Important.getForgot_profile_password(),jsonObject,25,ForgotProfilePassword.this);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    phone.setError("Field Can Not Be Empty!");
+                    phone.requestFocus();
                 }
+
+
 
             }
         });
-
-
-
-
 
 
     }
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
-        CheckResponse(this,this,response,requestcode);
+        CheckResponse(this, this, response, requestcode);
     }
 
     @Override
@@ -181,7 +318,6 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
 
     static FirebaseAuth mAuth;
     private static String verificationId;
-
 
 
     private static void signInWithCredential(PhoneAuthCredential credential) {
@@ -202,16 +338,16 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
                             user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<GetTokenResult> task) {
-                                    Log.e("token",task.getResult().getToken());
+                                    Log.e("token", task.getResult().getToken());
 
 
                                     JSONObject jsonObject = new JSONObject();
                                     try {
-                                        jsonObject.put("for","passwordReset");
-                                        jsonObject.put("idToken",task.getResult().getToken());
-                                        jsonObject.put("forgot_id",forgotid);
+                                        jsonObject.put("for", "passwordReset");
+                                        jsonObject.put("idToken", task.getResult().getToken());
+                                        jsonObject.put("forgot_id", forgotid);
 
-                                        globalRequest(serverResponse,"POST",Important.getCheckfirebaseotp(),jsonObject,39,context);
+                                        globalRequest(serverResponse, "POST", Important.getCheckfirebaseotp(), jsonObject, 39, context);
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -224,7 +360,7 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
                         } else {
                             // if the code is not correct then we are
                             // displaying an error message to the user.
-                            ((Activity)context).runOnUiThread(new Runnable() {
+                            ((Activity) context).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -246,12 +382,12 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
                 // verification which is 60 seconds in our case.
                 TimeUnit.SECONDS, // third parameter is for initializing units
                 // for time period which is in seconds in our case.
-                ((Activity)context), // this task will be excuted on Main thread.
+                ((Activity) context), // this task will be excuted on Main thread.
                 mCallBack // we are calling callback method when we recieve OTP for
                 // auto verification of user.
         );
 
-        ((Activity)context).runOnUiThread(new Runnable() {
+        ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Toast.makeText(context, "Verification Code sent!", Toast.LENGTH_SHORT).show();
@@ -284,16 +420,23 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
         @Override
         public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
             // below line is used for getting OTP code
-            // which is sent in phone auth credentials.
+            // which is sent in phone auth credentials. n
             final String code = phoneAuthCredential.getSmsCode();
 
             // checking if the code
             // is null or not.
-            if (code != null) {
+            if (code != null) {  
                 // if the code is not null then
                 // we are setting that code to
                 // our OTP edittext field.
-                phoneverificationcode.setText(code);
+                char[] codes = code.toCharArray();
+
+                code1.setText(String.valueOf(codes[0]));
+                code2.setText(String.valueOf(codes[1]));
+                code3.setText(String.valueOf(codes[2]));
+                code4.setText(String.valueOf(codes[3]));
+                code5.setText(String.valueOf(codes[4]));
+                code6.setText(String.valueOf(codes[5]));
 
                 // after setting this code
                 // to OTP edittext field we
@@ -307,7 +450,7 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
         @Override
         public void onVerificationFailed(FirebaseException e) {
             // displaying error message with firebase exception.
-            ((Activity)context).runOnUiThread(new Runnable() {
+            ((Activity) context).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -327,9 +470,6 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
         // calling sign in method.
         signInWithCredential(credential);
     }
-
-
-
 
 
 }
