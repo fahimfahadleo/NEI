@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
@@ -55,31 +57,31 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
         final JSONObject myListData = listdata.get(position);
         try {
             if(vi == R.layout.notificationlayout){
-                holder.activestatus.setVisibility(View.INVISIBLE);
+
                 holder.textView.setText(myListData.getString("message"));
                 switch (myListData.getString("type")){
                     case "alert":
                     case "expiry": {
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.red_500));
+                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.red_500));
                         break;
                     } case "new_friend_request":{
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.green));
+                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.green));
                         break;
                     } case "friend_request_accepted":{
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.green_500));
+                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.green_500));
                         break;
                     }
                     case "offers":{
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.background));
+                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.background));
                         break;
                     } case "recharge":{
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.blue_grey_500));
+                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.blue_grey_500));
                         break;
                     } case "message_recall":{
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.shadow));
+                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.shadow));
                         break;
                     } case "success":{
-                        holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.oceanblue));
+                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.oceanblue));
                         break;
                     }
                 }
@@ -258,18 +260,20 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
     public class ViewHolder extends RecyclerView.ViewHolder {
         public CircleImageView imageView;
         public TextView textView;
-        public CardView cardView;
+        public LinearLayout cardView;
         public TextView phonenumber;
-        public CircleImageView activestatus;
+        public ImageView audiocall;
+        public ImageView videocall;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             this.imageView = (CircleImageView) itemView.findViewById(R.id.profile_image);
             this.textView = (TextView) itemView.findViewById(R.id.name);
-            this.cardView = (CardView) itemView.findViewById(R.id.singlecardview);
+            this.cardView = itemView.findViewById(R.id.singlecardview);
             this.phonenumber = (TextView) itemView.findViewById(R.id.text);
-            this.activestatus = itemView.findViewById(R.id.activestatus);
+            this.audiocall = itemView.findViewById(R.id.audiocall);
+            this.videocall = itemView.findViewById(R.id.videocall);
         }
     }
 }

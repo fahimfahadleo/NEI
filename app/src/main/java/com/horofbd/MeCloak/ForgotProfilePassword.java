@@ -11,12 +11,16 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,11 +59,11 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
     static EditText code1, code2, code3, code4, code5, code6;
     TextView submitbutton, submitphoneverificationcode, submitnewpassword;
     CheckBox accesstophone;
-
+    static TextView title;
     CountryCodePicker picker;
-
     static Context context;
     static LinearLayout layout1,phoneverify,setnewpasswordview;
+    static int visivility = 1;
 
 
     public static void showPhoneVerificationlayout(){
@@ -68,6 +72,8 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
             public void run() {
                 layout1.setVisibility(View.INVISIBLE);
                 phoneverify.setVisibility(View.VISIBLE);
+                title.setText("Phone number verification");
+                visivility = 2;
             }
         });
 
@@ -79,9 +85,31 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
             public void run() {
                 phoneverify.setVisibility(View.INVISIBLE);
                 setnewpasswordview.setVisibility(View.VISIBLE);
+                title.setText("Set Password");
+                visivility = 3;
             }
         });
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if(visivility == 1){
+            super.onBackPressed();
+        }else if(visivility == 2){
+            visivility = 1;
+            layout1.setVisibility(View.VISIBLE);
+            phoneverify.setVisibility(View.INVISIBLE);
+            setnewpasswordview.setVisibility(View.INVISIBLE);
+            title.setText("Password Reset");
+        }else if(visivility == 3){
+            visivility = 2;
+            layout1.setVisibility(View.INVISIBLE);
+            phoneverify.setVisibility(View.VISIBLE);
+            setnewpasswordview.setVisibility(View.INVISIBLE);
+            title.setText("Phone number verification");
+        }
     }
 
     public static void closeActivtiy() {
@@ -126,6 +154,17 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
         layout1 = findViewById(R.id.layout1);
         phoneverify = findViewById(R.id.phoneverify);
         setnewpasswordview = findViewById(R.id.setnewpasswordview);
+        title = findViewById(R.id.title);
+        if(getIntent().hasExtra("title")){
+            title.setText(getIntent().getStringExtra("title"));
+        }else {
+            title.setText("Password Reset");
+        }
+
+
+
+
+
 
 
         code1.addTextChangedListener(new TextWatcher() {
@@ -425,7 +464,7 @@ public class ForgotProfilePassword extends AppCompatActivity implements ServerRe
 
             // checking if the code
             // is null or not.
-            if (code != null) {  
+            if (code != null) {
                 // if the code is not null then
                 // we are setting that code to
                 // our OTP edittext field.

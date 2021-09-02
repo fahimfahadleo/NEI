@@ -8,10 +8,13 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +42,26 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
     static {
         System.loadLibrary("native-lib");
     }
+
+//    PopupWindow popupWindow;
+//    void openpopup(View vi,String message){
+//
+//        LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+//        View popupView = layoutInflater.inflate(R.layout.trianglepopup, null);
+//        popupWindow = new PopupWindow();
+//        TextView edPop = popupView.findViewById(R.id.textview);
+//        edPop.setText(message);
+//        popupWindow.showAtLocation(vi, Gravity.CENTER,5,5);
+//        popupWindow.setOutsideTouchable(true);
+//        popupWindow.setFocusable(false);
+//        popupWindow.update();
+//    }
+//
+//    void closepopup(){
+//        if(popupWindow.isShowing()){
+//            popupWindow.dismiss();
+//        }
+//    }
 
 
     static native void RegisterRequest(ServerResponse serverResponse, String phone, String name, String password, String confirmpassword, String reference, String termsandconditions, String policy, int requestcode,Context context);
@@ -70,6 +93,21 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
         policy = findViewById(R.id.policy);
         countryCodePicker = findViewById(R.id.countryNameHolder);
         context = this;
+
+
+
+//        name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View view, boolean hasFocus) {
+//                if (hasFocus) {
+//                    Toast.makeText(getApplicationContext(), "Got the focus", Toast.LENGTH_LONG).show();
+//                    openpopup(name,"name is selected! \n sometext");
+//                } else {
+//                    Toast.makeText(getApplicationContext(), "Lost the focus", Toast.LENGTH_LONG).show();
+//                    closepopup();
+//                }
+//            }
+//        });
 
         password.addTextChangedListener(new TextWatcher() {
             @Override

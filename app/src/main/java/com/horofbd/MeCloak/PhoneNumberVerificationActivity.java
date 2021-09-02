@@ -7,6 +7,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -32,10 +34,12 @@ import org.json.JSONObject;
 import java.util.concurrent.TimeUnit;
 
 public class PhoneNumberVerificationActivity extends AppCompatActivity implements ServerResponse {
-    EditText verificationcode;
+
     TextView button;
     FirebaseAuth mAuth;
     private String verificationId;
+    static EditText code1, code2, code3, code4, code5, code6;
+
 
     static {
         System.loadLibrary("native-lib");
@@ -57,13 +61,103 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_number_verification);
-        verificationcode = findViewById(R.id.verifycode);
         button = findViewById(R.id.verifybutton);
         mAuth = FirebaseAuth.getInstance();
+        code1 = findViewById(R.id.code1);
+        code2 = findViewById(R.id.code2);
+        code3 = findViewById(R.id.code3);
+        code4 = findViewById(R.id.code4);
+        code5 = findViewById(R.id.code5);
+        code6 = findViewById(R.id.code6);
         context = this;
         new Functions(this);
 
         InitLinks();
+
+
+        code1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code2.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        code2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code3.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        code3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code4.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        code4.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code5.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        code5.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                code6.requestFocus();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         if(Important.getActivate_previous_premium()==null){
             Log.e("tag","notworking");
@@ -85,8 +179,10 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                String verificationcodestr = verificationcode.getText().toString();
-//                verifyCode(verificationcodestr);
+//                String codec = code1.getText().toString() + code2.getText().toString() +
+//                        code3.getText().toString() + code4.getText().toString() +
+//                        code5.getText().toString() + code6.getText().toString();
+//                verifyCode(codec);
 
                 JSONObject jsonObject = new JSONObject();
                 try {
@@ -217,7 +313,14 @@ public class PhoneNumberVerificationActivity extends AppCompatActivity implement
                 // if the code is not null then
                 // we are setting that code to
                 // our OTP edittext field.
-                verificationcode.setText(code);
+                char[] codes = code.toCharArray();
+
+                code1.setText(String.valueOf(codes[0]));
+                code2.setText(String.valueOf(codes[1]));
+                code3.setText(String.valueOf(codes[2]));
+                code4.setText(String.valueOf(codes[3]));
+                code5.setText(String.valueOf(codes[4]));
+                code6.setText(String.valueOf(codes[5]));
 
                 // after setting this code
                 // to OTP edittext field we

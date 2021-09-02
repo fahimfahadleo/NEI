@@ -23,6 +23,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -35,6 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -111,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     static native void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
 
 
-    CircleImageView profileimage, newmessage;
+    CircleImageView profileimage;
     public static boolean active = false;
     static DatabaseHelper helper;
     ImageView options, notification;
@@ -123,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     TextView logout, Settings, gopremiumtext, helptext, contactustext, tnctext, policytext, aboutustext,pagelogout;
     CardView logoutview, SettingsView, gopremiumview, helpview, contactusview, tncview, policyview, aboutusview,pagelogoutview;
     ImageView search;
-    LinearLayout searchlayout;
+
     static ServerResponse serverResponse;
     SwipeRefreshLayout swipeRefreshLayout;
     public static AbstractXMPPConnection connection;
@@ -131,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     public static String notificationRead = "true";
     static TextView notificationcounter;
     static CardView notificationcounterveiw;
-    static LinearLayout connectinglayout;
+
 
     @Override
     protected void onStart() {
@@ -217,7 +221,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
         context = this;
         profileimage = findViewById(R.id.profile_image);
-        newmessage = findViewById(R.id.newmessage);
         options = findViewById(R.id.options);
         drawerLayout = findViewById(R.id.drawer);
         logout = drawerLayout.findViewById(R.id.logout);
@@ -225,8 +228,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         logoutview = drawerLayout.findViewById(R.id.logoutview);
         notification = findViewById(R.id.notification);
         search = findViewById(R.id.search);
-        searchlayout = findViewById(R.id.searchlayout);
-        searchlayout.setVisibility(View.GONE);
+
+
         recyclerView = findViewById(R.id.recyclerview);
         SettingsView = findViewById(R.id.settingsview);
         Settings = findViewById(R.id.settings);
@@ -248,13 +251,18 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         aboutusview = findViewById(R.id.aboutview);
         notificationcounter = findViewById(R.id.notificationcounter);
         notificationcounterveiw = findViewById(R.id.notificationcounterview);
-        connectinglayout = findViewById(R.id.connectionlayout);
         pagelogout = findViewById(R.id.pagelogout);
         pagelogoutview = findViewById(R.id.pagelogoutview);
         helper = new DatabaseHelper(this);
         new Functions(this);
         InitLinks(this);
 
+
+
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.parseColor("#CBE1CF"));
 
 //        Cursor c = DatabaseHelper.getNotificationData();
 //        if (c != null) {
@@ -412,28 +420,22 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             }
         });
 
-        search.setOnClickListener(view -> {
-            if (isopen) {
-                TransitionManager.beginDelayedTransition(searchlayout, new AutoTransition());
-                TransitionManager.beginDelayedTransition(recyclerView, new AutoTransition());
-                searchlayout.setVisibility(View.GONE);
-                isopen = false;
-            } else {
-                TransitionManager.beginDelayedTransition(recyclerView, new AutoTransition());
-                TransitionManager.beginDelayedTransition(searchlayout, new AutoTransition());
-                searchlayout.setVisibility(View.VISIBLE);
-                isopen = true;
-            }
-        });
+//        search.setOnClickListener(view -> {
+//            if (isopen) {
+//                TransitionManager.beginDelayedTransition(searchlayout, new AutoTransition());
+//                TransitionManager.beginDelayedTransition(recyclerView, new AutoTransition());
+//                searchlayout.setVisibility(View.GONE);
+//                isopen = false;
+//            } else {
+//                TransitionManager.beginDelayedTransition(recyclerView, new AutoTransition());
+//                TransitionManager.beginDelayedTransition(searchlayout, new AutoTransition());
+//                searchlayout.setVisibility(View.VISIBLE);
+//                isopen = true;
+//            }
+//        });
         notification.setOnClickListener(view -> StartActivity(MainActivity.this, "Notification", ""));
         options.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.END));
-        newmessage.setOnClickListener(view -> {
-//                Intent i = new Intent(Intent.ACTION_PICK);
-//                i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-//                startActivityForResult(i, 2);
 
-            StartActivity(MainActivity.this, "AddFriend", "");
-        });
         profileimage.setOnClickListener(view -> StartActivity(MainActivity.this, "Profile", ""));
     }
 
@@ -1051,13 +1053,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                 @Override
                 public void connected(XMPPConnection xmppConnection) {
 
-                    connectinglayout.setBackgroundColor(context.getResources().getColor(R.color.green));
-                    connectinglayout.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            connectinglayout.setVisibility(View.GONE);
-                        }
-                    },500);
+
                     Log.e("xmpp", "connected");
                     MainActivity.connection = mConnection;
                     ChatManager chatManager = ChatManager.getInstanceFor(mConnection);
