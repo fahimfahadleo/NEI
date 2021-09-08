@@ -79,7 +79,7 @@
 
 
         <TextView
-            android:id="@+id/mutenotification"
+            android:id="@+id/addfriend"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_28sdp"
             android:background="@drawable/singlelongpressitem"
@@ -88,14 +88,14 @@
             android:paddingEnd="@dimen/_8sdp"
             android:layout_marginBottom="@dimen/_6sdp"
             android:alpha="0.8"
-            android:text="Mute Notification"
+            android:text="Add Friend"
             android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="#000" />
 
 
         <TextView
-            android:id="@+id/markasunread"
+            android:id="@+id/blockfriend"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_28sdp"
             android:background="@drawable/singlelongpressitem"
@@ -103,54 +103,6 @@
             android:paddingStart="@dimen/_8sdp"
             android:alpha="0.8"
             android:paddingEnd="@dimen/_8sdp"
-            android:textStyle="bold"
-            android:layout_marginBottom="@dimen/_6sdp"
-            android:text="Mark as unread"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#000" />
-
-
-        <TextView
-            android:id="@+id/ignoremessage"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_28sdp"
-            android:background="@drawable/singlelongpressitem"
-            android:gravity="center"
-            android:paddingStart="@dimen/_8sdp"
-            android:alpha="0.8"
-            android:paddingEnd="@dimen/_8sdp"
-            android:textStyle="bold"
-            android:layout_marginBottom="@dimen/_6sdp"
-            android:text="Ignore Message"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#000" />
-
-
-        <TextView
-            android:id="@+id/seal"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_28sdp"
-            android:background="@drawable/singlelongpressitem"
-            android:gravity="center"
-            android:paddingStart="@dimen/_8sdp"
-            android:textStyle="bold"
-            android:alpha="0.8"
-            android:layout_marginBottom="@dimen/_6sdp"
-            android:paddingEnd="@dimen/_8sdp"
-            android:text="Seal"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#000" />
-
-
-        <TextView
-            android:id="@+id/block"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_28sdp"
-            android:background="@drawable/singlelongpressitem"
-            android:gravity="center"
-            android:paddingStart="@dimen/_8sdp"
-            android:paddingEnd="@dimen/_8sdp"
-            android:alpha="0.8"
             android:textStyle="bold"
             android:layout_marginBottom="@dimen/_6sdp"
             android:text="Block"
@@ -158,19 +110,6 @@
             android:textColor="#000" />
 
 
-        <TextView
-            android:id="@+id/delete"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_28sdp"
-            android:background="@drawable/singlelongpressitem"
-            android:gravity="center"
-            android:paddingStart="@dimen/_8sdp"
-            android:paddingEnd="@dimen/_8sdp"
-            android:alpha="0.8"
-            android:text="Delete"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#000" />
 
 
     </LinearLayout>

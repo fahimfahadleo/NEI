@@ -31,7 +31,6 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
     protected AlertDialog dialog;
     protected TextView accept;
     protected TextView decline;
-    protected CardView mutenotificationview, markasunreadview, ignoremessageview, sealview, blockview, deleteview;
     protected TextView mutenotification, markasunread, ignoremessage, seal, block, delete;
 
     Context context;
@@ -56,47 +55,8 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
     public void onBindViewHolder(@NotNull ListViewAdapter.ViewHolder holder, int position) {
         final JSONObject myListData = listdata.get(position);
         try {
-            if(vi == R.layout.notificationlayout){
 
-                holder.textView.setText(myListData.getString("message"));
-                switch (myListData.getString("type")){
-                    case "alert":
-                    case "expiry": {
-                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.red_500));
-                        break;
-                    } case "new_friend_request":{
-                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.green));
-                        break;
-                    } case "friend_request_accepted":{
-                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.green_500));
-                        break;
-                    }
-                    case "offers":{
-                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.background));
-                        break;
-                    } case "recharge":{
-                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.blue_grey_500));
-                        break;
-                    } case "message_recall":{
-                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.shadow));
-                        break;
-                    } case "success":{
-                        holder.cardView.setBackgroundColor(context.getResources().getColor(R.color.oceanblue));
-                        break;
-                    }
-                }
-                imageViewSetUp(myListData.getString("type"), holder.imageView);
-                holder.cardView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        try {
-                            Log.e("notification","notificationcardviewselected "+myListData.getString("message"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }else if (vi == R.layout.showsinglefriendrequest) {
+            if(vi == R.layout.showsinglefriendrequest) {
                 holder.textView.setText(myListData.getString("name") + "(" + myListData.getString("phone_no") + ")");
                 holder.cardView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -150,17 +110,12 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
                         View view1 = inflater.inflate(R.layout.friendlongpressoption, null, false);
-                        mutenotificationview = view1.findViewById(R.id.mutenotificationview);
                         mutenotification = view1.findViewById(R.id.mutenotification);
-                        markasunreadview = view1.findViewById(R.id.markasunreadview);
+
                         markasunread = view1.findViewById(R.id.markasunread);
-                        ignoremessageview = view1.findViewById(R.id.ignoremessageview);
                         ignoremessage = view1.findViewById(R.id.ignoremessage);
-                        sealview = view1.findViewById(R.id.sealview);
                         seal = view1.findViewById(R.id.seal);
-                        blockview = view1.findViewById(R.id.blockview);
                         block = view1.findViewById(R.id.block);
-                        deleteview = view1.findViewById(R.id.deleteview);
                         delete = view1.findViewById(R.id.delete);
 
                         try {
@@ -168,21 +123,14 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                             if(status.equals("8")){
                                 seal.setText("Unseal");
                                 mutenotification.setEnabled(false);
-                                mutenotificationview.setEnabled(false);
                                 markasunread.setEnabled(false);
-                                markasunreadview.setEnabled(false);
                                 ignoremessage.setEnabled(false);
-                                ignoremessageview.setEnabled(false);
                                 block.setEnabled(false);
-                                blockview.setEnabled(false);
                                 delete.setEnabled(false);
-                                deleteview.setEnabled(false);
                             }else if(status.equals("6")){
                                 ignoremessage.setText("Release");
                                 mutenotification.setEnabled(false);
-                                mutenotificationview.setEnabled(false);
                                 markasunread.setEnabled(false);
-                                markasunreadview.setEnabled(false);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

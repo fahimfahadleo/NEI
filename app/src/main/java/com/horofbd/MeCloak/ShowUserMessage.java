@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -43,6 +44,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 
+import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
@@ -56,6 +58,11 @@ import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.ChatStateListener;
 import org.jivesoftware.smackx.chatstates.ChatStateManager;
+import org.jivesoftware.smackx.httpfileupload.HttpFileUploadManager;
+import org.jivesoftware.smackx.httpfileupload.UploadProgressListener;
+import org.jivesoftware.smackx.httpfileupload.UploadService;
+import org.jivesoftware.smackx.httpfileupload.element.Slot;
+import org.jivesoftware.smackx.httpfileupload.element.Slot_V0_2;
 import org.jivesoftware.smackx.mam.MamManager;
 import org.jivesoftware.smackx.omemo.OmemoManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceipt;
@@ -77,8 +84,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -87,8 +96,18 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.horofbd.MeCloak.MainActivity.connection;
@@ -104,7 +123,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     String boundageposition;
 
     EditText typemessage;
-    ImageView send,sendimage;
+    ImageView send, sendimage;
     List<Message> messages;
     ChatManager chatManager;
     RecyclerView messagerecyclerview;
@@ -113,9 +132,9 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     DrawerLayout drawerLayout;
     ChatMessageAdapter adapter;
     EditText typepassword;
-    ImageView timer, enableboundage;
-    CardView timerview, enableboundageview, boundageview;
-    TextView boundagetext, boundagetip,passwordtip,timertip;
+    ImageView timer, enableboundage, file;
+    CardView timerview, enableboundageview, boundageview, fileview;
+    TextView boundagetext, boundagetip, passwordtip, timertip;
     DatabaseHelper helper;
     ImageView menubutton;
     static boolean isboundageitemavailable = false;
@@ -127,15 +146,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     String userphonenumber;
     boolean isDatabaseAvailable = false;
     Bundle save;
-    TextView titletext,timerside;
+    TextView titletext, timerside;
     CircleImageView profilepicture;
     ImageView showbelow;
     ScrollView belowview;
     boolean isbelowviewvisible = false;
     ImageView boundagebelow;
     CardView boundagebelowview;
-    CardView passwordview,passwordbelowview,timerbelowview,timersideview;
-    ImageView passwordbutton,passwordbelowbutton,timerbelow;
+    CardView passwordview, passwordbelowview, timerbelowview, timersideview;
+    ImageView passwordbutton, passwordbelowbutton, timerbelow;
 
 
     static native void StartActivity(Context context, String activity, String data);
@@ -153,9 +172,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static native String EncrytpAndDecrypt(String message, String type, String password);
 
     static native void saveUserData(String key, String value);
+    static native void sendFiletoUser(ServerResponse serverResponse, AbstractXMPPConnection connection,File file,int requestcode);
 
     static native String DefaultED(String message, String type);
-
+    UploadProgressListener listener;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -184,9 +204,9 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
 
                 Uri tempUri = getImageUri(getApplicationContext(), bitmap);
-                Log.e("path",getRealPathFromURI(tempUri));
+                Log.e("path", getRealPathFromURI(tempUri));
                 // CALL THIS METHOD TO GET THE ACTUAL PATH
-               File file = new File(getRealPathFromURI(tempUri));
+                File file = new File(getRealPathFromURI(tempUri));
                 //Log.e("mimetype",getMimeType(getRealPathFromURI(tempUri)));
 
                 FileInputStream importdb = new FileInputStream(getContentResolver().openFileDescriptor(imageUri, "r").getFileDescriptor());
@@ -198,17 +218,50 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 Log.e("data", Arrays.toString(b));
 
 
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else if(requestCode == 123 && resultCode == RESULT_OK){
+            try {
+                InputStream is = getContentResolver().openInputStream(data.getData());
 
 
+                try{
 
+                    Uri imageUri = data.getData();
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                    Uri tempUri = getImageUri(getApplicationContext(), bitmap);
+                    Log.e("path", getRealPathFromURI(tempUri));
+                    // CALL THIS METHOD TO GET THE ACTUAL PATH
+                    File file = new File(getRealPathFromURI(tempUri));
+                    Log.e("mimetype",getMimeType(getRealPathFromURI(tempUri)));
+                    sendFiletoUser(this,connection,file,123);
+
+                }catch (Exception e){
+                    Log.e("exception",e.getMessage());
+                }
 
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
+//            Main.this.getContentResolver().delete(data.getData(), null,
+//                    null);
         }
     }
 
+
+
+
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -223,7 +276,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
         return cursor.getString(idx);
     }
-
 
 
     @Override
@@ -244,7 +296,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         timerview = findViewById(R.id.timerview);
         enableboundage = findViewById(R.id.enableboundage);
         enableboundageview = findViewById(R.id.enableboundageview);
-       helper = new DatabaseHelper(this);
+        helper = new DatabaseHelper(this);
         menubutton = findViewById(R.id.menubutton);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
@@ -272,6 +324,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         timersideview = findViewById(R.id.tiemrview);
         passwordtip = findViewById(R.id.encryptionpasstips);
         timertip = findViewById(R.id.expirytips);
+        file = findViewById(R.id.file);
+        fileview = findViewById(R.id.fileview);
+
+
 
 
 
@@ -295,6 +351,20 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             timerstr = "0";
             boundagestr = "0";
         }
+
+        context = this;
+        titletext.setText(getIntent().getStringExtra("name"));
+
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("friend", getIntent().getStringExtra("id"));
+            ImageRequest(this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        belowview.setVisibility(View.GONE);
 
         timerbelow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -387,18 +457,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         });
 
 
-        context = this;
-        titletext.setText(getIntent().getStringExtra("name"));
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("friend", getIntent().getStringExtra("id"));
-            ImageRequest(this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        belowview.setVisibility(View.GONE);
-
         showbelow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -419,6 +477,47 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             public void onClick(View view) {
                 // takeScreenshot();
                 drawerLayout.openDrawer(GravityCompat.END);
+            }
+        });
+
+        file.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String deviceName = android.os.Build.MODEL;
+                String deviceMan = android.os.Build.MANUFACTURER;
+                Log.e("devicename", deviceName);
+                Log.e("deviceman", deviceMan);
+                Intent intent;
+                if (deviceMan.equals("Samsung")) {
+                    intent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                    intent.putExtra("CONTENT_TYPE", "*/*");
+                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+                } else {
+                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("*/*");
+                }
+                startActivityForResult(intent, 123);
+            }
+        });
+        fileview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String deviceName = android.os.Build.MODEL;
+                String deviceMan = android.os.Build.MANUFACTURER;
+                Log.e("devicename", deviceName);
+                Log.e("deviceman", deviceMan);
+                Intent intent;
+                if (deviceMan.equals("Samsung")) {
+                    intent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                    intent.putExtra("CONTENT_TYPE", "*/*");
+                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+                } else {
+                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("*/*");
+                }
+                startActivityForResult(intent, 123);
             }
         });
 
@@ -463,7 +562,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 showTimerDialog();
             }
         });
-
 
 
         try {
@@ -514,7 +612,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 setPassword();
             }
         });
-
 
 
 // ContentView is the root view of the layout of this activity/fragment
@@ -589,7 +686,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
         });
 
-        InitLinks();
+
+
+
+
 
 
         setScrollPosition();
@@ -635,27 +735,27 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     }
 
     void setScrollPosition() {
-        if (getIntent().hasExtra("recyclerview")) {
-            typemessage.setText(getIntent().getStringExtra("message"));
-            messagerecyclerview.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    messagerecyclerview.scrollToPosition(getIntent().getIntExtra("recyclerview", 0));
-                }
-            }, 10);
+        if (messagerecyclerview.getAdapter() != null && messagerecyclerview.getAdapter().getItemCount() != 0) {
+            if (getIntent().hasExtra("recyclerview")) {
+                typemessage.setText(getIntent().getStringExtra("message"));
+                messagerecyclerview.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        messagerecyclerview.scrollToPosition(getIntent().getIntExtra("recyclerview", 0));
+                    }
+                }, 10);
 
-        } else {
+            } else {
 
-            messagerecyclerview.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
-                }
-            }, 10);
+                messagerecyclerview.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                    }
+                }, 10);
 
+            }
         }
-
-
     }
 
     void InitConnection() throws Settings.SettingNotFoundException {
@@ -703,7 +803,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             };
 
 
-            Log.e("data",getIntent().getStringExtra("phone_no"));
+            Log.e("data", getIntent().getStringExtra("phone_no"));
             MessageEventManager messageEventManager = MessageEventManager.getInstanceFor(connection);
             messageEventManager.addMessageEventNotificationListener(listener);
             DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
@@ -726,9 +826,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             } catch (SmackException | XmppStringprepException | InterruptedException | XMPPException e) {
                 e.printStackTrace();
             }
-
-
-
 
 
             new Handler().post(new Runnable() {
@@ -810,7 +907,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                                                 }
 
 
-
                                             }
                                         }
                                     }
@@ -830,8 +926,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     }
 
 
-    void setUpData(){
-        Log.e("setUpData","called");
+    void setUpData() {
+        Log.e("setUpData", "called");
         messagerecyclerview.setAdapter(null);
         adapter = new ChatMessageAdapter(this, messages);
         messagerecyclerview.setAdapter(adapter);
@@ -1025,11 +1121,9 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         }
 
 
-
-
         try {
             String s = DefaultED(message.getBody(), "decode");
-            JSONObject jsonObject  = null;
+            JSONObject jsonObject = null;
 
             jsonObject = new JSONObject(s);
 
@@ -1037,16 +1131,14 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
             encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
 
-            Log.e("encodeasdlfkdsaflkdsa",encodec );
+            Log.e("encodeasdlfkdsaflkdsa", encodec);
 
-            Log.e("odvudmessage", Base64.encodeToString(encodec.getBytes(),Base64.DEFAULT));
+            Log.e("odvudmessage", Base64.encodeToString(encodec.getBytes(), Base64.DEFAULT));
 
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
 
 
         addNewMessage(message);
@@ -1079,7 +1171,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 sb.append(c);
             }
 
-           JSONObject jsonObject = new JSONObject();
+            JSONObject jsonObject = new JSONObject();
 
 
             String encodec;
@@ -1091,16 +1183,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             String userexpiry = timerstr;
 
 
-            jsonObject.put("body",encodec);
-            jsonObject.put("boundage",userboundage);
-            jsonObject.put("hash1",Functions.md5(userpassword));
-            jsonObject.put("hash2",Functions.Sha1(userpassword));
-            jsonObject.put("timestamp",getDate("0"));
-            jsonObject.put("expiry",getDate(userexpiry));
+            jsonObject.put("body", encodec);
+            jsonObject.put("boundage", userboundage);
+            jsonObject.put("hash1", Functions.md5(userpassword));
+            jsonObject.put("hash2", Functions.Sha1(userpassword));
+            jsonObject.put("timestamp", getDate("0"));
+            jsonObject.put("expiry", getDate(userexpiry));
 
 
-
-            Log.e("message",body);
+            Log.e("message", body);
 
             String finalbody = jsonObject.toString();
 
@@ -1219,71 +1310,70 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                     Message messageModel = list.get(position);
 
                     String s = DefaultED(messageModel.getBody(), "decode");
-                    JSONObject jsonObject  = new JSONObject(s);
+                    JSONObject jsonObject = new JSONObject(s);
 
 
-                String encodec;
+                    String encodec;
 
-                encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
-                    Log.e("messageinaaaaaa",encodec);
+                    encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    Log.e("messageinaaaaaa", encodec);
 
-                String timestamp = jsonObject.getString("timestamp");
-                String expirytime = jsonObject.getString("expiry");
-                String boundagetime =jsonObject.getString("boundage");
-                if (!boundagetime.equals("0")) {
-                    if (list.size() - 1 == position) {
-                        if (!boundageposition.equals("1")) {
-                            Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
-                            RestartActivity("type1");
-                        }
-                        if (!isboundageitemavailable) {
-                            RestartActivity("type0");
+                    String timestamp = jsonObject.getString("timestamp");
+                    String expirytime = jsonObject.getString("expiry");
+                    String boundagetime = jsonObject.getString("boundage");
+                    if (!boundagetime.equals("0")) {
+                        if (list.size() - 1 == position) {
+                            if (!boundageposition.equals("1")) {
+                                Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
+                                RestartActivity("type1");
+                            }
+                            if (!isboundageitemavailable) {
+                                RestartActivity("type0");
+                            }
                         }
                     }
-                }
 
 
+                    message.setText(encodec);
+                    time.setText(jsonObject.getString("timestamp"));
 
-                message.setText(encodec);
-                time.setText(jsonObject.getString("timestamp"));
-
-                if (!expirytime.equals(timestamp)) {
-                    SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
-                    try {
-                        Date expiredate = format.parse(expirytime);
-                        Date currentime = format.parse(getDate("0"));
-                        Date timestampdate = format.parse(timestamp);
+                    if (!expirytime.equals(timestamp)) {
+                        SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
+                        try {
+                            Date expiredate = format.parse(expirytime);
+                            Date currentime = format.parse(getDate("0"));
+                            Date timestampdate = format.parse(timestamp);
 
 
-                        if (currentime.compareTo(expiredate) > 0) {
-                            message.setText("Message Expired!");
-                        } else {
-                            long difference = dateDifference(timestampdate, expiredate);
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            message.setText("Message Expired!");
-                                            messagerecyclerview.postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
-                                                }
-                                            }, 10);
-                                        }
-                                    });
+                            if (currentime.compareTo(expiredate) > 0) {
+                                message.setText("Message Expired!");
+                            } else {
+                                long difference = dateDifference(timestampdate, expiredate);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                message.setText("Message Expired!");
+                                                messagerecyclerview.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                                                    }
+                                                }, 10);
+                                            }
+                                        });
 
-                                }
-                            }, difference);
+                                    }
+                                }, difference);
+                            }
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
                         }
 
-                    } catch (ParseException e) {
-                        e.printStackTrace();
                     }
-
-                }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1313,74 +1403,71 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 String mode = DefaultED(messageModel.getBody(), "deocode");
 
 
-
                 try {
                     JSONObject jsonObject = new JSONObject(mode);
 
 
-
                     String encodec;
-                encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
-                Log.e("messageoutaaaa",encodec);
-                String timestamp = jsonObject.getString("timestamp");
-                String expirytime = jsonObject.getString("expiry");
-                String boundagetime = jsonObject.getString("boundage");
-                message.setText(encodec);
-                time.setText(jsonObject.getString("timestamp"));
+                    encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    Log.e("messageoutaaaa", encodec);
+                    String timestamp = jsonObject.getString("timestamp");
+                    String expirytime = jsonObject.getString("expiry");
+                    String boundagetime = jsonObject.getString("boundage");
+                    message.setText(encodec);
+                    time.setText(jsonObject.getString("timestamp"));
 
-                if (!boundagetime.equals("0")) {
-                    if (list.size() - 1 == position) {
-                        if (!boundageposition.equals("1")) {
-                            Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
-                            RestartActivity("type1");
-                            isboundageitemavailable = true;
-                        } else {
-                            if (!isboundageitemavailable) {
-                                RestartActivity("type0");
+                    if (!boundagetime.equals("0")) {
+                        if (list.size() - 1 == position) {
+                            if (!boundageposition.equals("1")) {
+                                Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
+                                RestartActivity("type1");
+                                isboundageitemavailable = true;
+                            } else {
+                                if (!isboundageitemavailable) {
+                                    RestartActivity("type0");
+                                }
                             }
                         }
                     }
-                }
 
 
-                if (!expirytime.equals(timestamp)) {
-                    SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
-                    try {
-                        Date expiredate = format.parse(expirytime);
-                        Date currentime = format.parse(getDate("0"));
-                        Date timestampdate = format.parse(timestamp);
-                        if (currentime.compareTo(expiredate) > 0) {
-                            message.setText("Message Expired!");
-                        } else {
-                            long difference = dateDifference(timestampdate, expiredate);
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            message.setText("Message Expired!");
-                                            messagerecyclerview.postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
-                                                }
-                                            }, 10);
-                                        }
-                                    });
+                    if (!expirytime.equals(timestamp)) {
+                        SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
+                        try {
+                            Date expiredate = format.parse(expirytime);
+                            Date currentime = format.parse(getDate("0"));
+                            Date timestampdate = format.parse(timestamp);
+                            if (currentime.compareTo(expiredate) > 0) {
+                                message.setText("Message Expired!");
+                            } else {
+                                long difference = dateDifference(timestampdate, expiredate);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                message.setText("Message Expired!");
+                                                messagerecyclerview.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                                                    }
+                                                }, 10);
+                                            }
+                                        });
 
-                                }
-                            }, difference);
+                                    }
+                                }, difference);
+                            }
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
                         }
 
-                    } catch (ParseException e) {
-                        e.printStackTrace();
                     }
 
-                }
-
-            }
-                catch (JSONException e){
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }

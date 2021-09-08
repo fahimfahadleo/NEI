@@ -255,9 +255,9 @@ public class EditPageSecurityQuestionActivity extends AppCompatActivity implemen
         });
 
         if(getIntent().getStringExtra("action").equals("challenge")){
-            JSONObject jsonObject = new JSONObject();
 
-            globalRequest(this, "GET", Important.getGetchillengerpagesecurityquestions(), jsonObject, 41, this);
+
+            globalRequest(this, "GET", Important.getGetchillengerpagesecurityquestions(), new JSONObject(), 41, this);
 
 
         }else {

@@ -10,27 +10,24 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.text.Layout;
 import android.text.TextUtils;
-import android.transition.AutoTransition;
-import android.transition.TransitionManager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,14 +35,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
@@ -88,10 +83,173 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         System.loadLibrary("native-lib");
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Functions.dismissDialogue();
+
+
+    static RecyclerView notificationrecyclerview;
+    static ArrayList<JSONObject> myNotificationData;
+    static NotificationAdapter notificationAdapter;
+    static int firstvisibleitem = 1;
+    static int lastVisibleitem = 4;
+    static int notificaionpageposition;
+    static String nextnotificationpageurl = "";
+    static TextView notificationcounttext;
+
+    CircleImageView profileimage;
+    public static boolean active = false;
+    static DatabaseHelper helper;
+    ImageView options, notification;
+    boolean isopen = false;
+    static RecyclerView recyclerView;
+    public static final int PICK_IMAGE = 1;
+    String number;
+    static DrawerLayout drawerLayout;
+    TextView logout, Settings, gopremiumtext, helptext, contactustext, tnctext, policytext, aboutustext,pagelogout;
+    CardView logoutview, SettingsView, gopremiumview, helpview, contactusview, tncview, policyview, aboutusview,pagelogoutview;
+    ImageView search;
+
+    static ServerResponse serverResponse;
+    SwipeRefreshLayout swipeRefreshLayout;
+    public static AbstractXMPPConnection connection;
+    public static int notificationcount = 0;
+    public static String notificationRead = "true";
+    static TextView notificationcounter;
+    static CardView notificationcounterveiw;
+    static Context context;
+    ServerRequest serverRequest;
+    static int pageposition;
+    static String nextpageurl = "";
+    static ListviewAdapter adapter;
+
+
+
+    public static void setUpNotificationData(ArrayList<JSONObject> listdata) {
+        for (int i = 0; i < listdata.size(); i++) {
+            if (!myNotificationData.contains(listdata.get(i))) {
+                myNotificationData.add(listdata.get(i));
+            }
+        }
+
+        for (int i = 0; i < myNotificationData.size(); i++) {
+            Log.e("data1" + i, myNotificationData.get(i).toString());
+        }
+
+
+
+        ((Activity) context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                notificationAdapter = new NotificationAdapter(myNotificationData, context) {
+                    @Override
+                    protected void deletenotification(int id) {
+                        //TODO delete single notification
+                    }
+                };
+                notificationrecyclerview.setHasFixedSize(true);
+
+                notificationrecyclerview.setLayoutManager(new LinearLayoutManager(context));
+                notificationrecyclerview.setAdapter(notificationAdapter);
+                if(!nextnotificationpageurl.equals("")){
+                    notificationcounttext.setText(firstvisibleitem+" to "+lastVisibleitem+" of "+notificationAdapter.getItemCount());
+                }
+
+
+
+                notificationrecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                    }
+
+                    @Override
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+
+                        LinearLayoutManager linearLayoutManager = (LinearLayoutManager)recyclerView.getLayoutManager();
+                        firstvisibleitem = linearLayoutManager.findFirstVisibleItemPosition();
+                        lastVisibleitem = linearLayoutManager.findLastVisibleItemPosition();
+
+                        if (!recyclerView.canScrollVertically(1) && dy > 0) {
+                            if(!nextnotificationpageurl.equals("")){
+                                globalRequest(serverResponse, "GET", nextnotificationpageurl, new JSONObject(), 22, context);
+                                nextnotificationpageurl = "";
+                                notificaionpageposition = linearLayoutManager.findFirstVisibleItemPosition();
+                            }
+                        }
+
+                        notificationcounttext.setText(firstvisibleitem+" to "+lastVisibleitem+" of "+notificationAdapter.getItemCount());
+
+                    }
+                });
+
+
+
+                notificationAdapter.notifyDataSetChanged();
+                setNotificationRecyclerviewposition();
+                Functions.dismissDialogue();
+            }
+        });
+
+    }
+
+    static void setNotificationRecyclerviewposition(){
+        recyclerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                notificationrecyclerview.getLayoutManager().scrollToPosition(notificaionpageposition);
+            }
+        },50);
+    }
+
+    public static void setNextNotificationpageurl(String next){
+        nextnotificationpageurl =next;
+    }
+
+    public static void showNotification(){
+
+        AlertDialog dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View view1 = inflater.inflate(R.layout.notification_layout, null, false);
+        notificationcounttext = view1.findViewById(R.id.notificationcounter);
+        TextView deleteall = view1.findViewById(R.id.deleteall);
+        notificationrecyclerview = view1.findViewById(R.id.notificationrecyclerview);
+        globalRequest(serverResponse, "GET", Important.getGetNotification(), new JSONObject(), 22, context);
+
+
+
+
+
+        builder.setView(view1);
+        builder.setCancelable(true);
+        dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.TOP;
+        wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        window.setAttributes(wlp);
+
+        ColorDrawable back = new ColorDrawable(Color.TRANSPARENT);
+
+
+        TypedValue tv = new TypedValue();
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,context.getResources().getDisplayMetrics());
+            InsetDrawable inset = new InsetDrawable(back, 8, actionBarHeight, 8, 8);;
+            dialog.getWindow().setBackgroundDrawable(inset);
+
+        }
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //style id
+
+
+
+
+
+        dialog.show();
     }
 
     /**
@@ -115,35 +273,17 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     static native void ImageRequest(ImageResponse imageResponse, CircleImageView imageView, String requestType, String Link, JSONObject jsonObject, int requestcode);
 
 
-    CircleImageView profileimage;
-    public static boolean active = false;
-    static DatabaseHelper helper;
-    ImageView options, notification;
-    boolean isopen = false;
-    static RecyclerView recyclerView;
-    public static final int PICK_IMAGE = 1;
-    String number;
-    static DrawerLayout drawerLayout;
-    TextView logout, Settings, gopremiumtext, helptext, contactustext, tnctext, policytext, aboutustext,pagelogout;
-    CardView logoutview, SettingsView, gopremiumview, helpview, contactusview, tncview, policyview, aboutusview,pagelogoutview;
-    ImageView search;
-
-    static ServerResponse serverResponse;
-    SwipeRefreshLayout swipeRefreshLayout;
-    public static AbstractXMPPConnection connection;
-    public static int notificationcount = 0;
-    public static String notificationRead = "true";
-    static TextView notificationcounter;
-    static CardView notificationcounterveiw;
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Functions.dismissDialogue();
+    }
 
     @Override
     protected void onStart() {
         super.onStart();
         active = true;
     }
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -210,26 +350,18 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         return cursor.getString(idx);
     }
 
-    static Context context;
-    ServerRequest serverRequest;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         context = this;
         profileimage = findViewById(R.id.profile_image);
         options = findViewById(R.id.options);
         drawerLayout = findViewById(R.id.drawer);
         logout = drawerLayout.findViewById(R.id.logout);
-
         logoutview = drawerLayout.findViewById(R.id.logoutview);
         notification = findViewById(R.id.notification);
         search = findViewById(R.id.search);
-
-
         recyclerView = findViewById(R.id.recyclerview);
         SettingsView = findViewById(R.id.settingsview);
         Settings = findViewById(R.id.settings);
@@ -256,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         helper = new DatabaseHelper(this);
         new Functions(this);
         InitLinks(this);
-
+        myNotificationData = new ArrayList<>();
 
 
         Window window = getWindow();
@@ -348,7 +480,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
     }
 
-    static int pageposition;
+
     static void setRecyclerviewposition(){
         recyclerView.postDelayed(new Runnable() {
             @Override
@@ -358,7 +490,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         },50);
     }
 
-    static String nextpageurl = "";
+
     public static void setNextpageurl(String next){
         nextpageurl =next;
     }
@@ -433,13 +565,18 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 //                isopen = true;
 //            }
 //        });
-        notification.setOnClickListener(view -> StartActivity(MainActivity.this, "Notification", ""));
+        notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showNotification();
+            }
+        });
         options.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.END));
 
         profileimage.setOnClickListener(view -> StartActivity(MainActivity.this, "Profile", ""));
     }
 
-    static ListviewAdapter adapter;
+
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
@@ -554,7 +691,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
     }
 
-
     static class ListviewAdapter extends ListViewAdapter implements ImageResponse {
 
         public ListviewAdapter(ArrayList<JSONObject> listdata, Context context, int view) {
@@ -586,123 +722,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             Log.e("jsonobject", jsonObject.toString());
 
 
-            mutenotificationview.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
 
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-                    View vi = inflater.inflate(R.layout.muteexpiry, null, false);
-                    TextView mute1hr, mute24hr, mute30days, muteun;
-                    mute1hr = vi.findViewById(R.id.mutefor1text);
-                    mute24hr = vi.findViewById(R.id.mutefor24text);
-                    mute30days = vi.findViewById(R.id.mutefor30text);
-                    muteun = vi.findViewById(R.id.muteforuntext);
-                    mute1hr.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            JSONObject jsonObject1 = new JSONObject();
-                            try {
-                                jsonObject1.put("page_friend_id", jsonObject.getString("page_friend_id"));
-
-                                if (jsonObject.getString("status").equals("9")) {
-                                    jsonObject1.put("mute", "0");
-                                } else {
-                                    jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(60)));
-                                }
-
-                                globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            mutedialog.dismiss();
-                        }
-
-                    });
-
-                    mute24hr.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            JSONObject jsonObject1 = new JSONObject();
-                            try {
-                                jsonObject1.put("page_friend_id", jsonObject.getString("page_friend_id"));
-
-                                if (jsonObject.getString("status").equals("9")) {
-                                    jsonObject1.put("mute", "0");
-                                } else {
-                                    jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(24 * 60)));
-                                }
-
-                                globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            mutedialog.dismiss();
-                        }
-
-                    });
-
-                    mute30days.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            JSONObject jsonObject1 = new JSONObject();
-                            try {
-                                jsonObject1.put("page_friend_id", jsonObject.getString("page_friend_id"));
-
-                                if (jsonObject.getString("status").equals("9")) {
-                                    jsonObject1.put("mute", "0");
-                                } else {
-                                    jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(30 * 24 * 60)));
-                                }
-
-                                globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            mutedialog.dismiss();
-                        }
-
-                    });
-
-                    muteun.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            JSONObject jsonObject1 = new JSONObject();
-                            try {
-                                jsonObject1.put("page_friend_id", jsonObject.getString("page_friend_id"));
-
-                                if (jsonObject.getString("status").equals("9")) {
-                                    jsonObject1.put("mute", "0");
-                                } else {
-                                    jsonObject1.put("mute", "1");
-                                    jsonObject.put("mute_expiry", getDate(String.valueOf(60 * 60 * 60 * 60)));
-                                }
-
-                                globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            mutedialog.dismiss();
-                        }
-
-                    });
-
-
-                    builder.setView(vi);
-                    mutedialog = builder.create();
-                    mutedialog.show();
-
-
-                }
-            });
             mutenotification.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -822,9 +842,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
             });
 
-            markasunreadview.setOnClickListener(view -> {
 
-            });
 
 
             ignoremessage.setOnClickListener(view -> {
@@ -844,22 +862,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                     e.printStackTrace();
                 }
             });
-            ignoremessageview.setOnClickListener(view -> {
-                JSONObject jsonObject1 = new JSONObject();
-                try {
-                    jsonObject1.put("page_friend_id", jsonObject.getString("page_friend_id"));
 
-                    if (jsonObject.getString("status").equals("6")) {
-                        jsonObject1.put("ignore", "0");
-                    } else {
-                        jsonObject1.put("ignore", "1");
-                    }
-
-                    globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            });
             seal.setOnClickListener(view -> {
                 Dialog dialog = new Dialog(context);
                 View view1 = ((LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.requireprofilepassword, null, false);
@@ -912,56 +915,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
 
             });
-            sealview.setOnClickListener(view -> {
-                Dialog dialog = new Dialog(context);
-                View view1 = ((LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.requireprofilepassword, null, false);
-                TextView canclebutton = view1.findViewById(R.id.cancelbutton);
-                TextView sealbutton = view1.findViewById(R.id.sealbutton);
-                EditText profilepassword = view1.findViewById(R.id.password);
 
-                try {
-                    String s = jsonObject.getString("status");
-                    if (s.equals("8")) {
-                        sealbutton.setText("Unseal");
-                    } else {
-                        Log.e("false", s);
-                        sealbutton.setText("Seal");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                canclebutton.setOnClickListener(view24 -> {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
-                });
-                sealbutton.setOnClickListener(view23 -> {
-                    String userpassword = profilepassword.getText().toString();
-                    if (!TextUtils.isEmpty(userpassword)) {
-                        JSONObject jsonObject1 = new JSONObject();
-                        try {
-                            jsonObject1.put("page_friend_id", jsonObject.getString("page_friend_id"));
-                            jsonObject1.put("password_confirmation", userpassword);
-                            if (jsonObject.getString("status").equals("8")) {
-                                jsonObject1.put("unseal", "1");
-                            } else {
-                                jsonObject1.put("seal", "1");
-                            }
-
-                            globalRequest(serverResponse, "POST", Important.getIgnore_friend(), jsonObject1, 19, context);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        profilepassword.setError("Field can not be empty!");
-                        profilepassword.requestFocus();
-                    }
-                });
-
-                dialog.setContentView(view1);
-                dialog.show();
-            });
             block.setOnClickListener(view -> {
                 try {
                     blockRequest(jsonObject.getString("id"));
@@ -969,21 +923,12 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                     e.printStackTrace();
                 }
             });
-            blockview.setOnClickListener(view -> {
-                try {
-                    blockRequest(jsonObject.getString("id"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            });
+
 
             delete.setOnClickListener(view -> {
 
             });
 
-            deleteview.setOnClickListener(view -> {
-
-            });
         }
 
         @Override
@@ -1022,7 +967,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         imageView.setImageBitmap(bitmap);
     }
 
-
     private static String getDate(String expiry) {
         String ourDate;
         try {
@@ -1039,7 +983,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         }
         return ourDate;
     }
-
 
     static class ConnnectXmpp extends XmppConnection implements IncomingChatMessageListener, OutgoingChatMessageListener {
         public ConnnectXmpp(Context context, String userid, String pass) {
@@ -1175,7 +1118,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
         }
     }
-
 
     static void showSnackbar(String message) {
         ((Activity) context).runOnUiThread(new Runnable() {

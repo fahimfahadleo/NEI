@@ -253,6 +253,22 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
 //             userpass = c.getString(1);
 //
 //        }
+
+
+        code.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    Toast.makeText(getApplicationContext(), "Got the focus", Toast.LENGTH_LONG).show();
+                    if(code.getError()!=null){
+                        code.setError(null);
+                    }
+                    passunhide.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Lost the focus", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         proceedbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -261,6 +277,7 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
                 if (TextUtils.isEmpty(pass)) {
                     code.setError("Password Must Be Filled!");
                     code.requestFocus();
+                    passunhide.setVisibility(View.INVISIBLE);
                 } else {
                     JSONObject jsonObject = new JSONObject();
                     try {
@@ -324,14 +341,5 @@ public class UserVerificationActivity extends AppCompatActivity implements Serve
         this.bitmap = bitmap;
         imageView.setImageBitmap(bitmap);
     }
-
     Bitmap bitmap;
-
-
-
-
-
-
-
-
 }

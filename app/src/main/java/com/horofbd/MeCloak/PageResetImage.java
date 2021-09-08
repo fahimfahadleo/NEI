@@ -177,6 +177,10 @@ public class PageResetImage extends AppCompatActivity implements ServerResponse,
             }
             case "chellenge": {
                 actionbutton.setText("Submit");
+
+
+                //get challenge image;
+
                 break;
             }
         }

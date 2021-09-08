@@ -23,6 +23,15 @@ import android.widget.Toast;
 
 import org.apache.commons.codec.DecoderException;
 import org.jetbrains.annotations.NotNull;
+import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smackx.httpfileupload.HttpFileUploadManager;
+import org.jivesoftware.smackx.httpfileupload.element.Slot;
+import org.jivesoftware.smackx.httpfileupload.element.Slot_V0_2;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,11 +71,15 @@ import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -76,7 +89,10 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -97,6 +113,7 @@ import okhttp3.logging.LoggingEventListener;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.WIFI_SERVICE;
+import static com.horofbd.MeCloak.MainActivity.connection;
 
 public class Functions {
     static Context context;
@@ -108,6 +125,46 @@ public class Functions {
         Functions.context = context;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
+
+    }
+
+
+    public static String getTimeWithZone(String time){
+
+//        DateTimeFormatter formatter = DateTimeFormat.forPattern( "yyyy-MM-dd' 'HH:mm:ss" );
+//        DateTime dateTimeInUTC = formatter.withZoneUTC().parseDateTime( "2011-10-06 03:35:05" );
+
+
+        DateTime dateTimeInUTC = DateTime.parse(time);
+
+// Adjust for 13 hour offset from UTC/GMT.
+//        DateTimeZone offsetThirteen = DateTimeZone.forOffsetHours( 13 );
+//        DateTime thirteenDateTime = dateTimeInUTC.toDateTime( offsetThirteen );
+
+// Hard-coded offsets should be avoided. Better to use a desired time zone for handling Daylight Saving Time (DST) and other anomalies.
+// Time Zone list… http://joda-time.sourceforge.net/timezones.html
+        DateTimeZone timeZoneTongatapu = DateTimeZone.forID(TimeZone.getDefault().getID());
+        DateTime tongatapuDateTime = dateTimeInUTC.toDateTime( timeZoneTongatapu );
+
+
+//        DateTimeFormatter formatter = DateTimeFormat.forPattern( "yyyy-MM-dd' 'HH:mm:ss" );
+//
+//        DateTime datetimeinlocal = formatter.parseDateTime(tongatapuDateTime.toLocalTime().toString());
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+        Date d = null;
+        try {
+            d = df.parse(tongatapuDateTime.toLocalDateTime().toString());
+            return  new SimpleDateFormat("hh-mm a   dd/MM/yyyy").format(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        return tongatapuDateTime.toLocalDateTime().toString();
 
     }
 
@@ -1020,6 +1077,110 @@ public class Functions {
         sslContext.init(null, new TrustManager[]{customTm}, null);
         SSLContext.setDefault(sslContext);
         return customTm;
+    }
+
+
+
+    public static OkHttpClient getUnsafeOkHttpClient() {
+        try {
+            // Create a trust manager that does not validate certificate chains
+            final TrustManager[] trustAllCerts = new TrustManager[] {
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[]{};
+                        }
+                    }
+            };
+
+            // Install the all-trusting trust manager
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            // Create an ssl socket factory with our all-trusting manager
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+            builder.hostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+
+            OkHttpClient okHttpClient = builder.build();
+            return okHttpClient;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public static void uploadProtectedFile(ServerResponse serverResponse, AbstractXMPPConnection connection, File file, int requestcode) {
+        try {
+            HttpFileUploadManager httpFileUploadManager = HttpFileUploadManager.getInstanceFor(connection);
+            if(httpFileUploadManager.discoverUploadService()){
+                if(httpFileUploadManager.isUploadServiceDiscovered()){
+                    final Slot slot = httpFileUploadManager.requestSlot(file.getName(), file.length(), "application/octet-stream");
+
+                    OkHttpClient client = getUnsafeOkHttpClient();
+
+                    RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(MediaType.parse("application/octet-stream"), file))
+                            .build();
+
+                    Request request = new Request.Builder()
+                            .url(slot.getPutUrl())
+                            .post(requestBody)
+                            .build();
+
+                    client.newCall(request).enqueue(new Callback() {
+
+                        @Override
+                        public void onFailure(final Call call, final IOException e) {
+                            Log.e("upload","unsuccessfull");
+                            Log.e("upload",e.getMessage());
+                            try {
+                                serverResponse.onFailure(e.getMessage());
+                            } catch (JSONException jsonException) {
+                                jsonException.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onResponse(final Call call, final Response response) throws IOException {
+                            if (!response.isSuccessful()) {
+                                try {
+                                    serverResponse.onResponse(slot.getGetUrl().toString(),200,requestcode);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+
+
+                }else {
+                    Log.e("uploadservice","false");
+                }
+            }else {
+                Log.e("httpuploadservice","false");
+            }
+
+
+        } catch (Exception ex) {
+            Log.e("exception",ex.getMessage());
+        }
+
     }
 
 

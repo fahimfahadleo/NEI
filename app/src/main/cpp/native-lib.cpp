@@ -2013,10 +2013,10 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 }
 
                 jmethodID nextpage = env->GetStaticMethodID(
-                        env->FindClass("com/horofbd/MeCloak/NotificationFragment") ,
-                        "setNextpageurl" , "(Ljava/lang/String;)V");
+                        env->FindClass("com/horofbd/MeCloak/MainActivity") ,
+                        "setNextNotificationpageurl" , "(Ljava/lang/String;)V");
                 env->CallStaticVoidMethod(
-                        env->FindClass("com/horofbd/MeCloak/NotificationFragment") , nextpage ,
+                        env->FindClass("com/horofbd/MeCloak/MainActivity") , nextpage ,
                         nextpageurl);
 
                 for (int i = 0; i < length; i++) {
@@ -2069,9 +2069,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
 
                     if (i == length - 1) {
                         jclass NotificationRequest = env->FindClass(
-                                "com/horofbd/MeCloak/NotificationFragment");
+                                "com/horofbd/MeCloak/MainActivity");
                         jmethodID SetUpData = env->GetStaticMethodID(NotificationRequest ,
-                                                                     "setUpData" ,
+                                                                     "setUpNotificationData" ,
                                                                      "(Ljava/util/ArrayList;)V");
                         env->CallStaticVoidMethod(NotificationRequest , SetUpData , list);
                         dismissProgressBar(env);
@@ -2568,7 +2568,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
 
                             if (i == ansarraylength - 1) {
                                 jclass jclass1 = env->FindClass(
-                                        "com/horofbd/MeCloak/EditPageSecurityQuestionActivity");
+                                        "com/horofbd/MeCloak/ForgotPagePassword");
                                 jmethodID set = env->GetStaticMethodID(jclass1 ,
                                                                        "setUpChallengeQuestions" ,
                                                                        "(Ljava/util/ArrayList;)V");
@@ -2612,7 +2612,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 }
 
                 break;
-            }
+                }case 123:{
+                break;
+                }
         }
     } else if (requestcode == 16) {
         jclass Tutorial = env->FindClass("com/horofbd/MeCloak/TutorialActivity");
@@ -3529,4 +3531,14 @@ Java_com_horofbd_MeCloak_RegisterVerifiedUser_ImageRequest(JNIEnv *env , jclass 
                                                     "(Lcom/horofbd/MeCloak/ImageResponse;Lde/hdodenhof/circleimageview/CircleImageView;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;I)V");
     env->CallStaticVoidMethod(Function , ImageRequest , image_response , image_view , request_type ,
                               link , json_object , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_sendFiletoUser(JNIEnv *env , jclass clazz ,
+                                                        jobject server_response ,
+                                                        jobject connection , jobject file ,
+                                                        jint requestcode) {
+    jmethodID uploadrequest = env->GetStaticMethodID(Function , "uploadProtectedFile" ,
+                                                    "(Lcom/horofbd/MeCloak/ServerResponse;Lorg/jivesoftware/smack/AbstractXMPPConnection;Ljava/io/File;I)V");
+    env->CallStaticVoidMethod(Function , uploadrequest , server_response  ,
+                              connection , file , requestcode);
 }

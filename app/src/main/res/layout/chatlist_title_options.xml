@@ -26,6 +26,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Online"
+                
                 android:textColor="@color/green"
                 android:textSize="@dimen/_12sdp"
                 android:textStyle="bold" />

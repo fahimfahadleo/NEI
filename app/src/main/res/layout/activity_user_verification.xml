@@ -125,6 +125,7 @@
                     android:gravity="start|center"
                     android:inputType="textPassword"
                     android:paddingStart="16dp"
+                    android:text="12"
                     android:paddingTop="8dp"
                     android:hint="Password"
                     android:paddingEnd="16dp"
