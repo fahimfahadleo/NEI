@@ -2612,8 +2612,6 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 }
 
                 break;
-                }case 123:{
-                break;
                 }
         }
     } else if (requestcode == 16) {
@@ -2627,6 +2625,8 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
         env->CallStaticVoidMethod(Function , writeToFile , response , context ,
                                   env->NewStringUTF("private.key"));
         dismissProgressBar(env);
+    } else if(requestcode == 123){
+        printlogcat(env,"uploadedimage",jstring2string(env,response));
     }
 
 }

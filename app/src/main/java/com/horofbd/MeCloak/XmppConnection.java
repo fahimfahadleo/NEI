@@ -78,7 +78,7 @@ public abstract class XmppConnection{
                         .setPort(Integer.parseInt(Important.getXmppPort()))
                         .setUsernameAndPassword(strings[0], strings[1])
                         .setSecurityMode(ConnectionConfiguration.SecurityMode.required)
-                        .setResource(Important.getXmppResource())
+                        .setResource("MeCloak-"+Functions.md5(strings[0]))
                         .setCustomX509TrustManager(Functions.getTrustFactory(context))
                         .setSendPresence(true)
                         .setCompressionEnabled(false);

@@ -2,6 +2,7 @@ package com.horofbd.MeCloak;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
@@ -18,6 +20,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -38,6 +41,8 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -48,7 +53,11 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -82,6 +91,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Handler;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -90,6 +100,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -1124,24 +1135,40 @@ public class Functions {
     }
 
 
+    public String getMimeType(Uri uri) {
+        String mimeType = null;
+        if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
+            ContentResolver cr = context.getContentResolver();
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
+    }
+
     public static void uploadProtectedFile(ServerResponse serverResponse, AbstractXMPPConnection connection, File file, int requestcode) {
         try {
             HttpFileUploadManager httpFileUploadManager = HttpFileUploadManager.getInstanceFor(connection);
             if(httpFileUploadManager.discoverUploadService()){
                 if(httpFileUploadManager.isUploadServiceDiscovered()){
-                    final Slot slot = httpFileUploadManager.requestSlot(file.getName(), file.length(), "application/octet-stream");
+
+                    RequestBody requestBody = RequestBody.create(file,MediaType.parse(FileUtils.getMimeType(file)));
+                    Log.e("mimetype",FileUtils.getMimeType(file));
+
+                    final Slot slot = httpFileUploadManager.requestSlot(file.getName(), requestBody.contentLength(), FileUtils.getMimeType(file));
 
                     OkHttpClient client = getUnsafeOkHttpClient();
 
-                    RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                            .addFormDataPart("file", file.getName(),
-                                    RequestBody.create(MediaType.parse("application/octet-stream"), file))
-                            .build();
-
                     Request request = new Request.Builder()
                             .url(slot.getPutUrl())
-                            .post(requestBody)
+                            .put(requestBody)
                             .build();
+
+                    Log.e("uploadurl",slot.getPutUrl().toString());
+                    Log.e("downloadurl",slot.getGetUrl().toString());
 
                     client.newCall(request).enqueue(new Callback() {
 
@@ -1160,6 +1187,7 @@ public class Functions {
                         public void onResponse(final Call call, final Response response) throws IOException {
                             if (!response.isSuccessful()) {
                                 try {
+                                    Log.e("response",response.body().string());
                                     serverResponse.onResponse(slot.getGetUrl().toString(),200,requestcode);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -1178,10 +1206,138 @@ public class Functions {
 
 
         } catch (Exception ex) {
-            Log.e("exception",ex.getMessage());
+            Log.e("exceptionasdf",ex.toString());
         }
 
     }
+
+
+
+    public static boolean upload_image5(String urls,File file){
+
+
+        HttpURLConnection connection = null;
+        DataOutputStream outputStream = null;
+        DataInputStream inputStream = null;
+        String myfilename = file.getName();
+        String urlServer = urls;
+        String lineEnd = "\r\n";
+        String twoHyphens = "--";
+        String boundary =  "*****";
+        boolean erg = false;
+        int bytesRead, bytesAvailable, bufferSize;
+        byte[] buffer;
+        int maxBufferSize = 1*1024*1024;
+        String LastError = "";
+
+        try
+        {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            Log.e("true1","true");
+            URL url = new URL(urlServer);
+            connection = (HttpsURLConnection) url.openConnection();
+            Log.e("true2","true");
+            // Allow Inputs & Outputs
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setUseCaches(false);
+
+            // Enable POST method
+            connection.setRequestMethod("PUT");
+
+            connection.setRequestProperty("Connection", "Keep-Alive");
+            connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+//            connection.addRequestProperty("Authorization","Basic [YOUR MD5 LOGIN VALUE]");
+
+            outputStream = new DataOutputStream( connection.getOutputStream() );
+            Log.e("true4","true");
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            Log.e("true4","true");
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"DestFileName\"");
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(myfilename);
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"Target\"" );
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes("DOC");
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"filename\"");
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(myfilename);
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"File\"; filename=\"" + myfilename + "\"");
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes("Content-Type: application/*");
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(lineEnd);
+            //hier File schreiben
+            bytesAvailable = fileInputStream.available();
+            bufferSize = Math.min(bytesAvailable, maxBufferSize);
+            buffer = new byte[bufferSize];
+            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+            while (bytesRead > 0)
+            {
+                outputStream.write(buffer, 0, bufferSize);
+                bytesAvailable = fileInputStream.available();
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+            }
+
+            outputStream.writeBytes(lineEnd);
+            outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+
+            fileInputStream.close();
+
+
+            try {
+                inputStream = new DataInputStream(connection.getInputStream());
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = inputStream.readLine()) != null) {
+                    response.append(line).append('\n');
+                }
+               LastError =response.toString();
+                Log.e("error",LastError);
+                erg = true;
+            } catch (IOException e) {
+                LastError = e.getMessage();
+                Log.e("error2",LastError);
+                erg = false;
+            } finally {
+                if (inputStream != null){
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            outputStream.flush();
+            outputStream.close();
+        }
+       catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return erg;
+    }
+
+
 
 
 }

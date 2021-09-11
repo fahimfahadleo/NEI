@@ -22,5 +22,7 @@
     <string name="terms_conditions"><u>Terms &amp; Conditions</u></string>
     <string name="privacy_policy"><u>Privacy Policy</u></string>
     <string name="copyright">Copyright © 2021, Horof tech, Bangladesh, All rights reserved</string>
+    <string name="home">MeCloak</string>
+    <string name="sd_card">Sd Card</string>
 
 </resources>

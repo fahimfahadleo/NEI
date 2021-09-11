@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.media.Image;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -46,6 +47,7 @@ import com.google.gson.Gson;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
@@ -58,11 +60,20 @@ import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.ChatStateListener;
 import org.jivesoftware.smackx.chatstates.ChatStateManager;
+import org.jivesoftware.smackx.filetransfer.FileTransfer;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
+import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.httpfileupload.HttpFileUploadManager;
 import org.jivesoftware.smackx.httpfileupload.UploadProgressListener;
 import org.jivesoftware.smackx.httpfileupload.UploadService;
 import org.jivesoftware.smackx.httpfileupload.element.Slot;
 import org.jivesoftware.smackx.httpfileupload.element.Slot_V0_2;
+import org.jivesoftware.smackx.jingle.JingleManager;
+import org.jivesoftware.smackx.jingle.JingleSession;
+import org.jivesoftware.smackx.jingle.element.Jingle;
 import org.jivesoftware.smackx.mam.MamManager;
 import org.jivesoftware.smackx.omemo.OmemoManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceipt;
@@ -78,8 +89,10 @@ import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+import org.jxmpp.util.XmppStringUtils;
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -87,6 +100,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -111,6 +125,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.horofbd.MeCloak.MainActivity.connection;
+import static java.lang.Thread.sleep;
 
 public class ShowUserMessage extends AppCompatActivity implements ServerResponse, IncomingChatMessageListener, OutgoingChatMessageListener, ImageResponse {
 
@@ -222,37 +237,29 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 e.printStackTrace();
             }
         }else if(requestCode == 123 && resultCode == RESULT_OK){
-            try {
-                InputStream is = getContentResolver().openInputStream(data.getData());
 
 
-                try{
-
-                    Uri imageUri = data.getData();
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-
-                    Uri tempUri = getImageUri(getApplicationContext(), bitmap);
-                    Log.e("path", getRealPathFromURI(tempUri));
-                    // CALL THIS METHOD TO GET THE ACTUAL PATH
-                    File file = new File(getRealPathFromURI(tempUri));
-                    Log.e("mimetype",getMimeType(getRealPathFromURI(tempUri)));
-                    sendFiletoUser(this,connection,file,123);
-
-                }catch (Exception e){
-                    Log.e("exception",e.getMessage());
-                }
+            Log.e("data",data.toString());
 
 
-            } catch (IOException e) {
-                e.printStackTrace();
+            final Uri uri = data.getData();
+
+            // Get the File path from the Uri
+            String path = FileUtils.getPath(this, uri);
+            Log.e("path",path);
+
+            // Alternatively, use FileUtils.getFile(Context, Uri)
+            if (path != null && FileUtils.isLocal(path)) {
+                File file = new File(path);
+
+                sendFiletoUser(this,connection,file,123);
             }
-//            Main.this.getContentResolver().delete(data.getData(), null,
-//                    null);
+
         }
     }
 
 
-
+byte[] dataToSend,dataReceived;
 
     public static String getMimeType(String url) {
         String type = null;
@@ -326,9 +333,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         timertip = findViewById(R.id.expirytips);
         file = findViewById(R.id.file);
         fileview = findViewById(R.id.fileview);
-
-
-
 
 
 

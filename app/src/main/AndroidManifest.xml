@@ -100,6 +100,20 @@
             </intent-filter>
         </receiver>
 
+
+
+        <provider
+            android:name=".LocalStorageProvider"
+            android:authorities="com.horofbd.MeCloak.documents"
+            android:enabled="true"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS" >
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+
     </application>
 
 

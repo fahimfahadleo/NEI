@@ -1146,6 +1146,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             @Override
             public void run() {
                 connection.disconnect();
+                
             }
         });
     }
