@@ -75,24 +75,22 @@ public abstract class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapt
                         @Override
                         public void onClick(View view) {
 
-                            Intent i = new Intent(context, ShowUserMessage.class);
 
-                            try {
-                                i.putExtra("id",myListData.getString("id"));
-                                i.putExtra("name",myListData.getString("name"));
-                                i.putExtra("phone_no",myListData.getString("phone_no"));
-                                i.putExtra("table_id",myListData.getString("table_id"));
-                                i.putExtra("page_friend_id",myListData.getString("page_friend_id"));
-                                i.putExtra("status",myListData.getString("status"));
-                                i.putExtra("boundage", "0");
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            if(MainActivity.connection!= null && MainActivity.connection.isConnected() && MainActivity.connection.isAuthenticated()){
+                                Intent i = new Intent(context, ShowUserMessage.class);
+                                try {
+                                    i.putExtra("id",myListData.getString("id"));
+                                    i.putExtra("name",myListData.getString("name"));
+                                    i.putExtra("phone_no",myListData.getString("phone_no"));
+                                    i.putExtra("table_id",myListData.getString("table_id"));
+                                    i.putExtra("page_friend_id",myListData.getString("page_friend_id"));
+                                    i.putExtra("status",myListData.getString("status"));
+                                    i.putExtra("boundage", "0");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                ((Activity) context).startActivity(i);
                             }
-
-                            ((Activity) context).startActivity(i);
-
-
                         }
                     });
                     imageViewSetUp(myListData.getString("id"), holder.imageView);

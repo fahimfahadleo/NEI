@@ -24,6 +24,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true">
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
         <activity android:name=".OfflineChatList"></activity>
         <activity android:name=".OfflineActivity" />
         <activity android:name=".Report" />
@@ -34,6 +39,9 @@
         <activity android:name=".WalletActivity" />
         <activity android:name=".Referral" />
         <activity android:name=".PageResetImage" />
+
+
+
         <activity
             android:name=".TutorialActivity"
             android:configChanges="orientation" />
@@ -78,7 +86,8 @@
         <activity android:name=".PhoneNumberVerificationActivity" />
         <activity
             android:name=".ShowUserMessage"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation"/>
         <activity android:name=".RegisterVerifiedUser" />
         <activity android:name=".UserVerificationActivity" />
         <activity

@@ -5,13 +5,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import android.media.Image;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -22,32 +23,67 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
+import android.webkit.URLUtil;
+import android.webkit.WebSettings;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.OkHttp3Downloader;
+import com.squareup.picasso.Picasso;
+
+import org.jetbrains.annotations.NotNull;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
@@ -60,22 +96,8 @@ import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.chatstates.ChatState;
 import org.jivesoftware.smackx.chatstates.ChatStateListener;
 import org.jivesoftware.smackx.chatstates.ChatStateManager;
-import org.jivesoftware.smackx.filetransfer.FileTransfer;
-import org.jivesoftware.smackx.filetransfer.FileTransferListener;
-import org.jivesoftware.smackx.filetransfer.FileTransferManager;
-import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-import org.jivesoftware.smackx.httpfileupload.HttpFileUploadManager;
 import org.jivesoftware.smackx.httpfileupload.UploadProgressListener;
-import org.jivesoftware.smackx.httpfileupload.UploadService;
-import org.jivesoftware.smackx.httpfileupload.element.Slot;
-import org.jivesoftware.smackx.httpfileupload.element.Slot_V0_2;
-import org.jivesoftware.smackx.jingle.JingleManager;
-import org.jivesoftware.smackx.jingle.JingleSession;
-import org.jivesoftware.smackx.jingle.element.Jingle;
 import org.jivesoftware.smackx.mam.MamManager;
-import org.jivesoftware.smackx.omemo.OmemoManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceipt;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
@@ -89,21 +111,17 @@ import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
-import org.jxmpp.util.XmppStringUtils;
-import org.w3c.dom.Text;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
+import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -113,19 +131,21 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
-import okhttp3.Callback;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
+import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.horofbd.MeCloak.MainActivity.connection;
-import static java.lang.Thread.sleep;
 
 public class ShowUserMessage extends AppCompatActivity implements ServerResponse, IncomingChatMessageListener, OutgoingChatMessageListener, ImageResponse {
 
@@ -133,19 +153,23 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         System.loadLibrary("native-lib");
     }
 
+    static ServerResponse serverResponse;
+    static IncomingChatMessageListener incomingChatMessageListener;
+    static OutgoingChatMessageListener outgoingChatMessageListener;
+
     CardView setpasswordview;
     TextView setPassword;
-    String boundageposition;
+    static String boundageposition;
 
-    EditText typemessage;
+    static EditText typemessage;
     ImageView send, sendimage;
-    List<Message> messages;
-    ChatManager chatManager;
-    RecyclerView messagerecyclerview;
-    int me = 0;
-    int him = 0;
+    static List<Message> messages;
+    static ChatManager chatManager;
+    static RecyclerView messagerecyclerview;
+    static int me = 0;
+    static int him = 0;
     DrawerLayout drawerLayout;
-    ChatMessageAdapter adapter;
+    static ChatMessageAdapter adapter;
     EditText typepassword;
     ImageView timer, enableboundage, file;
     CardView timerview, enableboundageview, boundageview, fileview;
@@ -155,10 +179,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static boolean isboundageitemavailable = false;
     static Context context;
     AlertDialog dialog;
-    String passstr = "";
-    String timerstr = "";
-    String boundagestr = "";
-    String userphonenumber;
+    static String passstr = "";
+    static String timerstr = "";
+    static String boundagestr = "";
+    static String userphonenumber;
     boolean isDatabaseAvailable = false;
     Bundle save;
     TextView titletext, timerside;
@@ -187,9 +211,13 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static native String EncrytpAndDecrypt(String message, String type, String password);
 
     static native void saveUserData(String key, String value);
-    static native void sendFiletoUser(ServerResponse serverResponse, AbstractXMPPConnection connection,File file,int requestcode);
+
+    static native void sendFiletoUser(ServerResponse serverResponse, AbstractXMPPConnection connection, File file, int requestcode);
 
     static native String DefaultED(String message, String type);
+
+    static native void ImageViewImageRequest(ImageResponseImageView imageResponse, ImageView imageView, String Link, int requestcode);
+
     UploadProgressListener listener;
 
     @Override
@@ -200,89 +228,39 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 return;
             }
 
-            Uri imageUri = data.getData();
+            Uri uri = data.getData();
 
-            try {
-//               Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-//                uploadedImage.setImageBitmap(bitmap);
-//                uploadimage.setVisibility(View.GONE);
-//                uploadedImage.buildDrawingCache();
-//                Bitmap temp = Bitmap.createBitmap(uploadedImage.getDrawingCache(), 0, 0, uploadedImage.getWidth(), uploadedImage.getHeight());
-//                mutableBitmap = temp.copy(Bitmap.Config.ARGB_8888, true);
-//                Uri tempUri = getImageUri(getApplicationContext(), mutableBitmap);
-//                Log.e("path",getRealPathFromURI(tempUri));
-//                // CALL THIS METHOD TO GET THE ACTUAL PATH
-//                file = new File(getRealPathFromURI(tempUri));
-//                Log.e("mimetype",getMimeType(getRealPathFromURI(tempUri)));
-
-
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-
-                Uri tempUri = getImageUri(getApplicationContext(), bitmap);
-                Log.e("path", getRealPathFromURI(tempUri));
-                // CALL THIS METHOD TO GET THE ACTUAL PATH
-                File file = new File(getRealPathFromURI(tempUri));
-                //Log.e("mimetype",getMimeType(getRealPathFromURI(tempUri)));
-
-                FileInputStream importdb = new FileInputStream(getContentResolver().openFileDescriptor(imageUri, "r").getFileDescriptor());
-                DataInputStream di = new DataInputStream(importdb);
-
-                byte[] b = new byte[10];
-                new DataInputStream(new FileInputStream(di.readUTF())).readFully(b);
-
-                Log.e("data", Arrays.toString(b));
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
+            String path = FileUtils.getPath(this, uri);
+            Log.e("path", path);
+            // Alternatively, use FileUtils.getFile(Context, Uri)
+            if (FileUtils.isLocal(path)) {
+                File file = new File(path);
+                sendFiletoUser(this, connection, file, 123);
             }
-        }else if(requestCode == 123 && resultCode == RESULT_OK){
 
 
-            Log.e("data",data.toString());
-
-
+        } else if (requestCode == 123 && resultCode == RESULT_OK) {
             final Uri uri = data.getData();
 
             // Get the File path from the Uri
             String path = FileUtils.getPath(this, uri);
-            Log.e("path",path);
-
+            Log.e("path", path);
             // Alternatively, use FileUtils.getFile(Context, Uri)
-            if (path != null && FileUtils.isLocal(path)) {
+            if (FileUtils.isLocal(path)) {
                 File file = new File(path);
-
-                sendFiletoUser(this,connection,file,123);
+                sendFiletoUser(this, connection, file, 123);
             }
 
         }
     }
 
 
-byte[] dataToSend,dataReceived;
-
-    public static String getMimeType(String url) {
-        String type = null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
-        if (extension != null) {
-            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        }
-        return type;
-    }
-
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, String.valueOf(System.currentTimeMillis()), null);
-        return Uri.parse(path);
-    }
-
-    public String getRealPathFromURI(Uri uri) {
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
-        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-        return cursor.getString(idx);
-    }
+    static PlayerView playerView;
+    static String userboundage, usertimer, friendid;
+    private final String STATE_RESUME_WINDOW = "resumeWindow";
+    private final String STATE_RESUME_POSITION = "resumePosition";
+    private final String STATE_PLAYER_FULLSCREEN = "playerFullscreen";
+    private final String STATE_CHECKSUM = "CHECKSUM";
 
 
     @Override
@@ -333,11 +311,19 @@ byte[] dataToSend,dataReceived;
         timertip = findViewById(R.id.expirytips);
         file = findViewById(R.id.file);
         fileview = findViewById(R.id.fileview);
+        serverResponse = this;
+        incomingChatMessageListener = this;
+        outgoingChatMessageListener = this;
 
+
+        // Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(profilepicture);
 
 
         String premiumstatus = getLoginInfo("premium");
         userphonenumber = getIntent().getStringExtra("phone_no");
+        userboundage = getIntent().getStringExtra("boundage");
+        usertimer = getIntent().getStringExtra("");
+        friendid = getIntent().getStringExtra("id");
 
         Cursor c = helper.getData(userphonenumber, getLoginInfo("page_no"));
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
@@ -364,11 +350,23 @@ byte[] dataToSend,dataReceived;
         try {
             jsonObject.put("friend", getIntent().getStringExtra("id"));
             ImageRequest(this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
+
+
+            //loadImage(profilepicture,"https://192.168.152.9:5443/upload/279cb5520ea1288b318e1bbd7c8e566337e4f7f1/dwkn1QA01sIMdRZ6XPWHNKV49dcTjGtjyVH2xQ5w/IMG_20210905_195838.jpg");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         belowview.setVisibility(View.GONE);
+
+        mFullScreenDialog = new Dialog(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            public void onBackPressed() {
+                if (isFullscreene)
+                    closeFullscreenDialog(playerView);
+                super.onBackPressed();
+            }
+        };
+
 
         timerbelow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -568,10 +566,19 @@ byte[] dataToSend,dataReceived;
         });
 
 
+        if (savedInstanceState != null && savedInstanceState.containsKey("STATE_CHECKSUM")) {
+            Log.e("state", "available");
+            mResumeWindow = savedInstanceState.getInt(STATE_RESUME_WINDOW);
+            mResumePosition = savedInstanceState.getLong(STATE_RESUME_POSITION);
+            isFullscreene = savedInstanceState.getBoolean(STATE_PLAYER_FULLSCREEN);
+            tempchecksum = savedInstanceState.getString(STATE_CHECKSUM);
+        }
+
+
         try {
             InitConnection();
         } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
+            Log.e("error1", e.toString());
         }
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setStackFromEnd(true);
@@ -684,16 +691,11 @@ byte[] dataToSend,dataReceived;
                 String message = typemessage.getText().toString();
                 if (!TextUtils.isEmpty(message)) {
                     typemessage.setText(null);
-                    sendMessage(message, userphonenumber);
+                    sendMessage(message, userphonenumber, "txt");
                 }
 
             }
         });
-
-
-
-
-
 
 
         setScrollPosition();
@@ -732,7 +734,7 @@ byte[] dataToSend,dataReceived;
         tipdialog.show();
     }
 
-    private Date yesterday() {
+    private static Date yesterday() {
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         return cal.getTime();
@@ -745,7 +747,7 @@ byte[] dataToSend,dataReceived;
                 messagerecyclerview.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        messagerecyclerview.scrollToPosition(getIntent().getIntExtra("recyclerview", 0));
+                        messagerecyclerview.smoothScrollToPosition(getIntent().getIntExtra("recyclerview", 0));
                     }
                 }, 10);
 
@@ -762,12 +764,32 @@ byte[] dataToSend,dataReceived;
         }
     }
 
-    void InitConnection() throws Settings.SettingNotFoundException {
+
+    public static void sendMediaTypeData(String string) {
+
+
+        try {
+            JSONObject jsonObject = new JSONObject(string);
+            Log.e("type", jsonObject.toString());
+            String body = jsonObject.getString("body");
+            String type = jsonObject.getString("type");
+
+            Log.e("body", body);
+            Log.e("type", type);
+
+            sendMessage(jsonObject.getString("body"), userphonenumber, jsonObject.getString("type"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    static void InitConnection() throws Settings.SettingNotFoundException {
         if (connection != null) {
             Log.e("connection", "notnull");
             chatManager = ChatManager.getInstanceFor(connection);
-            chatManager.addIncomingListener(this);
-            chatManager.addOutgoingListener(this);
+            chatManager.addIncomingListener(incomingChatMessageListener);
+            chatManager.addOutgoingListener(outgoingChatMessageListener);
 
 
             ChatStateManager chatmanager = ChatStateManager.getInstance(connection);
@@ -807,14 +829,13 @@ byte[] dataToSend,dataReceived;
             };
 
 
-            Log.e("data", getIntent().getStringExtra("phone_no"));
             MessageEventManager messageEventManager = MessageEventManager.getInstanceFor(connection);
             messageEventManager.addMessageEventNotificationListener(listener);
             DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
             dm.setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
             dm.autoAddDeliveryReceiptRequests();
             try {
-                if (dm.isSupported(JidCreate.bareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost()))) {
+                if (dm.isSupported(JidCreate.bareFrom(userphonenumber + "@" + Important.getXmppHost()))) {
                     Log.e("Deliveryreceipt", "supported");
                 } else {
                     Log.e("Deliveryreceipt", "notsupported");
@@ -835,13 +856,13 @@ byte[] dataToSend,dataReceived;
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {
-                    runOnUiThread(new Runnable() {
+                    ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
 
                             FormField formField = null;
                             try {
-                                formField = FormField.builder("with").setValue(JidCreate.bareFrom(getIntent().getStringExtra("phone_no") + "@" + Important.getXmppHost())).build();
+                                formField = FormField.builder("with").setValue(JidCreate.bareFrom(userphonenumber + "@" + Important.getXmppHost())).build();
                             } catch (XmppStringprepException e) {
                                 e.printStackTrace();
                             }
@@ -854,9 +875,8 @@ byte[] dataToSend,dataReceived;
                             try {
                                 MamManager.MamQuery mamQuery = manager.queryArchive(mamQueryArgs);
                                 messages = new LinkedList<Message>(mamQuery.getMessages());
-                                // Log.e("list", messages.toString());
 
-                                adapter = new ChatMessageAdapter(ShowUserMessage.this, messages);
+                                adapter = new ChatMessageAdapter(context, messages);
                                 messagerecyclerview.setAdapter(adapter);
                                 Log.e("message size", String.valueOf(messages.size()));
 
@@ -882,7 +902,7 @@ byte[] dataToSend,dataReceived;
                                             Log.e("first", String.valueOf(firstVisiblePosition));
                                             Log.e("last", String.valueOf(lastvisiblePosition));
 
-                                            boundageposition = getIntent().getStringExtra("boundage");
+                                            boundageposition = userboundage;
 
 
                                             ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
@@ -1105,6 +1125,7 @@ byte[] dataToSend,dataReceived;
 
     @Override
     public void onResponse(String response, int code, int requestcode) throws JSONException {
+        Log.e("response", response);
         CheckResponse(this, this, response, requestcode);
     }
 
@@ -1163,7 +1184,7 @@ byte[] dataToSend,dataReceived;
     }
 
 
-    public void sendMessage(String body, String toJid) {
+    public static void sendMessage(String body, String toJid, String type) {
 
         try {
             EntityBareJid jid = JidCreate.entityBareFrom(toJid + "@" + Important.getXmppHost());
@@ -1193,6 +1214,7 @@ byte[] dataToSend,dataReceived;
             jsonObject.put("hash2", Functions.Sha1(userpassword));
             jsonObject.put("timestamp", getDate("0"));
             jsonObject.put("expiry", getDate(userexpiry));
+            jsonObject.put("type", type);
 
 
             Log.e("message", body);
@@ -1237,20 +1259,29 @@ byte[] dataToSend,dataReceived;
             public void run() {
 
                 adapter.notifyDataSetChanged();
-                messagerecyclerview.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+
+                RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(context) {
+                    @Override protected int getVerticalSnapPreference() {
+                        return LinearSmoothScroller.SNAP_TO_END;
                     }
-                }, 10);
+                };
+
+                smoothScroller.setTargetPosition(messagerecyclerview.getAdapter().getItemCount());
+                messagerecyclerview.getLayoutManager().startSmoothScroll(smoothScroller);
+
+              //  messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+
+
             }
         });
 
 
     }
+    static AlertDialog messagelongclickdialog;
 
+    static Bitmap tempbitmap;
 
-    public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ImageResponse {
+    public static class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ImageResponse, ImageResponseImageView {
         Context context;
         List<Message> list;
 
@@ -1281,11 +1312,42 @@ byte[] dataToSend,dataReceived;
 
         }
 
+        @Override
+        public void onImageViewImageResponse(Response response, int code, int requestcode, ImageView imageView) throws JSONException {
+
+            //InputStream inputStream = response.body().byteStream();
+
+            Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+            if (tempbitmap == null) {
+                tempbitmap = bitmap;
+            }
+
+
+            ((Activity) context).runOnUiThread(() -> {
+                if (bitmap != null) {
+                    imageView.setImageBitmap(bitmap);
+
+                } else {
+                    Log.e("bitmap", "null");
+                }
+            });
+        }
+
+        @Override
+        public void onImageViewImageFailure(String failresponse) throws JSONException {
+
+        }
+
         private class MessageInViewHolder extends RecyclerView.ViewHolder {
 
 
             private final TextView message, time;
             private final CircleImageView profilepicture;
+            private final ImageView imageview;
+            private final PlayerView videoplayer;
+            private final RelativeLayout playerlayout;
+            private final ImageView fullscreen;
+            private final ImageView file;
 
             MessageInViewHolder(final View itemView) {
                 super(itemView);
@@ -1293,6 +1355,11 @@ byte[] dataToSend,dataReceived;
                 message = itemView.findViewById(R.id.sendertext);
                 time = itemView.findViewById(R.id.timetext);
                 profilepicture = itemView.findViewById(R.id.profile_image);
+                imageview = itemView.findViewById(R.id.senderimage);
+                videoplayer = itemView.findViewById(R.id.playerview);
+                playerlayout = itemView.findViewById(R.id.sendervideo);
+                fullscreen = itemView.findViewById(R.id.fullscreene);
+                file = itemView.findViewById(R.id.senderfile);
             }
 
             void bind(int position) {
@@ -1303,52 +1370,120 @@ byte[] dataToSend,dataReceived;
                 } else {
                     JSONObject jsonObject = new JSONObject();
                     try {
-                        jsonObject.put("friend", getIntent().getStringExtra("id"));
+                        jsonObject.put("friend", friendid);
                         ImageRequest(ChatMessageAdapter.this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-
+                Message messageModel = list.get(position);
+                String mode = DefaultED(messageModel.getBody(), "deocode");
                 try {
-                    Message messageModel = list.get(position);
+                    JSONObject jsonObject = new JSONObject(mode);
+                    String encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
 
-                    String s = DefaultED(messageModel.getBody(), "decode");
-                    JSONObject jsonObject = new JSONObject(s);
+                    Log.e("message", encodec);
+
+                    Log.e("type", jsonObject.getString("type"));
 
 
-                    String encodec;
+                    if (jsonObject.getString("type").equals("txt")) {
+                        //initialize for text message
+                        message.setVisibility(View.VISIBLE);
+                        imageview.setVisibility(View.GONE);
+                        playerlayout.setVisibility(View.GONE);
+                        fullscreen.setVisibility(View.GONE);
+                        file.setVisibility(View.GONE);
+                        message.setText(encodec);
+                    } else if (jsonObject.getString("type").equals("image")) {
+                        //initialize for imagemessage
+                        if (URLUtil.isValidUrl(encodec)) {
+                            message.setVisibility(View.GONE);
+                            imageview.setVisibility(View.VISIBLE);
+                            loadImage(imageview, encodec);
+                        } else {
+                            message.setVisibility(View.VISIBLE);
+                            message.setText(encodec);
+                        }
+                        playerlayout.setVisibility(View.GONE);
+                        fullscreen.setVisibility(View.GONE);
+                        file.setVisibility(View.GONE);
+                    } else if (jsonObject.getString("type").equals("file")) {
+                        if (URLUtil.isValidUrl(encodec)) {
+                            message.setVisibility(View.GONE);
+                            file.setVisibility(View.VISIBLE);
 
-                    encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
-                    Log.e("messageinaaaaaa", encodec);
+                            file.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    downloadFile(encodec);
+                                }
+                            });
+                        } else {
+                            message.setVisibility(View.VISIBLE);
+                            message.setText(encodec);
+                        }
+                        imageview.setVisibility(View.GONE);
+                        playerlayout.setVisibility(View.GONE);
+                        fullscreen.setVisibility(View.GONE);
+                    } else if (jsonObject.getString("type").equals("video")) {
+                        if (URLUtil.isValidUrl(encodec)) {
+                            message.setVisibility(View.GONE);
+                            playerlayout.setVisibility(View.VISIBLE);
 
+                            playerlayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    playerView = videoplayer;
+                                    initVideoPlayer(encodec);
+                                    mResumePosition = 0L;
+                                }
+                            });
+
+                            fullscreen.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (isFullscreene) {
+                                        closeFullscreenDialog(playerView);
+                                    } else {
+                                        enterfullScreene(playerView);
+                                    }
+
+                                }
+                            });
+
+                        } else {
+                            message.setVisibility(View.VISIBLE);
+                            message.setText(encodec);
+                        }
+                        imageview.setVisibility(View.GONE);
+                        file.setVisibility(View.GONE);
+                    }
+
+                    //check for boundage or expiry time
                     String timestamp = jsonObject.getString("timestamp");
                     String expirytime = jsonObject.getString("expiry");
                     String boundagetime = jsonObject.getString("boundage");
+                    time.setText(Functions.getMessageTime(jsonObject.getString("timestamp")));
                     if (!boundagetime.equals("0")) {
                         if (list.size() - 1 == position) {
                             if (!boundageposition.equals("1")) {
                                 Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
                                 RestartActivity("type1");
-                            }
-                            if (!isboundageitemavailable) {
-                                RestartActivity("type0");
+                                isboundageitemavailable = true;
+                            } else {
+                                if (!isboundageitemavailable) {
+                                    RestartActivity("type0");
+                                }
                             }
                         }
                     }
-
-
-                    message.setText(encodec);
-                    time.setText(jsonObject.getString("timestamp"));
-
                     if (!expirytime.equals(timestamp)) {
                         SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
                         try {
                             Date expiredate = format.parse(expirytime);
                             Date currentime = format.parse(getDate("0"));
                             Date timestampdate = format.parse(timestamp);
-
-
                             if (currentime.compareTo(expiredate) > 0) {
                                 message.setText("Message Expired!");
                             } else {
@@ -1356,7 +1491,7 @@ byte[] dataToSend,dataReceived;
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        runOnUiThread(new Runnable() {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
                                                 message.setText("Message Expired!");
@@ -1379,17 +1514,24 @@ byte[] dataToSend,dataReceived;
 
                     }
 
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
 
+
         private class MessageOutViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView message;
             private final TextView time;
             private final CircleImageView profilepicture;
+            private final ImageView imageview;
+            private final PlayerView videoplayer;
+            private final RelativeLayout playerlayout;
+            private final ImageView fullscreen;
+            private final ImageView file;
 
 
             MessageOutViewHolder(final View itemView) {
@@ -1397,6 +1539,11 @@ byte[] dataToSend,dataReceived;
                 message = itemView.findViewById(R.id.sendertext);
                 time = itemView.findViewById(R.id.timetext);
                 profilepicture = itemView.findViewById(R.id.profile_image);
+                imageview = itemView.findViewById(R.id.senderimage);
+                videoplayer = itemView.findViewById(R.id.playerview);
+                playerlayout = itemView.findViewById(R.id.sendervideo);
+                fullscreen = itemView.findViewById(R.id.fullscreene);
+                file = itemView.findViewById(R.id.senderfile);
             }
 
             void bind(int position) {
@@ -1405,20 +1552,139 @@ byte[] dataToSend,dataReceived;
                 Message messageModel = list.get(position);
 
                 String mode = DefaultED(messageModel.getBody(), "deocode");
+                message.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View view1 = inflater.inflate(R.layout.messagelongclickoptions, null, false);
+                        TextView replay = view1.findViewById(R.id.replay);
+                        TextView forword = view1.findViewById(R.id.forword);
+                        replay.setEnabled(false);
+
+                        forword.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                View forwordview = inflater.inflate(R.layout.messageforword,null,false);
+                                RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
+                                simpleAdapter adapter = new simpleAdapter(MainActivity.data,context,mode);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                                recyclerView.setAdapter(adapter);
+                                builder.setView(forwordview);
+                                builder.setCancelable(true);
+                                messagelongclickdialog = builder.create();
+                                messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                                messagelongclickdialog.show();
+
+                            }
+                        });
+
+
+
+
+
+                        builder.setView(view1);
+                        builder.setCancelable(true);
+                        messagelongclickdialog = builder.create();
+                        messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                        messagelongclickdialog.show();
+
+                        return true;
+                    }
+                });
 
 
                 try {
                     JSONObject jsonObject = new JSONObject(mode);
 
+                    String encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    Log.e("message", encodec);
 
-                    String encodec;
-                    encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
-                    Log.e("messageoutaaaa", encodec);
+
+                    Log.e("type", jsonObject.getString("type"));
+
+                    if (jsonObject.getString("type").equals("txt")) {
+                        //initialize for text message
+                        message.setVisibility(View.VISIBLE);
+                        imageview.setVisibility(View.GONE);
+                        playerlayout.setVisibility(View.GONE);
+                        fullscreen.setVisibility(View.GONE);
+                        file.setVisibility(View.GONE);
+                        message.setText(encodec);
+                    } else if (jsonObject.getString("type").equals("image")) {
+                        //initialize for imagemessage
+                        if (URLUtil.isValidUrl(encodec)) {
+                            message.setVisibility(View.GONE);
+                            imageview.setVisibility(View.VISIBLE);
+                            loadImage(imageview, encodec);
+                        } else {
+                            message.setVisibility(View.VISIBLE);
+                            message.setText(encodec);
+                        }
+                        playerlayout.setVisibility(View.GONE);
+                        fullscreen.setVisibility(View.GONE);
+                        file.setVisibility(View.GONE);
+                    } else if (jsonObject.getString("type").equals("file")) {
+                        if (URLUtil.isValidUrl(encodec)) {
+                            message.setVisibility(View.GONE);
+                            file.setVisibility(View.VISIBLE);
+
+                            file.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    downloadFile(encodec);
+                                }
+                            });
+                        } else {
+                            message.setVisibility(View.VISIBLE);
+                            message.setText(encodec);
+                        }
+                        imageview.setVisibility(View.GONE);
+                        playerlayout.setVisibility(View.GONE);
+                        fullscreen.setVisibility(View.GONE);
+                    } else if (jsonObject.getString("type").equals("video")) {
+                        if (URLUtil.isValidUrl(encodec)) {
+                            message.setVisibility(View.GONE);
+                            playerlayout.setVisibility(View.VISIBLE);
+
+
+                            playerlayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    playerView = videoplayer;
+                                    initVideoPlayer(encodec);
+                                    mResumePosition = 0L;
+                                }
+                            });
+
+                            fullscreen.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (isFullscreene) {
+                                        closeFullscreenDialog(playerView);
+                                    } else {
+                                        enterfullScreene(playerView);
+                                    }
+
+                                }
+                            });
+
+
+                        } else {
+                            message.setVisibility(View.VISIBLE);
+                            message.setText(encodec);
+                        }
+                        imageview.setVisibility(View.GONE);
+                        file.setVisibility(View.GONE);
+                    }
+                    time.setText(Functions.getMessageTime(jsonObject.getString("timestamp")));
+
+                    //check for boundage or expiry time
                     String timestamp = jsonObject.getString("timestamp");
                     String expirytime = jsonObject.getString("expiry");
                     String boundagetime = jsonObject.getString("boundage");
-                    message.setText(encodec);
-                    time.setText(jsonObject.getString("timestamp"));
 
                     if (!boundagetime.equals("0")) {
                         if (list.size() - 1 == position) {
@@ -1433,8 +1699,6 @@ byte[] dataToSend,dataReceived;
                             }
                         }
                     }
-
-
                     if (!expirytime.equals(timestamp)) {
                         SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
                         try {
@@ -1448,7 +1712,7 @@ byte[] dataToSend,dataReceived;
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        runOnUiThread(new Runnable() {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
                                                 message.setText("Message Expired!");
@@ -1470,7 +1734,6 @@ byte[] dataToSend,dataReceived;
                         }
 
                     }
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1538,8 +1801,8 @@ byte[] dataToSend,dataReceived;
     }
 
 
-    void RestartActivity(String type) {
-        Intent i = getIntent();
+    static void RestartActivity(String type) {
+        Intent i = ((Activity) context).getIntent();
         if (type.equals("type1")) {
             i.putExtra("boundage", "1");
         } else {
@@ -1547,29 +1810,29 @@ byte[] dataToSend,dataReceived;
         }
 
         LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
-        overridePendingTransition(0, 0);
+        ((Activity) context).overridePendingTransition(0, 0);
         i.putExtra("recyclerview", layoutManager.findFirstVisibleItemPosition());
 
         if (typemessage.getText().toString() != null) {
             i.putExtra("message", typemessage.getText().toString());
         }
-        startActivity(i);
+        context.startActivity(i);
 
-        overridePendingTransition(0, 0);
-        finish();
+        ((Activity) context).overridePendingTransition(0, 0);
+        ((Activity) context).finish();
 
     }
 
 
     //1 day = 3600 x 24 = 86400
-    public long dateDifference(Date startDate, Date endDate) {
+    public static long dateDifference(Date startDate, Date endDate) {
         //milliseconds
         return endDate.getTime() - startDate.getTime();
 
 
     }
 
-    private String getDate(String expiry) {
+    private static String getDate(String expiry) {
         String ourDate;
         try {
 
@@ -1599,4 +1862,239 @@ byte[] dataToSend,dataReceived;
         }
         super.onDestroy();
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (playerView != null && player != null) {
+            mResumeWindow = player.getCurrentWindowIndex();
+            mResumePosition = Math.max(0, player.getContentPosition());
+            player.release();
+        }
+
+        if (mFullScreenDialog != null)
+            mFullScreenDialog.dismiss();
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        if (playerView != null)
+            initVideoPlayer(tempchecksum);
+
+        if (isFullscreene) {
+            ((ViewGroup) playerView.getParent()).removeView(playerView);
+            mFullScreenDialog.addContentView(playerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            //  mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_fullscreen_skrink));
+            mFullScreenDialog.show();
+        }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putInt(STATE_RESUME_WINDOW, mResumeWindow);
+        outState.putLong(STATE_RESUME_POSITION, mResumePosition);
+        outState.putBoolean(STATE_PLAYER_FULLSCREEN, isFullscreene);
+        outState.putString(STATE_CHECKSUM, tempchecksum);
+
+
+        super.onSaveInstanceState(outState);
+    }
+
+
+    static void loadImage(ImageView ImageView, String url) {
+
+        Picasso picasso = new Picasso.Builder(context).downloader(new OkHttp3Downloader(Functions.getUnsafeOkHttpClient())).build();
+        picasso.setLoggingEnabled(true);
+        picasso.load(url)
+                .placeholder(R.drawable.ic_launcher_background)
+                .fit()
+                .centerInside()
+                .error(R.drawable.applogo)
+                .into(ImageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("loaderror", e.getMessage());
+                    }
+                });
+
+    }
+
+    static void downloadFile(String url) {
+
+    }
+
+    static SimpleExoPlayer player;
+    private static int mResumeWindow;
+    static String tempchecksum;
+    private static long mResumePosition;
+
+
+    public static void initVideoPlayer(String checksum) {
+        try {
+            DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
+            DataSource.Factory dataSourceFactory = new OkHttpDataSourceFactory(Functions.getUnsafeOkHttpClient(), Util.getUserAgent(context, context.getString(R.string.app_name)), defaultBandwidthMeter);
+            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            TrackSelector trackSelector = new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
+            player = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+            Uri videoURI = Uri.parse(checksum);
+            ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+            MediaSource mediaSource = new ExtractorMediaSource(videoURI, dataSourceFactory, extractorsFactory, null, null);
+            player.prepare(mediaSource);
+
+
+        } catch (Exception e) {
+            Log.e("errorasdfa", e.toString());
+        }
+
+        player.setPlayWhenReady(true);
+
+        boolean haveResumePosition = mResumeWindow != C.INDEX_UNSET;
+
+        if (haveResumePosition) {
+            if (tempchecksum != null && tempchecksum.equals(checksum)) {
+                Log.e("DEBUG", " haveResumePosition ");
+                Log.e("position", String.valueOf(mResumePosition));
+                player.seekTo(mResumeWindow, mResumePosition);
+            }
+
+            tempchecksum = checksum;
+
+
+        }
+//        String contentUrl = getString(url);
+
+        playerView.setPlayer(player);
+
+
+    }
+
+    private static Dialog mFullScreenDialog;
+
+    static void enterfullScreene(PlayerView playerView) {
+        ((Activity) context).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        ((ViewGroup) playerView.getParent()).removeView(playerView);
+        mFullScreenDialog.addContentView(playerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        // mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_fullscreen_skrink));
+        isFullscreene = true;
+        mFullScreenDialog.show();
+    }
+
+    static boolean isFullscreene = false;
+
+
+    private static void closeFullscreenDialog(PlayerView playerView) {
+        ((Activity) context).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        ((ViewGroup) playerView.getParent()).removeView(playerView);
+
+        if (playerView != null && player != null) {
+            player.stop(true);
+        }
+
+        isFullscreene = false;
+        mFullScreenDialog.dismiss();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    InitConnection();
+                } catch (Settings.SettingNotFoundException e) {
+                    Log.e("error2", e.toString());
+                }
+            }
+        }, 1000);
+
+
+        // mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_fullscreen_expand));
+
+    }
+
+
+    public static class simpleAdapter extends RecyclerView.Adapter<simpleAdapter.ViewHolder> {
+        protected ArrayList<JSONObject> listdata;
+        protected AlertDialog dialog;
+
+        Context context;
+        String message;
+
+
+        public simpleAdapter(ArrayList<JSONObject> listdata, Context context,String message) {
+            Log.e("listviewcxvbcvb", listdata.toString());
+            this.listdata = listdata;
+            this.context = context;
+            this.message = message;
+        }
+
+        @Override
+        public simpleAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            View listItem = layoutInflater.inflate(R.layout.forwordtosinglefriend, parent, false);
+            return new simpleAdapter.ViewHolder(listItem);
+        }
+
+
+        @Override
+        public void onBindViewHolder(@NotNull simpleAdapter.ViewHolder holder, int position) {
+            final JSONObject myListData = listdata.get(position);
+            try {
+
+                holder.friendname.setText(myListData.getString("name"));
+
+                holder.sendbutton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        if (MainActivity.connection != null && MainActivity.connection.isConnected() && MainActivity.connection.isAuthenticated()) {
+//                            try {
+//                                //sendMessage(message,myListData.getString("phone"),"txt");
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+                        }
+
+                    }
+                });
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+        protected JSONObject mylistdata;
+
+
+        @Override
+        public int getItemCount() {
+            return listdata.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public ImageView sendbutton;
+            public TextView friendname;
+
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+
+                this.sendbutton = itemView.findViewById(R.id.sendtofriendbutton);
+                this.friendname = (TextView) itemView.findViewById(R.id.friendname);
+
+            }
+        }
+    }
+
+
 }

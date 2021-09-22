@@ -71,6 +71,8 @@
         </LinearLayout>
 
 
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messagerecyclerview"
             android:layout_width="match_parent"
@@ -78,6 +80,7 @@
             android:layout_above="@id/sendmessagelayout"
             android:layout_below="@id/titlelayout"
             android:layout_marginTop="9dp"
+            android:layoutAnimation="@anim/layout_animation"
             android:divider="@null"
             android:stackFromBottom="true"
             android:transcriptMode="alwaysScroll" />

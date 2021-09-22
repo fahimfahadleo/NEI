@@ -83,8 +83,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         System.loadLibrary("native-lib");
     }
 
-
-
     static RecyclerView notificationrecyclerview;
     static ArrayList<JSONObject> myNotificationData;
     static NotificationAdapter notificationAdapter;
@@ -119,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     static int pageposition;
     static String nextpageurl = "";
     static ListviewAdapter adapter;
+    EditText searchedt;
 
 
 
@@ -361,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         logout = drawerLayout.findViewById(R.id.logout);
         logoutview = drawerLayout.findViewById(R.id.logoutview);
         notification = findViewById(R.id.notification);
-        search = findViewById(R.id.search);
+        search = findViewById(R.id.searchbutton);
         recyclerView = findViewById(R.id.recyclerview);
         SettingsView = findViewById(R.id.settingsview);
         Settings = findViewById(R.id.settings);
@@ -385,6 +384,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         notificationcounterveiw = findViewById(R.id.notificationcounterview);
         pagelogout = findViewById(R.id.pagelogout);
         pagelogoutview = findViewById(R.id.pagelogoutview);
+        searchedt = findViewById(R.id.searchedt);
         helper = new DatabaseHelper(this);
         new Functions(this);
         InitLinks(this);
@@ -396,27 +396,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.parseColor("#CBE1CF"));
 
-//        Cursor c = DatabaseHelper.getNotificationData();
-//        if (c != null) {
-//            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-//                notificationRead = c.getString(c.getColumnIndex("notificationread"));
-//                notificationcount = Integer.parseInt(c.getString(c.getColumnIndex("notificationcount")));
-//            }
-//            c.close();
-//        } else {
-//            DatabaseHelper.setNotificationInformation("0", "true");
-//        }
-//
-//
-//        if (notificationcount != 0) {
-//            if (notificationRead.equals("false")) {
-//                notificationcounter.setText(String.valueOf(notificationcount));
-//                notificationcounterveiw.setVisibility(View.VISIBLE);
-//            }
-//        } else {
-//            notificationcounter.setText(null);
-//            notificationcounterveiw.setVisibility(View.INVISIBLE);
-//        }
+
 
 
         if (connection != null) {
@@ -455,12 +435,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-//        if (!Functions.fileExists("private.key", this)) {
-//            globalRequest(this, "GET", Important.getPrivatekey(), new JSONObject(), 20, context);
-//        }
-
-
+        
         init();
 
 
@@ -473,7 +448,11 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                 .MODE_NIGHT_NO);
 
 
-        new ConnnectXmpp(this, getLoginInfo("phone_no"), getLoginInfo("sec"));
+        if(connection==null || !connection.isConnected()){
+            new ConnnectXmpp(this, getLoginInfo("phone_no"), getLoginInfo("sec"));
+        }
+
+
         Log.e("phone", getLoginInfo("phone_no"));
         Log.e("pass", getLoginInfo("sec"));
 
@@ -602,8 +581,11 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             Functions.dismissDialogue();
         });
     }
+    public static ArrayList<JSONObject> data;
 
     public static void setUpData(ArrayList<JSONObject> listdata) {
+        data = listdata;
+
         Log.e("mainlist", listdata.toString());
         ((Activity) context).runOnUiThread(() -> {
             Log.e("listviewdata", listdata.toString());
@@ -611,8 +593,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             recyclerView.setHasFixedSize(true);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(adapter);
-
-
 
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override

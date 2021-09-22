@@ -100,8 +100,8 @@ static jmethodID MethodID , MethodID40 , MethodID49 ,
         MethodID51 , MethodID52 , MethodID53 , MethodID54 , MethodID55 , MethodID6 ,
         MethodID56 , MethodID57 , MethodID58 , MethodID59 , MethodID60 , MethodID61 , MethodID62 , MethodID63 ,
         MethodID64 , MethodID65 , MethodID66 , MethodID67 , MethodID68 , MethodID69 ,
-        MethodID70 , MethodID71 , MethodID72 , MethodID73 , MethodID74 , MethodID75 , MethodID76 , MethodID77,
-        MethodID78,MethodID79,MethodID80;
+        MethodID70 , MethodID71 , MethodID72 , MethodID73 , MethodID74 , MethodID75 , MethodID76 , MethodID77 ,
+        MethodID78 , MethodID79 , MethodID80;
 
 string schema = "http";
 string domain = "192.168.152.9";
@@ -400,7 +400,7 @@ void initlinks(JNIEnv *env) {
 
     MethodID79 = env->GetStaticMethodID(Important , "setResetpassword" ,
                                         "(Ljava/lang/String;)V");
-    MethodID80= env->GetStaticMethodID(Important , "setChangeforgottenpassword" ,
+    MethodID80 = env->GetStaticMethodID(Important , "setChangeforgottenpassword" ,
                                         "(Ljava/lang/String;)V");
 }
 
@@ -451,47 +451,44 @@ void initver(JNIEnv *env) {
 
 
     setDatabaseUserInformation = env->GetMethodID(DatabaseHelper , "setUserInformation" ,
-                                                        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+                                                  "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
     getDatabaseUserInformation = env->GetMethodID(DatabaseHelper , "getUserInformation" ,
-                                                        "()Landroid/database/Cursor;");
+                                                  "()Landroid/database/Cursor;");
     updateDatabaseUserInformation = env->GetMethodID(DatabaseHelper ,
-                                                           "updateUserInformation" ,
-                                                           "(Ljava/lang/String;Ljava/lang/String;)Z");
+                                                     "updateUserInformation" ,
+                                                     "(Ljava/lang/String;Ljava/lang/String;)Z");
 
 
     setDatabaseFriendInformation = env->GetMethodID(DatabaseHelper , "setFriendInformation" ,
-                                                          "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+                                                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
     getDatabaseFriendInformation = env->GetMethodID(DatabaseHelper , "getData" ,
-                                                          "(Ljava/lang/String;Ljava/lang/String;)Landroid/database/Cursor;");
+                                                    "(Ljava/lang/String;Ljava/lang/String;)Landroid/database/Cursor;");
     updateDatabaseFriendInformation = env->GetMethodID(DatabaseHelper ,
-                                                             "updateFriendInformation" ,
-                                                             "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+                                                       "updateFriendInformation" ,
+                                                       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
     deleteFriend = env->GetMethodID(DatabaseHelper , "deleteFriend" ,
-                                          "(Ljava/lang/String;Ljava/lang/String;)Z");
+                                    "(Ljava/lang/String;Ljava/lang/String;)Z");
 
     setDatabaseUserNotification = env->GetMethodID(DatabaseHelper ,
-                                                         "setNotificationInformation" ,
-                                                         "(Ljava/lang/String;Ljava/lang/String;)V");
+                                                   "setNotificationInformation" ,
+                                                   "(Ljava/lang/String;Ljava/lang/String;)V");
     getDatabaseUserNotification = env->GetMethodID(DatabaseHelper , "getNotificationData" ,
-                                                         "()Landroid/database/Cursor;");
+                                                   "()Landroid/database/Cursor;");
     updateDatabaseUserNotification = env->GetMethodID(DatabaseHelper , "updateNotification" ,
-                                                            "(Ljava/lang/String;Ljava/lang/String;)Z");
-
-
+                                                      "(Ljava/lang/String;Ljava/lang/String;)Z");
 
 
     setDatabaseUserOfflineChatList = env->GetMethodID(DatabaseHelper ,
-                                                            "setOfflineChatListnInformation" ,
-                                                            "(Ljava/lang/String;Ljava/lang/String;)V");
+                                                      "setOfflineChatListnInformation" ,
+                                                      "(Ljava/lang/String;Ljava/lang/String;)V");
     getDatabaseUserOfflineChatList = env->GetMethodID(DatabaseHelper ,
-                                                            "getOfflineChatList" ,
-                                                            "()Landroid/database/Cursor;");
+                                                      "getOfflineChatList" ,
+                                                      "()Landroid/database/Cursor;");
     updateDatabaseUserOfflineChatList = env->GetMethodID(DatabaseHelper ,
-                                                               "updateOfflineChatList" ,
-                                                               "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
-    deleteofflinefriend = env->GetMethodID(DatabaseHelper,"deleteofflinefriend", "(Ljava/lang/String;)Z");
-
-
+                                                         "updateOfflineChatList" ,
+                                                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
+    deleteofflinefriend = env->GetMethodID(DatabaseHelper , "deleteofflinefriend" ,
+                                           "(Ljava/lang/String;)Z");
 
 
     isJSONArrayNull = env->GetStaticMethodID(Function , "isJSONArrayNull" ,
@@ -1084,7 +1081,7 @@ jobject getCursor(JNIEnv *env , string method , jstring phoneno , jstring pageno
         return env->CallObjectMethod(databasehelperobject , getDatabaseUserInformation);
     } else if (method == "gfi") {
         return env->CallObjectMethod(databasehelperobject , getDatabaseFriendInformation , phoneno ,
-                                           pageno);
+                                     pageno);
     } else if (method == "gni") {
         return env->CallObjectMethod(databasehelperobject , getDatabaseUserNotification);
     } else if (method == "goi") {
@@ -1099,7 +1096,7 @@ jobject getCursor(JNIEnv *env , string method , jstring phoneno , jstring pageno
 
 
 void deleteOfflineFriend(JNIEnv *env , jstring phoneno) {
-    env->CallBooleanMethod(databasehelperobject,deleteofflinefriend,phoneno);
+    env->CallBooleanMethod(databasehelperobject , deleteofflinefriend , phoneno);
 }
 
 
@@ -1107,32 +1104,40 @@ void setUpDatabase(JNIEnv *env , jstring method , jobjectArray values) {
     string cmethod = jstring2string(env , method);
 
 
-
     if (cmethod == "sui") {
         //String username, String userphone, String userpass, String userid, String userref, String loginstatus
 
 
-        env->CallBooleanMethod(databasehelperobject , setDatabaseUserInformation , env->GetObjectArrayElement(values, 0) ,
-                                     env->GetObjectArrayElement(values, 1)  , env->GetObjectArrayElement(values, 2) ,
-                                     env->GetObjectArrayElement(values, 3)  , env->GetObjectArrayElement(values, 4),
-                                     env->GetObjectArrayElement(values, 5),env->GetObjectArrayElement(values, 6));
+        env->CallBooleanMethod(databasehelperobject , setDatabaseUserInformation ,
+                               env->GetObjectArrayElement(values , 0) ,
+                               env->GetObjectArrayElement(values , 1) ,
+                               env->GetObjectArrayElement(values , 2) ,
+                               env->GetObjectArrayElement(values , 3) ,
+                               env->GetObjectArrayElement(values , 4) ,
+                               env->GetObjectArrayElement(values , 5) ,
+                               env->GetObjectArrayElement(values , 6));
     } else if (cmethod == "sfi") {
         //String phonenumber,String textpass, String boundage,String timer,String pageno
-        env->CallBooleanMethod(databasehelperobject , setDatabaseFriendInformation , env->GetObjectArrayElement(values, 0) ,
-                                     env->GetObjectArrayElement(values, 1)  , env->GetObjectArrayElement(values, 2) ,
-                                     env->GetObjectArrayElement(values, 3)  , env->GetObjectArrayElement(values, 4));
+        env->CallBooleanMethod(databasehelperobject , setDatabaseFriendInformation ,
+                               env->GetObjectArrayElement(values , 0) ,
+                               env->GetObjectArrayElement(values , 1) ,
+                               env->GetObjectArrayElement(values , 2) ,
+                               env->GetObjectArrayElement(values , 3) ,
+                               env->GetObjectArrayElement(values , 4));
     } else if (cmethod == "sni") {
         //String notification,String notificationread
-        env->CallVoidMethod(databasehelperobject , setDatabaseUserNotification , env->GetObjectArrayElement(values, 0) ,
-                                  env->GetObjectArrayElement(values, 1));
+        env->CallVoidMethod(databasehelperobject , setDatabaseUserNotification ,
+                            env->GetObjectArrayElement(values , 0) ,
+                            env->GetObjectArrayElement(values , 1));
     } else if (cmethod == "soi") {
         //String number,String isignored
-        env->CallVoidMethod(databasehelperobject , setDatabaseUserOfflineChatList , env->GetObjectArrayElement(values, 0) ,
-                                  env->GetObjectArrayElement(values, 1));
+        env->CallVoidMethod(databasehelperobject , setDatabaseUserOfflineChatList ,
+                            env->GetObjectArrayElement(values , 0) ,
+                            env->GetObjectArrayElement(values , 1));
     }
 }
 
-void updateDatabse(JNIEnv *env , jstring method , jstring position,jstring key , jstring value) {
+void updateDatabse(JNIEnv *env , jstring method , jstring position , jstring key , jstring value) {
     string cmethod = jstring2string(env , method);
 
     if (cmethod == "sui") {
@@ -1141,15 +1146,21 @@ void updateDatabse(JNIEnv *env , jstring method , jstring position,jstring key ,
     } else if (cmethod == "sfi") {
         //String phonenumber,String textpass, String boundage,String timer,String pageno
         env->CallBooleanMethod(databasehelperobject , updateDatabaseFriendInformation , key ,
-                                     value);
+                               value);
     } else if (cmethod == "sni") {
         //String notification,String notificationread
         env->CallBooleanMethod(databasehelperobject , updateDatabaseUserNotification , key , value);
     } else if (cmethod == "soi") {
         //String number,String isignored
-        env->CallBooleanMethod(databasehelperobject , updateDatabaseUserOfflineChatList , position,key ,
-                                     value);
+        env->CallBooleanMethod(databasehelperobject , updateDatabaseUserOfflineChatList , position ,
+                               key ,
+                               value);
     }
+}
+
+void deleteDatabase(JNIEnv *env){
+    jmethodID deletedatabase = env->GetMethodID(env->FindClass("com/horofbd/MeCloak/DatabaseHelper"),"deleteAllData", "()V");
+    env->CallVoidMethod(databasehelperobject,deletedatabase);
 }
 
 void saveLoginData(JNIEnv *env , jobject context , jstring response) {
@@ -1287,12 +1298,12 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
 
                         if (jsonlength == 0) {
                             env->CallBooleanMethod(databasehelperobject ,
-                                                         setDatabaseUserInformation , user_name ,
-                                                         phone_no , getSharedPreference(env ,
-                                                                                        env->NewStringUTF(
-                                                                                                "password")) ,
-                                                         user_id , user_ref ,
-                                                         env->NewStringUTF("true"),premium);
+                                                   setDatabaseUserInformation , user_name ,
+                                                   phone_no , getSharedPreference(env ,
+                                                                                  env->NewStringUTF(
+                                                                                          "password")) ,
+                                                   user_id , user_ref ,
+                                                   env->NewStringUTF("true") , premium);
                         }
                         startActivity(env , context , "UserVerification" , "");
                         CloseActivity(env , context);
@@ -1478,9 +1489,10 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
             case 8: {
                 //logout
                 clearSharedPreference(env);
+                deleteDatabase(env);
                 startActivity(env , context , "Login" , "");
                 env->CallStaticVoidMethod(Function , closeActivity , context);
-                finishActivity(env,context);
+                finishActivity(env , context);
                 break;
             }
             case 9: {
@@ -2100,22 +2112,23 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
             case 25: {
                 //forgot profile password
 
-                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
+                if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
                     jobject jobject1 = env->CallObjectMethod(jsonobject , getJsonObject ,
                                                              env->NewStringUTF("response"));
                     jint tempobject = env->CallIntMethod(jobject1 , getInt ,
-                                                               env->NewStringUTF("forgot-id"));
+                                                         env->NewStringUTF("forgot-id"));
 
 
-                    jclass Forgotprofilepass = env->FindClass("com/horofbd/MeCloak/ForgotProfilePassword");
-                    jmethodID showverification = env->GetStaticMethodID(Forgotprofilepass,"showPhoneVerificationlayout","()V");
-                    env->CallStaticVoidMethod(Forgotprofilepass,showverification);
-                    jmethodID sendOtp = env->GetStaticMethodID(Forgotprofilepass,"sendOtp", "(I)V");
-                    env->CallStaticVoidMethod(Forgotprofilepass,sendOtp,tempobject);
+                    jclass Forgotprofilepass = env->FindClass(
+                            "com/horofbd/MeCloak/ForgotProfilePassword");
+                    jmethodID showverification = env->GetStaticMethodID(Forgotprofilepass ,
+                                                                        "showPhoneVerificationlayout" ,
+                                                                        "()V");
+                    env->CallStaticVoidMethod(Forgotprofilepass , showverification);
+                    jmethodID sendOtp = env->GetStaticMethodID(Forgotprofilepass , "sendOtp" ,
+                                                               "(I)V");
+                    env->CallStaticVoidMethod(Forgotprofilepass , sendOtp , tempobject);
                 }
-
-
-
 
 
                 break;
@@ -2485,26 +2498,29 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                 }
                 break;
             }
-            case 39:{
+            case 39: {
                 //check firebase otp
-                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
-                    jclass Forgotprofilepass = env->FindClass("com/horofbd/MeCloak/ForgotProfilePassword");
-                    jmethodID showverification = env->GetStaticMethodID(Forgotprofilepass,"showResetPasswordLayout","()V");
-                    env->CallStaticVoidMethod(Forgotprofilepass,showverification);
+                if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
+                    jclass Forgotprofilepass = env->FindClass(
+                            "com/horofbd/MeCloak/ForgotProfilePassword");
+                    jmethodID showverification = env->GetStaticMethodID(Forgotprofilepass ,
+                                                                        "showResetPasswordLayout" ,
+                                                                        "()V");
+                    env->CallStaticVoidMethod(Forgotprofilepass , showverification);
                 }
                 break;
             }
 
-            case 40:{
+            case 40: {
                 //change profile password after all verification
-                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
-                    showToast(env,context,env->NewStringUTF("Password Reset Successfull!"));
-                    finishActivity(env,context);
+                if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
+                    showToast(env , context , env->NewStringUTF("Password Reset Successfull!"));
+                    finishActivity(env , context);
                 }
                 break;
             }
 
-            case 41:{
+            case 41: {
                 //get challenge questions
 
 
@@ -2521,8 +2537,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
 //                                env->NewStringUTF(getpagesecurityquestions.c_str()) , jobject1 ,
 //                                29 , context);
 
-                        showToast(env,context,env->NewStringUTF("You have not set up your security questions therefore you can not recover your page password by Page Security Questions"));
-                        finishActivity(env,context);
+                        showToast(env , context , env->NewStringUTF(
+                                "You have not set up your security questions therefore you can not recover your page password by Page Security Questions"));
+                        finishActivity(env , context);
                     } else {
                         jobject ansarray = env->CallObjectMethod(jsonobject , getJSONArray ,
                                                                  env->NewStringUTF("response"));
@@ -2542,7 +2559,7 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                         for (int i = 0; i < ansarraylength; i++) {
                             jobject object = env->CallObjectMethod(ansarray ,
                                                                    jsonarraygetjsonobject , i);
-                            jstring questionid =  (jstring)env->CallObjectMethod(object ,
+                            jstring questionid = (jstring) env->CallObjectMethod(object ,
                                                                                  getString ,
                                                                                  env->NewStringUTF(
                                                                                          "security_question_id"));
@@ -2559,9 +2576,8 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
                             jobject tempobject1 = env->CallStaticObjectMethod(Function , map ,
                                                                               env->NewStringUTF(
                                                                                       "question_id") ,
-                                                                              questionid,
+                                                                              questionid ,
                                                                               questionobject);
-
 
 
                             env->CallBooleanMethod(list , addMethod , tempobject1);
@@ -2588,31 +2604,48 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
 
                 break;
             }
-            case 42:{
+            case 42: {
 
-                if(env->CallBooleanMethod(jsonobject,has,env->NewStringUTF("response"))){
-                    jobject json = env->CallObjectMethod(jsonobject,getJsonObject,env->NewStringUTF("response"));
-                    jint code = env->CallIntMethod(json,getInt,env->NewStringUTF("code"));
+                if (env->CallBooleanMethod(jsonobject , has , env->NewStringUTF("response"))) {
+                    jobject json = env->CallObjectMethod(jsonobject , getJsonObject ,
+                                                         env->NewStringUTF("response"));
+                    jint code = env->CallIntMethod(json , getInt , env->NewStringUTF("code"));
 
                     char buf[64]; // assumed large enough to cope with result
 
-                    sprintf(buf, "%d", code);  // error checking omitted
+                    sprintf(buf , "%d" , code);  // error checking omitted
 
-                    printlogcat(env,"code",jstring2string(env,env->NewStringUTF(buf)));
-                    jstring somemessage = (jstring)env->CallObjectMethod(json,getString,env->NewStringUTF("msg"));
-                    printlogcat(env,"error",jstring2string(env,somemessage));
+                    printlogcat(env , "code" , jstring2string(env , env->NewStringUTF(buf)));
+                    jstring somemessage = (jstring) env->CallObjectMethod(json , getString ,
+                                                                          env->NewStringUTF("msg"));
+                    printlogcat(env , "error" , jstring2string(env , somemessage));
                     //showToast(env,context,somemessage);
 
-                    startActivity(env,context,"ForgotPagePassword","");
-                    finishActivity(env,context);
+                    startActivity(env , context , "ForgotPagePassword" , "");
+                    finishActivity(env , context);
 
                     jclass someclass = env->FindClass("com/horofbd/MeCloak/ForgotPagePassword");
-                    jmethodID setUpPasswordChangeField = env->GetStaticMethodID(someclass,"setUpPasswordChangeField", "(Ljava/lang/String;)V");
-                    env->CallStaticVoidMethod(someclass,setUpPasswordChangeField,env->NewStringUTF(buf));
+                    jmethodID setUpPasswordChangeField = env->GetStaticMethodID(someclass ,
+                                                                                "setUpPasswordChangeField" ,
+                                                                                "(Ljava/lang/String;)V");
+                    env->CallStaticVoidMethod(someclass , setUpPasswordChangeField ,
+                                              env->NewStringUTF(buf));
                 }
 
                 break;
-                }
+            }
+            case 123: {
+
+                printlogcat(env , "uploadedimage" , jstring2string(env , response));
+
+                jclass someclass = env->FindClass("com/horofbd/MeCloak/ShowUserMessage");
+                jmethodID setUpPasswordChangeField = env->GetStaticMethodID(someclass ,
+                                                                            "sendMediaTypeData" ,
+                                                                            "(Ljava/lang/String;)V");
+                env->CallStaticVoidMethod(someclass , setUpPasswordChangeField , response);
+
+                break;
+            }
         }
     } else if (requestcode == 16) {
         jclass Tutorial = env->FindClass("com/horofbd/MeCloak/TutorialActivity");
@@ -2625,8 +2658,9 @@ void CheckResponse(JNIEnv *env , jobject ServerResponse , jobject context , jstr
         env->CallStaticVoidMethod(Function , writeToFile , response , context ,
                                   env->NewStringUTF("private.key"));
         dismissProgressBar(env);
-    } else if(requestcode == 123){
-        printlogcat(env,"uploadedimage",jstring2string(env,response));
+    } else if (requestcode == 145) {
+
+
     }
 
 }
@@ -3443,7 +3477,7 @@ Java_com_horofbd_MeCloak_BuyActivity_InitLinks(JNIEnv *env , jclass clazz) {
 JNIEXPORT jobject JNICALL
 Java_com_horofbd_MeCloak_LoginActivity_getData(JNIEnv *env , jclass clazz , jstring method) {
 
-    printlogcat(env,"sometag","somemessage");
+    printlogcat(env , "sometag" , "somemessage");
 
     return ParseDatabaseCursor(env , getCursor(env , jstring2string(env , method) ,
                                                env->NewStringUTF("") , env->NewStringUTF("")));
@@ -3461,17 +3495,20 @@ Java_com_horofbd_MeCloak_OfflineChatList_loaddata(JNIEnv *env , jclass clazz , j
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_horofbd_MeCloak_OfflineChatList_updateloaddata(JNIEnv *env , jclass clazz , jstring position,jstring field ,
+Java_com_horofbd_MeCloak_OfflineChatList_updateloaddata(JNIEnv *env , jclass clazz ,
+                                                        jstring position , jstring field ,
                                                         jstring value) {
-    updateDatabse(env , env->NewStringUTF("soi") , position,field , value);
+    updateDatabse(env , env->NewStringUTF("soi") , position , field , value);
 }extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_horofbd_MeCloak_OfflineChatList_getData(JNIEnv *env , jclass clazz) {
-    return ParseDatabaseCursor(env,getCursor(env,"goi",env->NewStringUTF(""),env->NewStringUTF("")));
+    return ParseDatabaseCursor(env , getCursor(env , "goi" , env->NewStringUTF("") ,
+                                               env->NewStringUTF("")));
 }extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_horofbd_MeCloak_OfflineChatList_deleteFriend(JNIEnv *env , jclass clazz,jstring phonenumber) {
-    deleteOfflineFriend(env,phonenumber);
+Java_com_horofbd_MeCloak_OfflineChatList_deleteFriend(JNIEnv *env , jclass clazz ,
+                                                      jstring phonenumber) {
+    deleteOfflineFriend(env , phonenumber);
 }extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_horofbd_MeCloak_OfflineActivity_EncrytpAndDecrypt(JNIEnv *env , jclass clazz ,
@@ -3538,7 +3575,46 @@ Java_com_horofbd_MeCloak_ShowUserMessage_sendFiletoUser(JNIEnv *env , jclass cla
                                                         jobject connection , jobject file ,
                                                         jint requestcode) {
     jmethodID uploadrequest = env->GetStaticMethodID(Function , "uploadProtectedFile" ,
-                                                    "(Lcom/horofbd/MeCloak/ServerResponse;Lorg/jivesoftware/smack/AbstractXMPPConnection;Ljava/io/File;I)V");
-    env->CallStaticVoidMethod(Function , uploadrequest , server_response  ,
+                                                     "(Lcom/horofbd/MeCloak/ServerResponse;Lorg/jivesoftware/smack/AbstractXMPPConnection;Ljava/io/File;I)V");
+    env->CallStaticVoidMethod(Function , uploadrequest , server_response ,
                               connection , file , requestcode);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_ShowUserMessage_ImageViewImageRequest(JNIEnv *env , jclass clazz ,
+                                                               jobject image_response ,
+                                                               jobject image_view , jstring link ,
+                                                               jint requestcode) {
+    printlogcat(env,"native","native");
+    jmethodID uploadrequest = env->GetStaticMethodID(Function , "ImageViewImageRequest" ,
+                                                     "(Lcom/horofbd/MeCloak/ImageResponseImageView;Landroid/widget/ImageView;Ljava/lang/String;I)V");
+    env->CallStaticVoidMethod(Function , uploadrequest , image_response ,
+                              image_view , link , requestcode);
+}extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_horofbd_MeCloak_Animation_getData(JNIEnv *env , jclass clazz , jstring method) {
+    printlogcat(env , "sometag" , "somemessage");
+
+    return ParseDatabaseCursor(env , getCursor(env , jstring2string(env , method) ,
+                                               env->NewStringUTF("") , env->NewStringUTF("")));
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_Animation_LoginRequest(JNIEnv *env , jclass clazz , jobject context ,
+                                                jobject server_response , jstring phone ,
+                                                jstring passwrod , jint requestcode) {
+    initver(env);
+    SetUpLinks(env);
+    LoginRequest(env , context , server_response , phone , passwrod , requestcode);
+    setSharedPreference(env , env->NewStringUTF("phone_no") , phone);
+    setSharedPreference(env , env->NewStringUTF("password") , passwrod);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_Animation_SaveLogindata(JNIEnv *env , jclass clazz , jstring response ,
+                                                 jobject context) {
+    saveLoginData(env , context , response);
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_horofbd_MeCloak_Animation_InitLinks(JNIEnv *env , jclass clazz) {
+    initver(env);
+    SetUpLinks(env);
 }

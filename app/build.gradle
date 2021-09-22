@@ -25,6 +25,7 @@ android {
     buildTypes {
         debug {
             manifestPlaceholders = [usesCleartextTraffic:"true"]
+
         }
 
         release {
@@ -93,11 +94,15 @@ dependencies {
     implementation 'com.squareup.okio:okio:2.8.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.8.3'
+    implementation "com.google.android.exoplayer:extension-okhttp:2.8.3"
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'net.danlew:android.joda:2.10.9.1'
 
+//    implementation 'com.github.bumptech.glide:glide:4.12.0'
+//    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
 
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation 'org.igniterealtime.smack:smack-android:4.4.2'
 // Optional for XMPP extensions support
@@ -120,7 +125,7 @@ dependencies {
     implementation 'com.hbb20:ccp:2.3.7'
 
     implementation 'com.google.code.gson:gson:2.8.4'
-
+    //implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0"
 
 
     implementation 'org.jetbrains.anko:anko-common:0.10.8'

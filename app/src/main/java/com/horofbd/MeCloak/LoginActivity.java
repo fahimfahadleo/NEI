@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         Functions.dismissDialogue();
     }
 
-    JSONArray jsonArray;
+JSONArray jsonArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,18 +86,6 @@ public class LoginActivity extends AppCompatActivity implements ServerResponse {
         InitLinks();
 
         jsonArray = getData("gui");
-        Log.e("gui", jsonArray.toString());
-        if (jsonArray.length() != 0) {
-            if (Functions.isInternetAvailable()) {
-                try {
-                    if (jsonArray.getJSONObject(0).getString("loginstatus").equals("true")) {
-                        //LoginRequest(this,this,jsonArray.getJSONObject(0).getString("userphone"),jsonArray.getJSONObject(0).getString("userpass"),1);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 
         invisiblelayout.setOnTouchListener(new OnSwipeTouchListener(this, "T", invisiblelayout));
 

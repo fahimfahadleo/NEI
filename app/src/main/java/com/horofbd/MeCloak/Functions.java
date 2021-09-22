@@ -24,25 +24,18 @@ import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import org.apache.commons.codec.DecoderException;
 import org.jetbrains.annotations.NotNull;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smackx.httpfileupload.HttpFileUploadManager;
 import org.jivesoftware.smackx.httpfileupload.element.Slot;
-import org.jivesoftware.smackx.httpfileupload.element.Slot_V0_2;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,57 +43,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.KeyFactory;
 import java.security.KeyManagementException;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.InvalidParameterSpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPublicKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Handler;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -119,18 +83,19 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.logging.LoggingEventListener;
+import okhttp3.internal.Util;
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.WIFI_SERVICE;
-import static com.horofbd.MeCloak.MainActivity.connection;
 
 public class Functions {
     static Context context;
     static SharedPreferences preferences;
     public static boolean isActive = false;
-    private final String sSs ="MessagePreference";
+    private final String sSs = "MessagePreference";
 
     public Functions(Context context) {
         Functions.context = context;
@@ -140,46 +105,40 @@ public class Functions {
     }
 
 
-    public static String getTimeWithZone(String time){
-
-//        DateTimeFormatter formatter = DateTimeFormat.forPattern( "yyyy-MM-dd' 'HH:mm:ss" );
-//        DateTime dateTimeInUTC = formatter.withZoneUTC().parseDateTime( "2011-10-06 03:35:05" );
-
-
+    public static String getTimeWithZone(String time) {
         DateTime dateTimeInUTC = DateTime.parse(time);
-
-// Adjust for 13 hour offset from UTC/GMT.
-//        DateTimeZone offsetThirteen = DateTimeZone.forOffsetHours( 13 );
-//        DateTime thirteenDateTime = dateTimeInUTC.toDateTime( offsetThirteen );
-
-// Hard-coded offsets should be avoided. Better to use a desired time zone for handling Daylight Saving Time (DST) and other anomalies.
-// Time Zone list… http://joda-time.sourceforge.net/timezones.html
         DateTimeZone timeZoneTongatapu = DateTimeZone.forID(TimeZone.getDefault().getID());
-        DateTime tongatapuDateTime = dateTimeInUTC.toDateTime( timeZoneTongatapu );
-
-
-//        DateTimeFormatter formatter = DateTimeFormat.forPattern( "yyyy-MM-dd' 'HH:mm:ss" );
-//
-//        DateTime datetimeinlocal = formatter.parseDateTime(tongatapuDateTime.toLocalTime().toString());
-
+        DateTime tongatapuDateTime = dateTimeInUTC.toDateTime(timeZoneTongatapu);
+        //2021-09-07T22:28:55.000000Z
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
         Date d = null;
         try {
             d = df.parse(tongatapuDateTime.toLocalDateTime().toString());
-            return  new SimpleDateFormat("hh-mm a   dd/MM/yyyy").format(d);
+            return new SimpleDateFormat("hh-mm a   dd/MM/yyyy").format(d);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-
-
-
         return tongatapuDateTime.toLocalDateTime().toString();
+    }
+
+    public static String getMessageTime(String time) {
+
+        Date datetime;
+        //09-15-2021 02:43:33 +0600
+        SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss Z");
+
+        try {
+            datetime = df.parse(time);
+            return new SimpleDateFormat("hh:mma dd/MM/yyyy").format(datetime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
 
     }
 
-    public static JSONArray pc(Cursor c){
+
+    public static JSONArray pc(Cursor c) {
 
         JSONArray array = new JSONArray();
         if (c != null) {
@@ -188,8 +147,8 @@ public class Functions {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     int length = c.getColumnCount();
-                    for(int p = 0;p<length;p++){
-                        jsonObject.put(c.getColumnName(p),c.getString(p));
+                    for (int p = 0; p < length; p++) {
+                        jsonObject.put(c.getColumnName(p), c.getString(p));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -207,10 +166,10 @@ public class Functions {
         ((Activity) context).finish();
     }
 
-    public static boolean isJSONArrayNull(JSONArray jsonArray){
-        if(jsonArray != null ){
+    public static boolean isJSONArrayNull(JSONArray jsonArray) {
+        if (jsonArray != null) {
             return jsonArray.length() == 0;
-        }else {
+        } else {
             return false;
         }
     }
@@ -218,11 +177,11 @@ public class Functions {
     static Dialog dialog;
 
     public static void showProgress(Context context) {
-        ((Activity)context).runOnUiThread(new Runnable() {
+        ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(dialog!=null){
-                    if( !dialog.isShowing()){
+                if (dialog != null) {
+                    if (!dialog.isShowing()) {
                         dialog = new Dialog(context);
                         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
                         View vi = inflater.inflate(R.layout.progressbar, null, false);
@@ -232,7 +191,7 @@ public class Functions {
                         Log.e("context", context.toString());
                         dialog.show();
                     }
-                }else {
+                } else {
                     dialog = new Dialog(context);
                     LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
                     View vi = inflater.inflate(R.layout.progressbar, null, false);
@@ -248,12 +207,12 @@ public class Functions {
     }
 
     public static void dismissDialogue() {
-        ((Activity)context).runOnUiThread(new Runnable() {
+        ((Activity) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (dialog != null && dialog.isShowing()) {
-                    Log.e("contextdialogue","dismissed");
-                    Log.e("contextcontext",context.toString());
+                    Log.e("contextdialogue", "dismissed");
+                    Log.e("contextcontext", context.toString());
                     dialog.dismiss();
                 }
             }
@@ -271,7 +230,7 @@ public class Functions {
         return jsonObject;
     }
 
-    public static JSONObject getInstanse(){
+    public static JSONObject getInstanse() {
         return new JSONObject();
     }
 
@@ -286,7 +245,7 @@ public class Functions {
         editor.apply();// commit is important here.
     }
 
-    public static boolean dataContains(String key){
+    public static boolean dataContains(String key) {
         return preferences.contains(key);
     }
 
@@ -377,22 +336,17 @@ public class Functions {
         return "";
     }
 
-    public static String Sha1(String clearString)
-    {
-        try
-        {
+    public static String Sha1(String clearString) {
+        try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
             messageDigest.update(clearString.getBytes("UTF-8"));
             byte[] bytes = messageDigest.digest();
             StringBuilder buffer = new StringBuilder();
-            for (byte b : bytes)
-            {
+            for (byte b : bytes) {
                 buffer.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
             }
             return buffer.toString();
-        }
-        catch (Exception ignored)
-        {
+        } catch (Exception ignored) {
             ignored.printStackTrace();
             return null;
         }
@@ -452,19 +406,19 @@ public class Functions {
     }
 
 
-  public static boolean athenticationRequired = true;
+    public static boolean athenticationRequired = true;
 
     public static void Request(ServerResponse serverResponse, String requestType, String Link, JSONObject jsonObject, int requestcode) {
         OkHttpClient client;
-        if(athenticationRequired){
-             client = getClient();
-        }else {
+        if (athenticationRequired) {
+            client = getClient();
+        } else {
             client = new OkHttpClient()
                     .newBuilder()
                     .build();
         }
 
-        Log.e("link",Link);
+        Log.e("link", Link);
         MultipartBody.Builder builder = new MultipartBody.Builder();
         RequestBody body = null;
 
@@ -474,15 +428,14 @@ public class Functions {
                 String key = iter.next();
 
 
-
                 try {
-                    Log.e("formdata",key+" : "+jsonObject.getString(key));
+                    Log.e("formdata", key + " : " + jsonObject.getString(key));
                     Object o = jsonObject.get(key);
-                    if(o instanceof JSONArray){
-                        for(int i = 0;i<jsonObject.getJSONArray(key).length();i++){
-                            builder.addFormDataPart(key+"[]",((JSONArray) o).getString(i));
+                    if (o instanceof JSONArray) {
+                        for (int i = 0; i < jsonObject.getJSONArray(key).length(); i++) {
+                            builder.addFormDataPart(key + "[]", ((JSONArray) o).getString(i));
                         }
-                    }else {
+                    } else {
                         builder.addFormDataPart(key, jsonObject.getString(key));
                     }
                 } catch (JSONException e) {
@@ -497,8 +450,6 @@ public class Functions {
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
             body = RequestBody.create(JSON, "{}");
         }
-
-
 
 
         Request request;
@@ -658,7 +609,7 @@ public class Functions {
             builder.addFormDataPart("ref", reference);
         }
 
-        Log.e("reference",reference);
+        Log.e("reference", reference);
 
 
         builder.setType(MultipartBody.FORM);
@@ -763,11 +714,11 @@ public class Functions {
     }
 
 
-    public static void UploadFile(ServerResponse serverResponse, String requestType, String Link,String filetype, File file, JSONObject jsonObject, int requestcode) {
+    public static void UploadFile(ServerResponse serverResponse, String requestType, String Link, String filetype, File file, JSONObject jsonObject, int requestcode) {
         OkHttpClient client = getClient();
 
-        Log.e("link",Link);
-        Log.e("jsonobject",jsonObject.toString());
+        Log.e("link", Link);
+        Log.e("jsonobject", jsonObject.toString());
 
         MultipartBody.Builder builder = new MultipartBody.Builder();
         RequestBody body = null;
@@ -778,11 +729,11 @@ public class Functions {
                 String key = iter.next();
                 try {
                     Object o = jsonObject.get(key);
-                    if(o instanceof JSONArray){
-                        for(int i = 0;i<jsonObject.getJSONArray(key).length();i++){
-                            builder.addFormDataPart(key+"[]",((JSONArray) o).getString(i));
+                    if (o instanceof JSONArray) {
+                        for (int i = 0; i < jsonObject.getJSONArray(key).length(); i++) {
+                            builder.addFormDataPart(key + "[]", ((JSONArray) o).getString(i));
                         }
-                    }else {
+                    } else {
                         builder.addFormDataPart(key, jsonObject.getString(key));
                     }
                 } catch (JSONException e) {
@@ -821,8 +772,41 @@ public class Functions {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try {
-                    String s =response.body().string();
+                    String s = response.body().string();
                     serverResponse.onResponse(s, response.code(), requestcode);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+
+    public static void ImageViewImageRequest(ImageResponseImageView imageResponseImageView, ImageView imageView, String Link, int requestcode) {
+        OkHttpClient client = getUnsafeOkHttpClient();
+        Request request;
+
+        Log.e("testing ", "testing");
+        request = new Request.Builder().url(Link).build();
+
+        Log.e("testing ", "testing2");
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.e("exceptiong", e.getMessage());
+                try {
+                    imageResponseImageView.onImageViewImageFailure(e.getMessage());
+                } catch (JSONException jsonException) {
+                    jsonException.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try {
+                    Log.e("data", response.body().string());
+                    imageResponseImageView.onImageViewImageResponse(response, response.code(), requestcode, imageView);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -848,8 +832,6 @@ public class Functions {
         }
 
 
-
-
         MultipartBody.Builder builder = new MultipartBody.Builder();
         RequestBody body = null;
 
@@ -871,7 +853,6 @@ public class Functions {
         }
 
 
-
         if (requestType.equals("GET")) {
             request = new Request.Builder().url(httpBuilder.build()).method("GET", null).build();
         } else {
@@ -880,8 +861,6 @@ public class Functions {
                     .method(requestType, body)
                     .build();
         }
-
-
 
 
         client.newCall(request).enqueue(new Callback() {
@@ -915,7 +894,6 @@ public class Functions {
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
-
 
 
     public static String readFromFile(Context context, String name) {
@@ -1091,11 +1069,10 @@ public class Functions {
     }
 
 
-
     public static OkHttpClient getUnsafeOkHttpClient() {
         try {
             // Create a trust manager that does not validate certificate chains
-            final TrustManager[] trustAllCerts = new TrustManager[] {
+            final TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         @Override
                         public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
@@ -1119,7 +1096,7 @@ public class Functions {
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override
                 public boolean verify(String hostname, SSLSession session) {
@@ -1152,11 +1129,24 @@ public class Functions {
     public static void uploadProtectedFile(ServerResponse serverResponse, AbstractXMPPConnection connection, File file, int requestcode) {
         try {
             HttpFileUploadManager httpFileUploadManager = HttpFileUploadManager.getInstanceFor(connection);
-            if(httpFileUploadManager.discoverUploadService()){
-                if(httpFileUploadManager.isUploadServiceDiscovered()){
+            if (httpFileUploadManager.discoverUploadService()) {
+                if (httpFileUploadManager.isUploadServiceDiscovered()) {
 
-                    RequestBody requestBody = RequestBody.create(file,MediaType.parse(FileUtils.getMimeType(file)));
-                    Log.e("mimetype",FileUtils.getMimeType(file));
+
+                    long totalSize = file.length();
+                    // RequestBody requestBody = RequestBody.create(file, MediaType.parse(FileUtils.getMimeType(file)));
+                    RequestBody requestBody = new CountingFileRequestBody(file, FileUtils.getMimeType(file), new CountingFileRequestBody.ProgressListener() {
+                        @Override
+                        public void transferred(long num) {
+                            float progress = (num / (float) totalSize) * 100;
+                            // uploadData.progressValue = (int) progress;
+                            Log.e("progress", String.valueOf(progress));
+
+
+                        }
+                    });
+
+                    Log.e("mimetype", FileUtils.getMimeType(file));
 
                     final Slot slot = httpFileUploadManager.requestSlot(file.getName(), requestBody.contentLength(), FileUtils.getMimeType(file));
 
@@ -1167,15 +1157,10 @@ public class Functions {
                             .put(requestBody)
                             .build();
 
-                    Log.e("uploadurl",slot.getPutUrl().toString());
-                    Log.e("downloadurl",slot.getGetUrl().toString());
-
                     client.newCall(request).enqueue(new Callback() {
 
                         @Override
                         public void onFailure(final Call call, final IOException e) {
-                            Log.e("upload","unsuccessfull");
-                            Log.e("upload",e.getMessage());
                             try {
                                 serverResponse.onFailure(e.getMessage());
                             } catch (JSONException jsonException) {
@@ -1185,159 +1170,89 @@ public class Functions {
 
                         @Override
                         public void onResponse(final Call call, final Response response) throws IOException {
-                            if (!response.isSuccessful()) {
-                                try {
-                                    Log.e("response",response.body().string());
-                                    serverResponse.onResponse(slot.getGetUrl().toString(),200,requestcode);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+
+                            try {
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("body", slot.getGetUrl());
+                                if (FileUtils.getMimeType(file).contains("image")) {
+                                    jsonObject.put("type", "image");
+                                } else if (FileUtils.getMimeType(file).contains("video")) {
+                                    jsonObject.put("type", "video");
+                                } else {
+                                    jsonObject.put("type", "file");
                                 }
+
+                                serverResponse.onResponse(jsonObject.toString(), 200, requestcode);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+
                         }
                     });
 
 
-                }else {
-                    Log.e("uploadservice","false");
+                } else {
+                    Log.e("uploadservice", "false");
                 }
-            }else {
-                Log.e("httpuploadservice","false");
+            } else {
+                Log.e("httpuploadservice", "false");
             }
 
 
         } catch (Exception ex) {
-            Log.e("exceptionasdf",ex.toString());
+            Log.e("exceptionasdf", ex.toString());
         }
 
     }
 
+    public static class CountingFileRequestBody extends RequestBody {
 
+        private static final int SEGMENT_SIZE = 2048; // okio.Segment.SIZE
 
-    public static boolean upload_image5(String urls,File file){
+        private final File file;
+        private final ProgressListener listener;
+        private final String contentType;
 
+        public CountingFileRequestBody(File file, String contentType, ProgressListener listener) {
+            this.file = file;
+            this.contentType = contentType;
+            this.listener = listener;
+        }
 
-        HttpURLConnection connection = null;
-        DataOutputStream outputStream = null;
-        DataInputStream inputStream = null;
-        String myfilename = file.getName();
-        String urlServer = urls;
-        String lineEnd = "\r\n";
-        String twoHyphens = "--";
-        String boundary =  "*****";
-        boolean erg = false;
-        int bytesRead, bytesAvailable, bufferSize;
-        byte[] buffer;
-        int maxBufferSize = 1*1024*1024;
-        String LastError = "";
+        @Override
+        public long contentLength() {
+            return file.length();
+        }
 
-        try
-        {
-            FileInputStream fileInputStream = new FileInputStream(file);
-            Log.e("true1","true");
-            URL url = new URL(urlServer);
-            connection = (HttpsURLConnection) url.openConnection();
-            Log.e("true2","true");
-            // Allow Inputs & Outputs
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-            connection.setUseCaches(false);
+        @Override
+        public MediaType contentType() {
+            return MediaType.parse(contentType);
+        }
 
-            // Enable POST method
-            connection.setRequestMethod("PUT");
-
-            connection.setRequestProperty("Connection", "Keep-Alive");
-            connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
-//            connection.addRequestProperty("Authorization","Basic [YOUR MD5 LOGIN VALUE]");
-
-            outputStream = new DataOutputStream( connection.getOutputStream() );
-            Log.e("true4","true");
-            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-            Log.e("true4","true");
-            outputStream.writeBytes("Content-Disposition: form-data; name=\"DestFileName\"");
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(myfilename);
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-            outputStream.writeBytes("Content-Disposition: form-data; name=\"Target\"" );
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes("DOC");
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-            outputStream.writeBytes("Content-Disposition: form-data; name=\"filename\"");
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(myfilename);
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-            outputStream.writeBytes("Content-Disposition: form-data; name=\"File\"; filename=\"" + myfilename + "\"");
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes("Content-Type: application/*");
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(lineEnd);
-            //hier File schreiben
-            bytesAvailable = fileInputStream.available();
-            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            buffer = new byte[bufferSize];
-            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-            while (bytesRead > 0)
-            {
-                outputStream.write(buffer, 0, bufferSize);
-                bytesAvailable = fileInputStream.available();
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-            }
-
-            outputStream.writeBytes(lineEnd);
-            outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-
-            fileInputStream.close();
-
-
+        @Override
+        public void writeTo(BufferedSink sink) throws IOException {
+            Source source = null;
             try {
-                inputStream = new DataInputStream(connection.getInputStream());
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = inputStream.readLine()) != null) {
-                    response.append(line).append('\n');
+                source = Okio.source(file);
+                long total = 0;
+                long read;
+
+                while ((read = source.read(sink.buffer(), SEGMENT_SIZE)) != -1) {
+                    total += read;
+                    sink.flush();
+                    this.listener.transferred(total);
+
                 }
-               LastError =response.toString();
-                Log.e("error",LastError);
-                erg = true;
-            } catch (IOException e) {
-                LastError = e.getMessage();
-                Log.e("error2",LastError);
-                erg = false;
             } finally {
-                if (inputStream != null){
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-
-                        e.printStackTrace();
-                    }
-                }
+                Util.closeQuietly(source);
             }
+        }
 
-            outputStream.flush();
-            outputStream.close();
+        public interface ProgressListener {
+            void transferred(long num);
         }
-       catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return erg;
+
     }
-
-
 
 
 }
