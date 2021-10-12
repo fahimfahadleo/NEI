@@ -81,6 +81,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.SmackException;
@@ -872,6 +873,9 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                                     .limitResultsSince(yesterday())
                                     .queryLastPage().withAdditionalFormField(formField)
                                     .build();
+
+
+                            
                             try {
                                 MamManager.MamQuery mamQuery = manager.queryArchive(mamQueryArgs);
                                 messages = new LinkedList<Message>(mamQuery.getMessages());
@@ -1200,8 +1204,11 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
             String encodec;
+            Log.e("emoji",body);
+            String toServerUnicodeEncoded = StringEscapeUtils.escapeJava(body);
+            Log.e("emojiunicode",toServerUnicodeEncoded);
 
-            encodec = EncrytpAndDecrypt(body, "encode", passstr);
+            encodec = EncrytpAndDecrypt(toServerUnicodeEncoded, "encode", passstr);
 
             String userpassword = passstr;
             String userboundage = boundagestr;
@@ -1342,45 +1349,90 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
             private final TextView message, time;
-            private final CircleImageView profilepicture;
             private final ImageView imageview;
             private final PlayerView videoplayer;
             private final RelativeLayout playerlayout;
             private final ImageView fullscreen;
             private final ImageView file;
 
+
+            private final TextView expirytimertext;
+
+            private final ImageView timericon;
+            private final ImageView boundageicon;
+            private final ImageView deliveryreport;
+
             MessageInViewHolder(final View itemView) {
                 super(itemView);
 
                 message = itemView.findViewById(R.id.sendertext);
                 time = itemView.findViewById(R.id.timetext);
-                profilepicture = itemView.findViewById(R.id.profile_image);
                 imageview = itemView.findViewById(R.id.senderimage);
                 videoplayer = itemView.findViewById(R.id.playerview);
                 playerlayout = itemView.findViewById(R.id.sendervideo);
                 fullscreen = itemView.findViewById(R.id.fullscreene);
                 file = itemView.findViewById(R.id.senderfile);
+
+                expirytimertext = itemView.findViewById(R.id.timertext);
+                timericon = itemView.findViewById(R.id.timericon);
+                boundageicon = itemView.findViewById(R.id.boundageicon);
+                deliveryreport = itemView.findViewById(R.id.sendstatus);
             }
 
             void bind(int position) {
-                him++;
-                me = 0;
-                if (him > 1) {
-                    profilepicture.setVisibility(View.INVISIBLE);
-                } else {
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("friend", friendid);
-                        ImageRequest(ChatMessageAdapter.this, profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+
                 Message messageModel = list.get(position);
                 String mode = DefaultED(messageModel.getBody(), "deocode");
+
+
+                message.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View view1 = inflater.inflate(R.layout.messagelongclickoptions, null, false);
+                        TextView replay = view1.findViewById(R.id.replay);
+                        TextView forword = view1.findViewById(R.id.forword);
+                        replay.setEnabled(false);
+
+                        forword.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                View forwordview = inflater.inflate(R.layout.messageforword,null,false);
+                                RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
+                                simpleAdapter adapter = new simpleAdapter(MainActivity.data,context,mode);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                                recyclerView.setAdapter(adapter);
+                                builder.setView(forwordview);
+                                builder.setCancelable(true);
+                                messagelongclickdialog = builder.create();
+                                messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                                messagelongclickdialog.show();
+
+                            }
+                        });
+
+
+
+
+
+                        builder.setView(view1);
+                        builder.setCancelable(true);
+                        messagelongclickdialog = builder.create();
+                        messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+                        messagelongclickdialog.show();
+
+                        return true;
+                    }
+                });
+
+                Log.e("body",mode);
                 try {
                     JSONObject jsonObject = new JSONObject(mode);
-                    String encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    String encodec = StringEscapeUtils.unescapeJava(test);
 
                     Log.e("message", encodec);
 
@@ -1394,6 +1446,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                         playerlayout.setVisibility(View.GONE);
                         fullscreen.setVisibility(View.GONE);
                         file.setVisibility(View.GONE);
+                        Log.e("encodec",encodec);
                         message.setText(encodec);
                     } else if (jsonObject.getString("type").equals("image")) {
                         //initialize for imagemessage
@@ -1469,6 +1522,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                         if (list.size() - 1 == position) {
                             if (!boundageposition.equals("1")) {
                                 Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
+                                boundageicon.setVisibility(View.VISIBLE);
                                 RestartActivity("type1");
                                 isboundageitemavailable = true;
                             } else {
@@ -1506,6 +1560,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
                                     }
                                 }, difference);
+                                //todo timertext show korte hobe
                             }
 
                         } catch (ParseException e) {
@@ -1526,7 +1581,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
             private final TextView message;
             private final TextView time;
-            private final CircleImageView profilepicture;
             private final ImageView imageview;
             private final PlayerView videoplayer;
             private final RelativeLayout playerlayout;
@@ -1534,24 +1588,39 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             private final ImageView file;
 
 
+            private final TextView expirytimertext;
+
+            private final ImageView timericon;
+            private final ImageView boundageicon;
+            private final ImageView deliveryreport;
+
+
             MessageOutViewHolder(final View itemView) {
                 super(itemView);
                 message = itemView.findViewById(R.id.sendertext);
                 time = itemView.findViewById(R.id.timetext);
-                profilepicture = itemView.findViewById(R.id.profile_image);
+
                 imageview = itemView.findViewById(R.id.senderimage);
                 videoplayer = itemView.findViewById(R.id.playerview);
                 playerlayout = itemView.findViewById(R.id.sendervideo);
                 fullscreen = itemView.findViewById(R.id.fullscreene);
                 file = itemView.findViewById(R.id.senderfile);
+
+                expirytimertext = itemView.findViewById(R.id.timertext);
+                timericon = itemView.findViewById(R.id.timericon);
+                boundageicon = itemView.findViewById(R.id.boundageicon);
+                deliveryreport = itemView.findViewById(R.id.sendstatus);
+
+
             }
 
             void bind(int position) {
-                him = 0;
-                profilepicture.setVisibility(View.INVISIBLE);
                 Message messageModel = list.get(position);
 
                 String mode = DefaultED(messageModel.getBody(), "deocode");
+
+                Log.e("body",mode);
+
                 message.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
@@ -1599,7 +1668,9 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 try {
                     JSONObject jsonObject = new JSONObject(mode);
 
-                    String encodec = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    String encodec = StringEscapeUtils.unescapeJava(test);
+
                     Log.e("message", encodec);
 
 
@@ -1612,6 +1683,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                         playerlayout.setVisibility(View.GONE);
                         fullscreen.setVisibility(View.GONE);
                         file.setVisibility(View.GONE);
+                        Log.e("encodec",encodec);
                         message.setText(encodec);
                     } else if (jsonObject.getString("type").equals("image")) {
                         //initialize for imagemessage

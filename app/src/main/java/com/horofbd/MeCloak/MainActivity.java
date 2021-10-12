@@ -1,11 +1,13 @@
 package com.horofbd.MeCloak;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,7 +19,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -35,6 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -42,6 +47,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.JsonObject;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionListener;
@@ -62,6 +68,7 @@ import org.json.JSONObject;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+import org.minidns.record.A;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -103,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     static DrawerLayout drawerLayout;
     TextView logout, Settings, gopremiumtext, helptext, contactustext, tnctext, policytext, aboutustext,pagelogout;
     CardView logoutview, SettingsView, gopremiumview, helpview, contactusview, tncview, policyview, aboutusview,pagelogoutview;
-    ImageView search;
+
 
     static ServerResponse serverResponse;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -118,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     static String nextpageurl = "";
     static ListviewAdapter adapter;
     EditText searchedt;
+
 
 
 
@@ -349,6 +357,28 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         return cursor.getString(idx);
     }
 
+    ArrayList<JSONObject>temparraylist;
+
+    boolean isPermissionGranted(){
+        boolean b = false;
+        for(String s:permissions){
+            b =  ActivityCompat.checkSelfPermission(this, s) == PackageManager.PERMISSION_GRANTED;
+            if(!b){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void askPermission(){
+        ActivityCompat.requestPermissions(this, permissions, 15);
+    }
+
+
+    String [] permissions = new String[]{Manifest.permission.INTERNET,Manifest.permission.ACCESS_NETWORK_STATE,Manifest.permission.ACCESS_MEDIA_LOCATION,Manifest.permission.READ_PHONE_STATE
+    ,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_WIFI_STATE,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.READ_SMS,
+            Manifest.permission.SEND_SMS,Manifest.permission.RECEIVE_SMS};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -360,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         logout = drawerLayout.findViewById(R.id.logout);
         logoutview = drawerLayout.findViewById(R.id.logoutview);
         notification = findViewById(R.id.notification);
-        search = findViewById(R.id.searchbutton);
+
         recyclerView = findViewById(R.id.recyclerview);
         SettingsView = findViewById(R.id.settingsview);
         Settings = findViewById(R.id.settings);
@@ -390,11 +420,55 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         InitLinks(this);
         myNotificationData = new ArrayList<>();
 
+        if(!isPermissionGranted()){
+            askPermission();
+        }
+
+
+
+
 
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.parseColor("#CBE1CF"));
+
+
+
+        searchedt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String text = charSequence.toString();
+                temparraylist = new ArrayList<>();
+                if(text.length()!=0&& data.size()!=0){
+                    for(JSONObject jsonObject:data){
+                        try {
+                            if(jsonObject.getString("name").toLowerCase().contains(text.toLowerCase())){
+                                temparraylist.add(jsonObject);
+                            }
+                            if(jsonObject.getString("phone_no").toLowerCase().contains(text.toLowerCase())){
+                                temparraylist.add(jsonObject);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    setUpData(temparraylist);
+                }
+                if(text.length() == 0){
+                    setUpData(data);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+
+
 
 
 
@@ -531,19 +605,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             }
         });
 
-//        search.setOnClickListener(view -> {
-//            if (isopen) {
-//                TransitionManager.beginDelayedTransition(searchlayout, new AutoTransition());
-//                TransitionManager.beginDelayedTransition(recyclerView, new AutoTransition());
-//                searchlayout.setVisibility(View.GONE);
-//                isopen = false;
-//            } else {
-//                TransitionManager.beginDelayedTransition(recyclerView, new AutoTransition());
-//                TransitionManager.beginDelayedTransition(searchlayout, new AutoTransition());
-//                searchlayout.setVisibility(View.VISIBLE);
-//                isopen = true;
-//            }
-//        });
+
         notification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -583,8 +645,16 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     }
     public static ArrayList<JSONObject> data;
 
+
+
+
+
     public static void setUpData(ArrayList<JSONObject> listdata) {
-        data = listdata;
+        if(data == null){
+            data = listdata;
+        }
+
+
 
         Log.e("mainlist", listdata.toString());
         ((Activity) context).runOnUiThread(() -> {
