@@ -71,27 +71,22 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"/>
 
-        <!--    <com.google.android.material.card.MaterialCardView-->
-        <!--        android:layout_width="wrap_content"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        app:layout_constraintStart_toStartOf="parent"-->
-        <!--        app:layout_constraintTop_toTopOf="parent"-->
-        <!--        app:layout_constraintEnd_toStartOf="@id/profile_image"-->
-        <!--        app:cardBackgroundColor="@color/red_500"-->
-        <!--        android:id="@+id/cardview"-->
-        <!--        android:layout_marginBottom="@dimen/_6sdp"-->
-        <!--        android:layout_marginTop="@dimen/_3sdp"-->
-        <!--        -->
-        <!--        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.End.MaterialCardView">-->
+        <ImageView
+            android:layout_width="@dimen/_16sdp"
+            android:layout_height="@dimen/_16sdp"
+            android:id="@+id/replaybutton"
+            android:src="@drawable/replay"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/_8sdp"/>
+
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_3sdp"
             android:layout_marginBottom="@dimen/_6sdp"
@@ -102,14 +97,13 @@
             app:layout_constraintTop_toTopOf="parent">
 
 
-            <EditText
+            <TextView
                 android:id="@+id/sendertext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:gravity="end"
                 android:background="@drawable/messagebackground"
-                android:enabled="false"
                 android:paddingStart="@dimen/_6sdp"
                 android:paddingTop="@dimen/_8sdp"
                 android:paddingEnd="@dimen/_6sdp"

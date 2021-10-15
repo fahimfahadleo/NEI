@@ -11,29 +11,29 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.webkit.MimeTypeMap;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.URLUtil;
-import android.webkit.WebSettings;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -42,7 +42,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
@@ -54,28 +53,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.OkHttp3Downloader;
@@ -113,37 +104,18 @@ import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.Call;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.OkHttp;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.horofbd.MeCloak.MainActivity.connection;
@@ -172,8 +144,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     DrawerLayout drawerLayout;
     static ChatMessageAdapter adapter;
     EditText typepassword;
-    ImageView timer, enableboundage, file;
-    CardView timerview, enableboundageview, boundageview, fileview;
+    ImageView timer, file;
+    CardView timerview, boundageview, fileview;
     TextView boundagetext, boundagetip, passwordtip, timertip;
     DatabaseHelper helper;
     ImageView menubutton;
@@ -186,15 +158,23 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static String userphonenumber;
     boolean isDatabaseAvailable = false;
     Bundle save;
-    TextView titletext, timerside;
+    TextView  timerside;
     CircleImageView profilepicture;
-    ImageView showbelow;
-    ScrollView belowview;
-    boolean isbelowviewvisible = false;
+    static ImageView showbelow;
+    static ScrollView belowview;
+    static boolean isbelowviewvisible = false;
     ImageView boundagebelow;
     CardView boundagebelowview;
-    CardView passwordview, passwordbelowview, timerbelowview, timersideview;
-    ImageView passwordbutton, passwordbelowbutton, timerbelow;
+    CardView  passwordbelowview, timerbelowview, timersideview;
+    ImageView  passwordbelowbutton, timerbelow;
+    TextView title,titlephonenumber;
+    static LinearLayout sendmessagelayout;
+    static ScrollView invisiblelayout;
+    static String isReplied = "";
+    static String  stanzaid = "";
+    static LinearLayout forwardlayout;
+    static LinearLayout visiblelayout;
+    static TextView invisiblebutton;
 
 
     static native void StartActivity(Context context, String activity, String data);
@@ -255,6 +235,16 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if(forwardlayout.getVisibility() == View.VISIBLE){
+            forwardlayout.setVisibility(View.GONE);
+            visiblelayout.setVisibility(View.VISIBLE);
+        }else {
+            super.onBackPressed();
+        }
+
+    }
 
     static PlayerView playerView;
     static String userboundage, usertimer, friendid;
@@ -280,13 +270,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         InitLinks();
         timer = findViewById(R.id.timer);
         timerview = findViewById(R.id.timerview);
-        enableboundage = findViewById(R.id.enableboundage);
-        enableboundageview = findViewById(R.id.enableboundageview);
         helper = new DatabaseHelper(this);
         menubutton = findViewById(R.id.menubutton);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
-        titletext = findViewById(R.id.titletext);
         profilepicture = findViewById(R.id.profile_image);
         showbelow = findViewById(R.id.showbelow);
         belowview = findViewById(R.id.belowbar);
@@ -299,8 +286,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         boundagetip = findViewById(R.id.boundagetips);
         boundagebelow = findViewById(R.id.enablebelowboundage);
         boundagebelowview = findViewById(R.id.enablebelowboundageview);
-        passwordview = findViewById(R.id.security).findViewById(R.id.passwordview);
-        passwordbutton = findViewById(R.id.security).findViewById(R.id.password);
         sendimage = findViewById(R.id.image);
         passwordbelowbutton = findViewById(R.id.belowpassword);
         passwordbelowview = findViewById(R.id.belowpasswordview);
@@ -315,6 +300,24 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         serverResponse = this;
         incomingChatMessageListener = this;
         outgoingChatMessageListener = this;
+        title = findViewById(R.id.titletext);
+        titlephonenumber = findViewById(R.id.titlephone);
+        sendmessagelayout = findViewById(R.id.sendmessagelayout);
+        invisiblelayout = findViewById(R.id.belowbar);
+        forwardlayout = findViewById(R.id.forwordlayout);
+        forwardlayout.setVisibility(View.GONE);
+visiblelayout = findViewById(R.id.visiblelayout);
+invisiblebutton = findViewById(R.id.invisiblebutton);
+invisiblebutton.setVisibility(View.GONE);
+
+invisiblebutton.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        forwardlayout.setVisibility(View.GONE);
+        visiblelayout.setVisibility(View.VISIBLE);
+        invisiblebutton.setVisibility(View.GONE);
+    }
+});
 
 
         // Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(profilepicture);
@@ -325,6 +328,13 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         userboundage = getIntent().getStringExtra("boundage");
         usertimer = getIntent().getStringExtra("");
         friendid = getIntent().getStringExtra("id");
+
+        String username = getIntent().getStringExtra("name");
+
+
+        title.setText(username);
+        titlephonenumber.setText(userphonenumber);
+
 
         Cursor c = helper.getData(userphonenumber, getLoginInfo("page_no"));
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
@@ -344,7 +354,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         }
 
         context = this;
-        titletext.setText(getIntent().getStringExtra("name"));
 
 
         JSONObject jsonObject = new JSONObject();
@@ -445,19 +454,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         });
 
 
-        enableboundageview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setBoundageIcon();
-
-            }
-        });
-        enableboundage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setBoundageIcon();
-            }
-        });
 
 
         showbelow.setOnClickListener(new View.OnClickListener() {
@@ -466,11 +462,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 if (isbelowviewvisible) {
                     isbelowviewvisible = false;
                     belowview.setVisibility(View.GONE);
-                    showbelow.setImageDrawable(getResources().getDrawable(R.drawable.arrowdown));
+                    belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_up));
+                    TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
+                    showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
                 } else {
                     isbelowviewvisible = true;
                     belowview.setVisibility(View.VISIBLE);
-                    showbelow.setImageDrawable(getResources().getDrawable(R.drawable.arrowupicon));
+                    belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_down));
+                    TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
+                    showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowupicon));
                 }
             }
         });
@@ -542,29 +542,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         Log.e("pass", "passstr");
 
         if (!timerstr.equals("0")) {
-            timerview.setCardBackgroundColor(getResources().getColor(R.color.green));
             timersideview.setCardBackgroundColor(getResources().getColor(R.color.green));
             timerbelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
         }
 
         if (!boundagestr.equals("0")) {
-            enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
             boundagebelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
-            boundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
         }
 
-        timer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showTimerDialog();
-            }
-        });
-        timerview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showTimerDialog();
-            }
-        });
+
 
 
         if (savedInstanceState != null && savedInstanceState.containsKey("STATE_CHECKSUM")) {
@@ -599,12 +585,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             }
         });
 
-        passwordview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setPassword();
-            }
-        });
 
         passwordbelowview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -618,12 +598,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 setPassword();
             }
         });
-        passwordbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setPassword();
-            }
-        });
+
 
 
 // ContentView is the root view of the layout of this activity/fragment
@@ -708,13 +683,11 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         try {
             if (!boundagestr.equals("0")) {
                 updateUserInfo(3, "0");
-                enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
                 boundageview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
                 boundagebelowview.setCardBackgroundColor(getResources().getColor(R.color.red_500));
 
             } else {
                 updateUserInfo(3, "1");
-                enableboundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
                 boundageview.setCardBackgroundColor(getResources().getColor(R.color.green));
                 boundagebelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
             }
@@ -784,6 +757,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         }
 
     }
+
+
+
+
 
     static void InitConnection() throws Settings.SettingNotFoundException {
         if (connection != null) {
@@ -890,53 +867,104 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                                 messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                                 messagerecyclerview.setItemAnimator(new DefaultItemAnimator());
 
+                                messagerecyclerview.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Log.e("clicked","recyclerviewclicked");
+                                        if(invisiblelayout.getVisibility() == View.VISIBLE){
+                                            invisiblelayout.setVisibility(View.GONE);
+                                            visiblelayout.setVisibility(View.VISIBLE);
+                                        }
+                                    }
+                                });
 
                                 messagerecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
                                     @Override
                                     public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                                         super.onScrollStateChanged(recyclerView, newState);
-                                        if (RecyclerView.SCROLL_STATE_IDLE == newState) {
-                                            // fragProductLl.setVisibility(View.VISIBLE);
-                                            Log.e("scrollstate", "idel");
-
-                                            LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
-                                            int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
-                                            int lastvisiblePosition = layoutManager.findLastVisibleItemPosition();
-
-                                            Log.e("first", String.valueOf(firstVisiblePosition));
-                                            Log.e("last", String.valueOf(lastvisiblePosition));
-
-                                            boundageposition = userboundage;
 
 
-                                            ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
-                                            for (int i = firstVisiblePosition; i <= lastvisiblePosition; i++) {
-                                                String s = DefaultED(adapter.getItem(i).getBody(), "decode");
 
 
-                                                try {
-                                                    JSONObject jsonObject = new JSONObject(s);
+                                        if(recyclerView.getAdapter()!=null && recyclerView.getAdapter().getItemCount()!=0) {
 
-                                                    if (jsonObject.getString("boundage").equals("1")) {
-                                                        if (!boundageposition.equals("1")) {
-                                                            RestartActivity("type1");
+
+                                            if(!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                                                if (isbelowviewvisible) {
+                                                    isbelowviewvisible = false;
+                                                    belowview.setVisibility(View.GONE);
+                                                    belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_up));
+                                                    TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
+                                                    showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
+                                                } else {
+                                                    isbelowviewvisible = true;
+                                                    belowview.setVisibility(View.VISIBLE);
+                                                    belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_down));
+                                                    TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
+                                                    showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowupicon));
+                                                }
+                                            }
+
+                                            if (RecyclerView.SCROLL_STATE_IDLE == newState) {
+                                                // fragProductLl.setVisibility(View.VISIBLE);
+                                                Log.e("scrollstate", "idel");
+
+                                                LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
+                                                int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+                                                int lastvisiblePosition = layoutManager.findLastVisibleItemPosition();
+
+                                                Log.e("first", String.valueOf(firstVisiblePosition));
+                                                Log.e("last", String.valueOf(lastvisiblePosition));
+
+                                                boundageposition = userboundage;
+
+
+                                                ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
+                                                for (int i = firstVisiblePosition; i <= lastvisiblePosition; i++) {
+                                                    String s = DefaultED(adapter.getItem(i).getBody(), "decode");
+
+
+                                                    try {
+                                                        JSONObject jsonObject = new JSONObject(s);
+
+                                                        if (jsonObject.getString("boundage").equals("1")) {
+                                                            if (!boundageposition.equals("1")) {
+                                                                RestartActivity("type1");
+                                                            }
+                                                            isboundageitemavailable = true;
+                                                            break;
+                                                        } else if (i == lastvisiblePosition) {
+                                                            if (!boundageposition.equals("0")) {
+                                                                RestartActivity("type0");
+                                                                isboundageitemavailable = false;
+                                                            }
                                                         }
-                                                        isboundageitemavailable = true;
-                                                        break;
-                                                    } else if (i == lastvisiblePosition) {
-                                                        if (!boundageposition.equals("0")) {
-                                                            RestartActivity("type0");
-                                                            isboundageitemavailable = false;
-                                                        }
+
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
                                                     }
 
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
+
                                                 }
+                                            }
 
 
+                                        }else {
+                                            if (isbelowviewvisible) {
+                                                isbelowviewvisible = false;
+                                                belowview.setVisibility(View.GONE);
+                                                belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_up));
+                                                TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
+                                                showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
+                                            } else {
+                                                isbelowviewvisible = true;
+                                                belowview.setVisibility(View.VISIBLE);
+                                                belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_down));
+                                                TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
+                                                showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowupicon));
                                             }
                                         }
+
                                     }
                                 });
 
@@ -994,7 +1022,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                     try {
                         updateUserInfo(1, password);
                         setpasswordview.setCardBackgroundColor(getResources().getColor(R.color.green));
-                        passwordview.setCardBackgroundColor(getResources().getColor(R.color.green));
                         passwordbelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
                         setUpData();
                     } catch (JSONException e) {
@@ -1004,7 +1031,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                     try {
                         updateUserInfo(1, password);
                         setpasswordview.setCardBackgroundColor(getResources().getColor(R.color.green));
-                        passwordview.setCardBackgroundColor(getResources().getColor(R.color.green));
                         passwordbelowview.setCardBackgroundColor(getResources().getColor(R.color.green));
                         setUpData();
                     } catch (JSONException e) {
@@ -1186,7 +1212,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         addNewMessage(message);
 
     }
-
+//,String isreplied,String stanzaid
 
     public static void sendMessage(String body, String toJid, String type) {
 
@@ -1222,6 +1248,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             jsonObject.put("timestamp", getDate("0"));
             jsonObject.put("expiry", getDate(userexpiry));
             jsonObject.put("type", type);
+
+//            jsonObject.put("isreplied", isreplied);
+//            jsonObject.put("stanzaid", stanzaid);
+
 
 
             Log.e("message", body);
@@ -1287,6 +1317,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static AlertDialog messagelongclickdialog;
 
     static Bitmap tempbitmap;
+
+
+
+
 
     public static class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ImageResponse, ImageResponseImageView {
         Context context;
@@ -1361,6 +1395,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             private final ImageView timericon;
             private final ImageView boundageicon;
             private final ImageView deliveryreport;
+            private final ImageView replaybutton;
 
             MessageInViewHolder(final View itemView) {
                 super(itemView);
@@ -1377,6 +1412,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 timericon = itemView.findViewById(R.id.timericon);
                 boundageicon = itemView.findViewById(R.id.boundageicon);
                 deliveryreport = itemView.findViewById(R.id.sendstatus);
+                replaybutton = itemView.findViewById(R.id.replaybutton);
             }
 
             void bind(int position) {
@@ -1385,50 +1421,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 String mode = DefaultED(messageModel.getBody(), "deocode");
 
 
-                message.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-                        View view1 = inflater.inflate(R.layout.messagelongclickoptions, null, false);
-                        TextView replay = view1.findViewById(R.id.replay);
-                        TextView forword = view1.findViewById(R.id.forword);
-                        replay.setEnabled(false);
-
-                        forword.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                View forwordview = inflater.inflate(R.layout.messageforword,null,false);
-                                RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
-                                simpleAdapter adapter = new simpleAdapter(MainActivity.data,context,mode);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-                                recyclerView.setAdapter(adapter);
-                                builder.setView(forwordview);
-                                builder.setCancelable(true);
-                                messagelongclickdialog = builder.create();
-                                messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-                                messagelongclickdialog.show();
-
-                            }
-                        });
-
-
-
-
-
-                        builder.setView(view1);
-                        builder.setCancelable(true);
-                        messagelongclickdialog = builder.create();
-                        messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-                        messagelongclickdialog.show();
-
-                        return true;
-                    }
-                });
-
                 Log.e("body",mode);
+
+
+
                 try {
                     JSONObject jsonObject = new JSONObject(mode);
                     String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
@@ -1448,6 +1444,32 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                         file.setVisibility(View.GONE);
                         Log.e("encodec",encodec);
                         message.setText(encodec);
+
+                        message.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View view) {
+
+//                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//                                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+//                                View forwordview =inflater.inflate(R.layout.messageforword,null,false);
+//                                RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
+//                                simpleAdapter adapter = new simpleAdapter(MainActivity.data,context,mode);
+//                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//                                recyclerView.setAdapter(adapter);
+//                                builder.setView(forwordview);
+//                                builder.setCancelable(true);
+//                                messagelongclickdialog = builder.create();
+//                                messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+//                                messagelongclickdialog.show();
+
+                                forwardlayout.setVisibility(View.VISIBLE);
+                                invisiblelayout.setVisibility(View.GONE);
+                                visiblelayout.setVisibility(View.GONE);
+                                TransitionManager.beginDelayedTransition(forwardlayout,new AutoTransition());
+                                invisiblebutton.setVisibility(View.VISIBLE);
+                                return true;
+                            }
+                        });
                     } else if (jsonObject.getString("type").equals("image")) {
                         //initialize for imagemessage
                         if (URLUtil.isValidUrl(encodec)) {
@@ -1577,6 +1599,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         }
 
 
+
+
         private class MessageOutViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView message;
@@ -1586,13 +1610,11 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             private final RelativeLayout playerlayout;
             private final ImageView fullscreen;
             private final ImageView file;
-
-
             private final TextView expirytimertext;
-
             private final ImageView timericon;
             private final ImageView boundageicon;
             private final ImageView deliveryreport;
+            private final ImageView replaybutton;
 
 
             MessageOutViewHolder(final View itemView) {
@@ -1610,6 +1632,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                 timericon = itemView.findViewById(R.id.timericon);
                 boundageicon = itemView.findViewById(R.id.boundageicon);
                 deliveryreport = itemView.findViewById(R.id.sendstatus);
+                replaybutton = itemView.findViewById(R.id.replaybutton);
 
 
             }
@@ -1617,52 +1640,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             void bind(int position) {
                 Message messageModel = list.get(position);
 
+
                 String mode = DefaultED(messageModel.getBody(), "deocode");
 
                 Log.e("body",mode);
-
-                message.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-                        View view1 = inflater.inflate(R.layout.messagelongclickoptions, null, false);
-                        TextView replay = view1.findViewById(R.id.replay);
-                        TextView forword = view1.findViewById(R.id.forword);
-                        replay.setEnabled(false);
-
-                        forword.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                View forwordview = inflater.inflate(R.layout.messageforword,null,false);
-                                RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
-                                simpleAdapter adapter = new simpleAdapter(MainActivity.data,context,mode);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-                                recyclerView.setAdapter(adapter);
-                                builder.setView(forwordview);
-                                builder.setCancelable(true);
-                                messagelongclickdialog = builder.create();
-                                messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-                                messagelongclickdialog.show();
-
-                            }
-                        });
-
-
-
-
-
-                        builder.setView(view1);
-                        builder.setCancelable(true);
-                        messagelongclickdialog = builder.create();
-                        messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-                        messagelongclickdialog.show();
-
-                        return true;
-                    }
-                });
 
 
                 try {
@@ -1676,6 +1657,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
                     Log.e("type", jsonObject.getString("type"));
 
+
                     if (jsonObject.getString("type").equals("txt")) {
                         //initialize for text message
                         message.setVisibility(View.VISIBLE);
@@ -1685,12 +1667,41 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                         file.setVisibility(View.GONE);
                         Log.e("encodec",encodec);
                         message.setText(encodec);
+
+
+                        message.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View view) {
+//                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//                                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+//                                View forwordview =inflater.inflate(R.layout.messageforword,null,false);
+//                                RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
+//                                simpleAdapter adapter = new simpleAdapter(MainActivity.data,context,mode);
+//                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//                                recyclerView.setAdapter(adapter);
+//                                builder.setView(forwordview);
+//                                builder.setCancelable(true);
+//                                messagelongclickdialog = builder.create();
+//                                messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+//                                messagelongclickdialog.show();
+                                forwardlayout.setVisibility(View.VISIBLE);
+                                invisiblelayout.setVisibility(View.GONE);
+                                visiblelayout.setVisibility(View.GONE);
+                                TransitionManager.beginDelayedTransition(forwardlayout,new AutoTransition());
+                                invisiblebutton.setVisibility(View.VISIBLE);
+
+
+                                return true;
+                            }
+                        });
+
                     } else if (jsonObject.getString("type").equals("image")) {
                         //initialize for imagemessage
                         if (URLUtil.isValidUrl(encodec)) {
                             message.setVisibility(View.GONE);
                             imageview.setVisibility(View.VISIBLE);
                             loadImage(imageview, encodec);
+
                         } else {
                             message.setVisibility(View.VISIBLE);
                             message.setText(encodec);
@@ -2137,6 +2148,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
                     }
                 });
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
