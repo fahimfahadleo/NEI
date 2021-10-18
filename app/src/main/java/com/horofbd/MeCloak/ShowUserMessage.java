@@ -3,12 +3,15 @@ package com.horofbd.MeCloak;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -23,15 +26,14 @@ import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Base64;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -44,12 +46,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 
 import com.google.android.exoplayer2.C;
@@ -139,8 +143,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static List<Message> messages;
     static ChatManager chatManager;
     static RecyclerView messagerecyclerview;
-    static int me = 0;
-    static int him = 0;
     DrawerLayout drawerLayout;
     static ChatMessageAdapter adapter;
     EditText typepassword;
@@ -158,23 +160,31 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static String userphonenumber;
     boolean isDatabaseAvailable = false;
     Bundle save;
-    TextView  timerside;
+    TextView timerside;
     CircleImageView profilepicture;
     static ImageView showbelow;
     static ScrollView belowview;
     static boolean isbelowviewvisible = false;
     ImageView boundagebelow;
     CardView boundagebelowview;
-    CardView  passwordbelowview, timerbelowview, timersideview;
-    ImageView  passwordbelowbutton, timerbelow;
-    TextView title,titlephonenumber;
+    CardView passwordbelowview, timerbelowview, timersideview;
+    ImageView passwordbelowbutton, timerbelow;
+    TextView title, titlephonenumber;
     static LinearLayout sendmessagelayout;
     static ScrollView invisiblelayout;
-    static String isReplied = "";
-    static String  stanzaid = "";
     static LinearLayout forwardlayout;
     static LinearLayout visiblelayout;
     static TextView invisiblebutton;
+    static LinearLayout replaylayout;
+    static ImageView closereplaylayout;
+    static TextView repliedmessage;
+    static boolean isFirstAttempt = true;
+    ImageView forwardmessageimage, copymessageimage, deletemessageimage;
+    TextView forwordmessagetext, copymessagetext, deletemessagetext;
+    LinearLayout forwardmessagelayout, copymessagelayout, deletemessagelayout;
+    static LinearLayout reactionlayout;
+    TextView love, wow, loveable, sad, gelitui, haha, cry;
+    ImageView addreaction;
 
 
     static native void StartActivity(Context context, String activity, String data);
@@ -237,10 +247,25 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
     @Override
     public void onBackPressed() {
-        if(forwardlayout.getVisibility() == View.VISIBLE){
+
+
+        if (forwardlayout.getVisibility() == View.VISIBLE) {
             forwardlayout.setVisibility(View.GONE);
             visiblelayout.setVisibility(View.VISIBLE);
-        }else {
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.goup);
+            forwardlayout.setAnimation(animation);
+            reactionlayout.setVisibility(View.GONE);
+            reactionlayout.setAnimation(animation);
+
+        } else if (isbelowviewvisible) {
+
+            isbelowviewvisible = false;
+            belowview.setVisibility(View.GONE);
+            belowview.setAnimation(AnimationUtils.loadAnimation(context, R.anim.dialog_slide_up));
+            TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+            showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
+
+        } else if (!isKeyboardShowing) {
             super.onBackPressed();
         }
 
@@ -252,6 +277,135 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     private final String STATE_RESUME_POSITION = "resumePosition";
     private final String STATE_PLAYER_FULLSCREEN = "playerFullscreen";
     private final String STATE_CHECKSUM = "CHECKSUM";
+
+    void forwordMessage() {
+        //todo forword message
+        String forwordmessge = templongpressstring;
+        Message forwordmode = templongpressmessage;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View forwordview = inflater.inflate(R.layout.messageforword, null, false);
+        TextView messagetext = forwordview.findViewById(R.id.replaymessage);
+        ImageView imagemessage = forwordview.findViewById(R.id.imageview);
+        messagetext.setVisibility(View.VISIBLE);
+
+        messagetext.setText(forwordmessge);
+
+        RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
+        simpleAdapter adapter = new simpleAdapter(MainActivity.data, context, forwordmessge);
+
+
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setAdapter(adapter);
+        builder.setView(forwordview);
+        builder.setCancelable(true);
+        messagelongclickdialog = builder.create();
+        messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
+        messagelongclickdialog.show();
+
+
+    }
+
+    AlertDialog messagelongclickdialog;
+
+    void copymessage() {
+        //todo forword message
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("MeCloakText", templongpressstring);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(context, "Text copied to clipboard!", Toast.LENGTH_SHORT).show();
+    }
+
+
+    void deletemessage() {
+        //todo forword message
+    }
+
+
+    public static void sendReaction(String body, String toJid, String stanzaid) {
+
+        try {
+            EntityBareJid jid = JidCreate.entityBareFrom(toJid + "@" + Important.getXmppHost());
+            char[] chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+            StringBuilder sb = new StringBuilder(20);
+            Random random = new Random();
+            for (int i = 0; i < 20; i++) {
+                char c = chars[random.nextInt(chars.length)];
+                sb.append(c);
+            }
+
+            JSONObject jsonObject = new JSONObject();
+
+
+            String encodec;
+            Log.e("emoji", body);
+            String toServerUnicodeEncoded = StringEscapeUtils.escapeJava(body);
+            Log.e("emojiunicode", toServerUnicodeEncoded);
+
+            encodec = EncrytpAndDecrypt(toServerUnicodeEncoded, "encode", passstr);
+
+            String userpassword = passstr;
+            String userboundage = boundagestr;
+            String userexpiry = timerstr;
+
+
+            jsonObject.put("body", encodec);
+            jsonObject.put("boundage", userboundage);
+            jsonObject.put("hash1", Functions.md5(userpassword));
+            jsonObject.put("hash2", Functions.Sha1(userpassword));
+            jsonObject.put("timestamp", getDate("0"));
+            jsonObject.put("expiry", getDate(userexpiry));
+            jsonObject.put("type", "");
+
+            jsonObject.put("isreplied", "false");
+            jsonObject.put("stanzaid", stanzaid);
+            jsonObject.put("replaymessage", "");
+
+
+            Log.e("message", body);
+
+            String finalbody = jsonObject.toString();
+
+            Message message = new Message();
+            message.setBody(DefaultED(finalbody, "encode"));
+
+            message.setType(Message.Type.chat);
+            message.setStanzaId("reaction " + sb.toString());
+
+            message.setFrom(JidCreate.entityBareFrom(getLoginInfo("phone_no") + "@" + Important.getXmppHost()));
+            message.setTo(jid);
+
+
+            Chat chat = chatManager.chatWith(jid);
+            chat.send(message);
+            MessageEventManager.addNotificationsRequests(message, false, true, false, false);
+            DeliveryReceiptManager.setDefaultAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
+            ProviderManager.addExtensionProvider(DeliveryReceipt.ELEMENT, DeliveryReceipt.NAMESPACE, new DeliveryReceipt.Provider());
+            ProviderManager.addExtensionProvider(DeliveryReceiptRequest.ELEMENT, DeliveryReceipt.NAMESPACE, new DeliveryReceiptRequest.Provider());
+            DeliveryReceiptRequest.addTo(message);
+            //mConnection.sendStanza();
+        } catch (SmackException.NotConnectedException e) {
+            Log.e("exception1", e.getMessage());
+        } catch (InterruptedException e) {
+            Log.e("exception2", e.getMessage());
+        } catch (XmppStringprepException e) {
+            Log.e("exception3", e.getMessage());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void forworddown(){
+        forwardlayout.setVisibility(View.GONE);
+        visiblelayout.setVisibility(View.VISIBLE);
+        reactionlayout.setVisibility(View.GONE);
+        invisiblebutton.setVisibility(View.GONE);
+        Animation animation1 = AnimationUtils.loadAnimation(context, R.anim.godown);
+        forwardlayout.setAnimation(animation1);
+        reactionlayout.setAnimation(animation1);
+    }
 
 
     @Override
@@ -306,19 +460,181 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         invisiblelayout = findViewById(R.id.belowbar);
         forwardlayout = findViewById(R.id.forwordlayout);
         forwardlayout.setVisibility(View.GONE);
-visiblelayout = findViewById(R.id.visiblelayout);
-invisiblebutton = findViewById(R.id.invisiblebutton);
-invisiblebutton.setVisibility(View.GONE);
-
-invisiblebutton.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        forwardlayout.setVisibility(View.GONE);
-        visiblelayout.setVisibility(View.VISIBLE);
+        visiblelayout = findViewById(R.id.visiblelayout);
+        invisiblebutton = findViewById(R.id.invisiblebutton);
         invisiblebutton.setVisibility(View.GONE);
-    }
-});
+        replaylayout = findViewById(R.id.replaylayout);
+        closereplaylayout = findViewById(R.id.closereplaylayout);
+        repliedmessage = findViewById(R.id.repliedmessage);
+        replaylayout.setVisibility(View.GONE);
 
+        forwardmessageimage = findViewById(R.id.forwordmessage);
+        copymessageimage = findViewById(R.id.copymessage);
+        deletemessageimage = findViewById(R.id.deletemessage);
+        forwordmessagetext = findViewById(R.id.forwardmessagetext);
+        copymessagetext = findViewById(R.id.copymessagetext);
+        deletemessagetext = findViewById(R.id.deletemessagetext);
+        forwardmessagelayout = findViewById(R.id.forwardmessagelayout);
+        copymessagelayout = findViewById(R.id.copymessagelayout);
+        deletemessagelayout = findViewById(R.id.deletemessagelayout);
+
+        reactionlayout = findViewById(R.id.reactionlayout);
+        love = findViewById(R.id.love);
+        wow = findViewById(R.id.wow);
+        loveable = findViewById(R.id.loveable);
+        sad = findViewById(R.id.sad);
+        gelitui = findViewById(R.id.gelitui);
+        haha = findViewById(R.id.haha);
+        cry = findViewById(R.id.cry);
+        addreaction = findViewById(R.id.addreaction);
+
+        reactionlayout.setVisibility(View.GONE);
+
+
+        love.setText("\u2764\uFE0F");
+        wow.setText("\uD83D\uDE31");
+        loveable.setText("\uD83E\uDD70");
+        sad.setText("\uD83D\uDE25");
+        gelitui.setText("\uD83D\uDE0F");
+        haha.setText("\uD83D\uDE02");
+        cry.setText("\uD83D\uDE2D");
+
+
+        love.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReaction(love.getText().toString(), userphonenumber, templongpressmessage.getStanzaId());
+                forworddown();
+            }
+        });
+
+        wow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReaction(wow.getText().toString(), userphonenumber, templongpressmessage.getStanzaId());
+                forworddown();
+            }
+        });
+        loveable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReaction(loveable.getText().toString(), userphonenumber, templongpressmessage.getStanzaId());
+                forworddown();
+            }
+        });
+        sad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReaction(sad.getText().toString(), userphonenumber, templongpressmessage.getStanzaId());
+                forworddown();
+            }
+        });
+        gelitui.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReaction(gelitui.getText().toString(), userphonenumber, templongpressmessage.getStanzaId());
+                forworddown();
+            }
+        });
+        haha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReaction(haha.getText().toString(), userphonenumber, templongpressmessage.getStanzaId());
+                forworddown();
+            }
+        });
+        cry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReaction(cry.getText().toString(), userphonenumber, templongpressmessage.getStanzaId());
+                forworddown();
+            }
+        });
+
+
+        forwardmessageimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                forwordMessage();
+            }
+        });
+        forwardmessagelayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                forwordMessage();
+            }
+        });
+        forwordmessagetext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                forwordMessage();
+            }
+        });
+
+        copymessageimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                copymessage();
+            }
+        });
+        copymessagelayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                copymessage();
+            }
+        });
+
+        copymessagetext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                copymessage();
+            }
+        });
+        deletemessageimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deletemessage();
+            }
+        });
+        deletemessagelayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deletemessage();
+            }
+        });
+
+        deletemessagetext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deletemessage();
+            }
+        });
+
+
+        closereplaylayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaylayout.setVisibility(View.GONE);
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.godown);
+                replaylayout.setAnimation(animation);
+
+                TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+                tempreplaymode = null;
+                isReplied = false;
+                tempreplaymessage = null;
+
+            }
+        });
+
+        invisiblebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               forworddown();
+            }
+        });
+
+
+        isbelowviewvisible = false;
 
         // Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(profilepicture);
 
@@ -454,22 +770,20 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
         });
 
 
-
-
         showbelow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (isbelowviewvisible) {
                     isbelowviewvisible = false;
                     belowview.setVisibility(View.GONE);
-                    belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_up));
-                    TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
+                    belowview.setAnimation(AnimationUtils.loadAnimation(context, R.anim.dialog_slide_up));
+                    TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
                     showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
                 } else {
                     isbelowviewvisible = true;
                     belowview.setVisibility(View.VISIBLE);
-                    belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_down));
-                    TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
+                    belowview.setAnimation(AnimationUtils.loadAnimation(context, R.anim.dialog_slide_down));
+                    TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
                     showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowupicon));
                 }
             }
@@ -551,8 +865,6 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
         }
 
 
-
-
         if (savedInstanceState != null && savedInstanceState.containsKey("STATE_CHECKSUM")) {
             Log.e("state", "available");
             mResumeWindow = savedInstanceState.getInt(STATE_RESUME_WINDOW);
@@ -598,7 +910,6 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
                 setPassword();
             }
         });
-
 
 
 // ContentView is the root view of the layout of this activity/fragment
@@ -667,7 +978,17 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
                 String message = typemessage.getText().toString();
                 if (!TextUtils.isEmpty(message)) {
                     typemessage.setText(null);
-                    sendMessage(message, userphonenumber, "txt");
+                    sendMessage(message, userphonenumber, "txt", String.valueOf(isReplied), tempreplaymode == null ? "" : tempreplaymode.getStanzaId(), tempreplaymessage == null ? "" : tempreplaymessage);
+
+                    if (replaylayout.getVisibility() == View.VISIBLE) {
+                        replaylayout.setVisibility(View.GONE);
+                        Animation animation = AnimationUtils.loadAnimation(context, R.anim.godown);
+                        replaylayout.setAnimation(animation);
+                        TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+                        isReplied = false;
+                        tempreplaymessage = null;
+                        tempreplaymode = null;
+                    }
                 }
 
             }
@@ -739,6 +1060,9 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
     }
 
 
+    static int isUpwords;
+
+
     public static void sendMediaTypeData(String string) {
 
 
@@ -751,15 +1075,23 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
             Log.e("body", body);
             Log.e("type", type);
 
-            sendMessage(jsonObject.getString("body"), userphonenumber, jsonObject.getString("type"));
+            sendMessage(jsonObject.getString("body"), userphonenumber, jsonObject.getString("type"), String.valueOf(isReplied), tempreplaymode == null ? "" : tempreplaymode.getStanzaId(), tempreplaymessage == null ? "" : tempreplaymessage);
+            if (replaylayout.getVisibility() == View.VISIBLE) {
+                replaylayout.setVisibility(View.GONE);
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.godown);
+                replaylayout.setAnimation(animation);
+                TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+                isReplied = false;
+                tempreplaymessage = null;
+                tempreplaymode = null;
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
     }
 
-
-
+    static int testing = 0;
 
 
     static void InitConnection() throws Settings.SettingNotFoundException {
@@ -852,14 +1184,72 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
                                     .build();
 
 
-                            
                             try {
                                 MamManager.MamQuery mamQuery = manager.queryArchive(mamQueryArgs);
                                 messages = new LinkedList<Message>(mamQuery.getMessages());
 
+                                final List<Message> temparraylist = new ArrayList<>(messages);
+
+
+
+
+
+                              for(int i = 0;i<temparraylist.size();i++){
+                                  Message mess = temparraylist.get(i);
+                                  if(mess.getStanzaId().contains("reaction")){
+                                      String s = DefaultED(mess.getBody(),"deocode");
+                                      try {
+                                          JSONObject jsonObject = new JSONObject(s);
+                                          String reactionemoji = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                                          String reactstanzaid = jsonObject.getString("stanzaid");
+
+                                          Log.e("reactionemoji",reactionemoji);
+
+                                          for(int j = 0;j<messages.size();j++){
+                                              Message mainmessage = messages.get(j);
+                                              if(mainmessage.getStanzaId().equals(reactstanzaid)){
+                                                 messages.remove(mainmessage);
+                                                 Message finalmessage = new Message();
+                                                  finalmessage.setFrom(mainmessage.getFrom());
+                                                  finalmessage.setTo(mainmessage.getTo());
+                                                  finalmessage.setType(mainmessage.getType());
+                                                  finalmessage.setStanzaId(mainmessage.getStanzaId());
+
+                                                  String messagejsonobject = DefaultED(mainmessage.getBody(),"deocode");
+                                                  JSONObject tempjsonobject = new JSONObject(messagejsonobject);
+                                                  Log.e("tempjsonobject",tempjsonobject.toString());
+                                                  tempjsonobject.put("reaction",reactionemoji);
+                                                  Log.e("tempjsonobject2",tempjsonobject.toString());
+                                                  String finaljsonobject = tempjsonobject.toString();
+
+                                                  finalmessage.setBody(DefaultED(finaljsonobject, "encode"));
+                                                  messages.add(j,finalmessage);
+                                                  messages.remove(mess);
+
+
+
+
+
+                                              }
+                                          }
+
+
+                                      } catch (JSONException e) {
+                                          e.printStackTrace();
+                                      }
+                                  }
+                              }
+
+
+
                                 adapter = new ChatMessageAdapter(context, messages);
+
                                 messagerecyclerview.setAdapter(adapter);
+
+
+                                isFirstAttempt = true;
                                 Log.e("message size", String.valueOf(messages.size()));
+                                Log.e("messages", messages.toString());
 
                                 messagerecyclerview.scrollToPosition(adapter.getItemCount() - 1);
                                 messagerecyclerview.setItemViewCacheSize(30);
@@ -867,106 +1257,318 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
                                 messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                                 messagerecyclerview.setItemAnimator(new DefaultItemAnimator());
 
-                                messagerecyclerview.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        Log.e("clicked","recyclerviewclicked");
-                                        if(invisiblelayout.getVisibility() == View.VISIBLE){
-                                            invisiblelayout.setVisibility(View.GONE);
-                                            visiblelayout.setVisibility(View.VISIBLE);
-                                        }
+
+                                ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
+                                        ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+                                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+
+                                        return true;
                                     }
-                                });
 
-                                messagerecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
                                     @Override
-                                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                                        super.onScrollStateChanged(recyclerView, newState);
+                                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                                        if (direction == ItemTouchHelper.RIGHT) {
+                                            //todo replayenable
+                                            final int position = viewHolder.getAdapterPosition();
+                                            String messagetext = null;
+                                            ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
+                                            Message message = adapter.getItem(position);
+                                            String mode = DefaultED(message.getBody(), "deocode");
+                                            Log.e("body", mode);
 
 
+                                            try {
+                                                JSONObject jsonObject = new JSONObject(mode);
 
+                                                String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                                                String encodec = StringEscapeUtils.unescapeJava(test);
 
-                                        if(recyclerView.getAdapter()!=null && recyclerView.getAdapter().getItemCount()!=0) {
-
-
-                                            if(!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_DRAGGING){
-                                                if (isbelowviewvisible) {
-                                                    isbelowviewvisible = false;
-                                                    belowview.setVisibility(View.GONE);
-                                                    belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_up));
-                                                    TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
-                                                    showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
-                                                } else {
-                                                    isbelowviewvisible = true;
-                                                    belowview.setVisibility(View.VISIBLE);
-                                                    belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_down));
-                                                    TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
-                                                    showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowupicon));
-                                                }
-                                            }
-
-                                            if (RecyclerView.SCROLL_STATE_IDLE == newState) {
-                                                // fragProductLl.setVisibility(View.VISIBLE);
-                                                Log.e("scrollstate", "idel");
-
-                                                LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
-                                                int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
-                                                int lastvisiblePosition = layoutManager.findLastVisibleItemPosition();
-
-                                                Log.e("first", String.valueOf(firstVisiblePosition));
-                                                Log.e("last", String.valueOf(lastvisiblePosition));
-
-                                                boundageposition = userboundage;
-
-
-                                                ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
-                                                for (int i = firstVisiblePosition; i <= lastvisiblePosition; i++) {
-                                                    String s = DefaultED(adapter.getItem(i).getBody(), "decode");
-
-
-                                                    try {
-                                                        JSONObject jsonObject = new JSONObject(s);
-
-                                                        if (jsonObject.getString("boundage").equals("1")) {
-                                                            if (!boundageposition.equals("1")) {
-                                                                RestartActivity("type1");
-                                                            }
-                                                            isboundageitemavailable = true;
-                                                            break;
-                                                        } else if (i == lastvisiblePosition) {
-                                                            if (!boundageposition.equals("0")) {
-                                                                RestartActivity("type0");
-                                                                isboundageitemavailable = false;
-                                                            }
-                                                        }
-
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
+                                                if (jsonObject.getString("type").equals("txt")) {
+                                                    messagetext = encodec;
+                                                } else if (jsonObject.getString("type").equals("image")) {
+                                                    if (URLUtil.isValidUrl(encodec)) {
+                                                        messagetext = "Photo";
+                                                    } else {
+                                                        messagetext = encodec;
                                                     }
-
-
+                                                } else if (jsonObject.getString("type").equals("file")) {
+                                                    if (URLUtil.isValidUrl(encodec)) {
+                                                        messagetext = "Attachment";
+                                                    } else {
+                                                        messagetext = encodec;
+                                                    }
+                                                } else if (jsonObject.getString("type").equals("video")) {
+                                                    if (URLUtil.isValidUrl(encodec)) {
+                                                        messagetext = "Video";
+                                                    } else {
+                                                        messagetext = encodec;
+                                                    }
                                                 }
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
                                             }
+                                            setUpReplayLayout(message, messagetext);
+
+                                        } else if (direction == ItemTouchHelper.LEFT) {
+                                            //todo replayenable
+                                            final int position = viewHolder.getAdapterPosition();
+                                            String messagetext = null;
+                                            ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
+                                            Message message = adapter.getItem(position);
+
+                                            String mode = DefaultED(message.getBody(), "deocode");
+                                            Log.e("body", mode);
 
 
-                                        }else {
-                                            if (isbelowviewvisible) {
-                                                isbelowviewvisible = false;
-                                                belowview.setVisibility(View.GONE);
-                                                belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_up));
-                                                TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
-                                                showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
-                                            } else {
-                                                isbelowviewvisible = true;
-                                                belowview.setVisibility(View.VISIBLE);
-                                                belowview.setAnimation(AnimationUtils.loadAnimation(context,R.anim.dialog_slide_down));
-                                                TransitionManager.beginDelayedTransition(sendmessagelayout,new AutoTransition());
-                                                showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowupicon));
+                                            try {
+                                                JSONObject jsonObject = new JSONObject(mode);
+
+                                                String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                                                String encodec = StringEscapeUtils.unescapeJava(test);
+
+                                                if (jsonObject.getString("type").equals("txt")) {
+                                                    messagetext = encodec;
+                                                } else if (jsonObject.getString("type").equals("image")) {
+                                                    if (URLUtil.isValidUrl(encodec)) {
+                                                        messagetext = "Photo";
+                                                    } else {
+                                                        messagetext = encodec;
+                                                    }
+                                                } else if (jsonObject.getString("type").equals("file")) {
+                                                    if (URLUtil.isValidUrl(encodec)) {
+                                                        messagetext = "Attachment";
+                                                    } else {
+                                                        messagetext = encodec;
+                                                    }
+                                                } else if (jsonObject.getString("type").equals("video")) {
+                                                    if (URLUtil.isValidUrl(encodec)) {
+                                                        messagetext = "Video";
+                                                    } else {
+                                                        messagetext = encodec;
+                                                    }
+                                                }
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
                                             }
+                                            setUpReplayLayout(message, messagetext);
                                         }
 
+
                                     }
-                                });
+
+                                    boolean swipeOutEnabled = true;
+                                    int swipeDir = 0;
+
+                                    @Override
+                                    public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                                                            RecyclerView.ViewHolder viewHolder,
+                                                            float dx, float dy, int actionState, boolean isCurrentlyActive) {
+
+                                        //check if it should swipe out
+                                        boolean shouldSwipeOut = false;
+                                        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && (!shouldSwipeOut)) {
+                                            swipeOutEnabled = false;
+
+                                            //Limit swipe
+                                            int maxMovement = recyclerView.getWidth() / 3;
+
+                                            //swipe right : left
+                                            float sign = dx > 0 ? 1 : -1;
+
+                                            float limitMovement = Math.min(maxMovement, sign * dx); // Only move to maxMovement
+
+                                            float displacementPercentage = limitMovement / maxMovement;
+
+                                            //limited threshold
+                                            boolean swipeThreshold = displacementPercentage == 1;
+
+                                            // Move slower when getting near the middle
+                                            dx = sign * maxMovement * (float) Math.sin((Math.PI / 2) * displacementPercentage);
+
+                                            if (isCurrentlyActive) {
+                                                int dir = dx > 0 ? ItemTouchHelper.RIGHT : ItemTouchHelper.LEFT;
+                                                swipeDir = swipeThreshold ? dir : 0;
+                                            }
+                                        } else {
+                                            swipeOutEnabled = true;
+                                        }
+
+
+                                        //do decoration
+
+                                        super.onChildDraw(c, recyclerView, viewHolder, dx, dy, actionState, isCurrentlyActive);
+                                    }
+
+                                    @Override
+                                    public float getSwipeEscapeVelocity(float defaultValue) {
+                                        return swipeOutEnabled ? defaultValue : Float.MAX_VALUE;
+                                    }
+
+                                    @Override
+                                    public float getSwipeVelocityThreshold(float defaultValue) {
+                                        return swipeOutEnabled ? defaultValue : 0;
+                                    }
+
+                                    @Override
+                                    public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
+                                        return swipeOutEnabled ? 0.6f : 1.0f;
+                                    }
+
+                                    @Override
+                                    public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                                        super.clearView(recyclerView, viewHolder);
+
+                                        if (swipeDir != 0) {
+                                            onSwiped(viewHolder, swipeDir);
+                                            swipeDir = 0;
+                                        }
+                                    }
+
+                                    @Override
+                                    public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                                        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+                                        int swipeFlags;
+                                        if (viewHolder instanceof ChatMessageAdapter.MessageInViewHolder) {
+                                            swipeFlags = ItemTouchHelper.RIGHT;
+                                        } else {
+                                            swipeFlags = ItemTouchHelper.LEFT;
+                                        }
+                                        return makeMovementFlags(dragFlags, swipeFlags);
+                                    }
+                                };
+
+                                ItemTouchHelper helper = new ItemTouchHelper(simpleItemTouchCallback);
+                                helper.attachToRecyclerView(messagerecyclerview);
+                                messagerecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+
+                                                                            @Override
+                                                                            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                                                                                super.onScrolled(recyclerView, dx, dy);
+
+
+                                                                                if (dy > 0) {
+                                                                                    //false
+                                                                                    isUpwords = 1;
+                                                                                } else if (dy < 0) {
+                                                                                    //true
+                                                                                    isUpwords = -1;
+
+                                                                                    if (isbelowviewvisible) {
+
+                                                                                        isbelowviewvisible = false;
+                                                                                        belowview.setVisibility(View.GONE);
+                                                                                        belowview.setAnimation(AnimationUtils.loadAnimation(context, R.anim.dialog_slide_up));
+                                                                                        TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+                                                                                        showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
+
+
+                                                                                    }
+
+
+                                                                                } else {
+                                                                                    isUpwords = 0;
+                                                                                    Log.e("scrollstate", "notscrolled");
+                                                                                }
+                                                                            }
+
+                                                                            @Override
+                                                                            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                                                                                super.onScrollStateChanged(recyclerView, newState);
+
+
+                                                                                if (recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
+
+                                                                                    if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                                                                                        if (isbelowviewvisible) {
+                                                                                            isbelowviewvisible = false;
+                                                                                            belowview.setVisibility(View.GONE);
+                                                                                            belowview.setAnimation(AnimationUtils.loadAnimation(context, R.anim.dialog_slide_up));
+                                                                                            TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+                                                                                            showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
+
+
+                                                                                        } else {
+
+
+                                                                                            isbelowviewvisible = true;
+                                                                                            belowview.setVisibility(View.VISIBLE);
+                                                                                            belowview.setAnimation(AnimationUtils.loadAnimation(context, R.anim.dialog_slide_down));
+                                                                                            TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+                                                                                            showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowupicon));
+
+
+                                                                                        }
+                                                                                    }
+
+
+                                                                                    if (RecyclerView.SCROLL_STATE_IDLE == newState) {
+                                                                                        // fragProductLl.setVisibility(View.VISIBLE);
+                                                                                        Log.e("scrollstate", "idel");
+
+                                                                                        LinearLayoutManager layoutManager = ((LinearLayoutManager) messagerecyclerview.getLayoutManager());
+                                                                                        int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+                                                                                        int lastvisiblePosition = layoutManager.findLastVisibleItemPosition();
+
+                                                                                        Log.e("first", String.valueOf(firstVisiblePosition));
+                                                                                        Log.e("last", String.valueOf(lastvisiblePosition));
+
+                                                                                        boundageposition = userboundage;
+
+
+                                                                                        ChatMessageAdapter adapter = (ChatMessageAdapter) messagerecyclerview.getAdapter();
+                                                                                        for (int i = firstVisiblePosition; i <= lastvisiblePosition; i++) {
+                                                                                            String s = DefaultED(adapter.getItem(i).getBody(), "decode");
+
+
+                                                                                            try {
+                                                                                                JSONObject jsonObject = new JSONObject(s);
+
+                                                                                                if (jsonObject.getString("boundage").equals("1")) {
+                                                                                                    if (!boundageposition.equals("1")) {
+                                                                                                        RestartActivity("type1");
+                                                                                                    }
+                                                                                                    isboundageitemavailable = true;
+                                                                                                    break;
+                                                                                                } else if (i == lastvisiblePosition) {
+                                                                                                    if (!boundageposition.equals("0")) {
+                                                                                                        RestartActivity("type0");
+                                                                                                        isboundageitemavailable = false;
+                                                                                                    }
+                                                                                                }
+
+                                                                                            } catch (JSONException e) {
+                                                                                                e.printStackTrace();
+                                                                                            }
+
+
+                                                                                        }
+                                                                                    }
+
+
+                                                                                } else {
+                                                                                    if (isbelowviewvisible) {
+                                                                                        isbelowviewvisible = false;
+                                                                                        belowview.setVisibility(View.GONE);
+                                                                                        belowview.setAnimation(AnimationUtils.loadAnimation(context, R.anim.dialog_slide_up));
+                                                                                        TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+                                                                                        showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowdown));
+                                                                                    } else {
+                                                                                        isbelowviewvisible = true;
+                                                                                        belowview.setVisibility(View.VISIBLE);
+                                                                                        belowview.setAnimation(AnimationUtils.loadAnimation(context, R.anim.dialog_slide_down));
+                                                                                        TransitionManager.beginDelayedTransition(sendmessagelayout, new AutoTransition());
+                                                                                        showbelow.setImageDrawable(context.getResources().getDrawable(R.drawable.arrowupicon));
+                                                                                    }
+                                                                                }
+
+                                                                            }
+                                                                        }
+
+
+                                );
 
 
                             } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException | SmackException.NotLoggedInException | InterruptedException e) {
@@ -1140,14 +1742,16 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
     }
 
 
-    boolean isKeyboardShowing = false;
+    static boolean isKeyboardShowing = false;
 
     void onKeyboardVisibilityChanged() {
         messagerecyclerview.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (messagerecyclerview.getAdapter() != null)
+                if (messagerecyclerview.getAdapter() != null) {
                     messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                }
+
             }
         }, 10);
 
@@ -1195,8 +1799,56 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
             e.printStackTrace();
         }
 
+        if (!isForworded) {
 
-        addNewMessage(message);
+            if (message.getStanzaId().contains("reaction")) {
+                String s = DefaultED(message.getBody(), "deocode");
+                try {
+                    JSONObject jsonObject = new JSONObject(s);
+                    String reactionemoji = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    String stanzaid = jsonObject.getString("stanzaid");
+                    for(int i = 0;i<messages.size();i++){
+                        Message mess = messages.get(i);
+                        if(mess.getStanzaId().equals(stanzaid)){
+                            messages.remove(mess);
+                            Message finalmessage = new Message();
+                            finalmessage.setFrom(mess.getFrom());
+                            finalmessage.setTo(mess.getTo());
+                            finalmessage.setType(mess.getType());
+                            finalmessage.setStanzaId(mess.getStanzaId());
+
+                            String messagejsonobject = DefaultED(mess.getBody(), "deocode");
+                            JSONObject tempjsonobject = new JSONObject(messagejsonobject);
+                            tempjsonobject.put("reaction", reactionemoji);
+                            String finaljsonobject = tempjsonobject.toString();
+
+                            finalmessage.setBody(DefaultED(finaljsonobject, "encode"));
+                            messages.add(i, finalmessage);
+
+                            int finalI = i;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    messagerecyclerview.getAdapter().notifyItemChanged(finalI);
+                                    messagerecyclerview.smoothScrollToPosition(messages.size());
+                                }
+                            });
+
+                        }
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }else {
+                addNewMessage(message);
+                isForworded = false;
+            }
+
+        }
+
 
     }
 
@@ -1209,12 +1861,59 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
         } catch (XmppStringprepException e) {
             e.printStackTrace();
         }
-        addNewMessage(message);
+        if (!isForworded) {
+
+            if (message.getStanzaId().contains("reaction")) {
+                String s = DefaultED(message.getBody(), "deocode");
+                try {
+                    JSONObject jsonObject = new JSONObject(s);
+                    String reactionemoji = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                    String stanzaid = jsonObject.getString("stanzaid");
+                    for(int i = 0;i<messages.size();i++){
+                        Message mess = messages.get(i);
+                        if(mess.getStanzaId().equals(stanzaid)){
+                            messages.remove(mess);
+                            Message finalmessage = new Message();
+                            finalmessage.setFrom(mess.getFrom());
+                            finalmessage.setTo(mess.getTo());
+                            finalmessage.setType(mess.getType());
+                            finalmessage.setStanzaId(mess.getStanzaId());
+
+                            String messagejsonobject = DefaultED(mess.getBody(), "deocode");
+                            JSONObject tempjsonobject = new JSONObject(messagejsonobject);
+                            tempjsonobject.put("reaction", reactionemoji);
+                            String finaljsonobject = tempjsonobject.toString();
+
+                            finalmessage.setBody(DefaultED(finaljsonobject, "encode"));
+                            messages.add(i, finalmessage);
+                            int finalI = i;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    messagerecyclerview.getAdapter().notifyItemChanged(finalI);
+                                    messagerecyclerview.smoothScrollToPosition(messages.size());
+                                }
+                            });
+                        }
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }else {
+                addNewMessage(message);
+                isForworded = false;
+            }
+
+        }
+
 
     }
 //,String isreplied,String stanzaid
 
-    public static void sendMessage(String body, String toJid, String type) {
+    public static void sendMessage(String body, String toJid, String type, String isreplied, String stanzaid, String replaymessage) {
 
         try {
             EntityBareJid jid = JidCreate.entityBareFrom(toJid + "@" + Important.getXmppHost());
@@ -1230,9 +1929,9 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
 
 
             String encodec;
-            Log.e("emoji",body);
+            Log.e("emoji", body);
             String toServerUnicodeEncoded = StringEscapeUtils.escapeJava(body);
-            Log.e("emojiunicode",toServerUnicodeEncoded);
+            Log.e("emojiunicode", toServerUnicodeEncoded);
 
             encodec = EncrytpAndDecrypt(toServerUnicodeEncoded, "encode", passstr);
 
@@ -1249,9 +1948,10 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
             jsonObject.put("expiry", getDate(userexpiry));
             jsonObject.put("type", type);
 
-//            jsonObject.put("isreplied", isreplied);
-//            jsonObject.put("stanzaid", stanzaid);
-
+            jsonObject.put("isreplied", isreplied);
+            jsonObject.put("stanzaid", stanzaid);
+            jsonObject.put("replaymessage", replaymessage);
+            jsonObject.put("reaction", "");
 
 
             Log.e("message", body);
@@ -1263,6 +1963,8 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
 
             message.setType(Message.Type.chat);
             message.setStanzaId(sb.toString());
+
+
             message.setFrom(JidCreate.entityBareFrom(getLoginInfo("phone_no") + "@" + Important.getXmppHost()));
             message.setTo(jid);
 
@@ -1288,25 +1990,30 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
 
 
     void addNewMessage(Message message) {
-        messages.add(message);
+        if (!messages.contains(message)) {
+            messages.add(message);
+        }
         Log.e("size ", String.valueOf(messages.size()));
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                messagerecyclerview.setItemAnimator(new SlideUpItemAnimator());
+                adapter.notifyItemInserted(messages.size());
+                adapter.notifyItemRangeInserted(messages.size(), 1);
 
-                adapter.notifyDataSetChanged();
-
-                RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(context) {
-                    @Override protected int getVerticalSnapPreference() {
-                        return LinearSmoothScroller.SNAP_TO_END;
-                    }
-                };
-
-                smoothScroller.setTargetPosition(messagerecyclerview.getAdapter().getItemCount());
-                messagerecyclerview.getLayoutManager().startSmoothScroll(smoothScroller);
-
-              //  messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                if (messagerecyclerview.canScrollVertically(1)) {
+                    messagerecyclerview.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                        }
+                    }, 10);
+                } else {
+                    LinearLayoutManager llm = (LinearLayoutManager) messagerecyclerview.getLayoutManager();
+                    int lastPos = llm.findLastVisibleItemPosition();
+                    messagerecyclerview.scrollToPosition(lastPos + 1);
+                }
 
 
             }
@@ -1314,12 +2021,125 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
 
 
     }
-    static AlertDialog messagelongclickdialog;
+
+
+    public static class SlideUpItemAnimator extends SimpleItemAnimator {
+        @Override
+        public boolean animateRemove(RecyclerView.ViewHolder holder) {
+            return false;
+        }
+
+        @Override
+        public boolean animateAdd(RecyclerView.ViewHolder holder) {
+            TranslateAnimation anim = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0f,
+                    Animation.RELATIVE_TO_SELF, 0f,
+                    Animation.RELATIVE_TO_SELF, 1f,
+                    Animation.RELATIVE_TO_SELF, 0f);
+            anim.setDuration(500);
+            holder.itemView.startAnimation(anim);
+            return true;
+        }
+
+        @Override
+        public boolean animateMove(RecyclerView.ViewHolder holder, int fromX, int fromY, int toX, int toY) {
+//            TranslateAnimation anim = new TranslateAnimation(
+//                    Animation.RELATIVE_TO_SELF, 0f,
+//                    Animation.RELATIVE_TO_SELF, 0f,
+//                    Animation.RELATIVE_TO_SELF, 1f,
+//                    Animation.RELATIVE_TO_SELF, 0f);
+//            anim.setDuration(500);
+//            holder.itemView.startAnimation(anim);
+            return false;
+        }
+
+        @Override
+        public boolean animateChange(RecyclerView.ViewHolder oldHolder, RecyclerView.ViewHolder newHolder, int fromLeft, int fromTop, int toLeft, int toTop) {
+            return false;
+        }
+
+        @Override
+        public void runPendingAnimations() {
+
+        }
+
+        @Override
+        public void endAnimation(RecyclerView.ViewHolder item) {
+
+        }
+
+        @Override
+        public void endAnimations() {
+
+        }
+
+        @Override
+        public boolean isRunning() {
+            return false;
+        }
+    }
+
 
     static Bitmap tempbitmap;
 
 
+    static void setUpReplayLayout(Message mode, String message) {
+        replaylayout.setVisibility(View.VISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(context, R.anim.goup);
+        replaylayout.setAnimation(animation);
 
+        if (message.length() > 25) {
+            message = message.substring(0, 24) + "";
+        }
+        String encodec = StringEscapeUtils.unescapeJava(message);
+        repliedmessage.setText(encodec);
+        tempreplaymessage = message;
+        tempreplaymode = mode;
+        isReplied = true;
+
+
+    }
+
+    static void focustoposition(int position) {
+        messagerecyclerview.smoothScrollToPosition(position);
+    }
+
+    static Message tempreplaymode = null;
+    static String tempreplaymessage = null;
+    static boolean isReplied = false;
+
+    static Message templongpressmessage;
+    static String templongpressstring;
+
+
+    static void setUpLongPressOptions(Message mode, String message) {
+        if (isKeyboardShowing) {
+            ((Activity) context).onBackPressed();
+        }
+        forwardlayout.setVisibility(View.VISIBLE);
+        invisiblelayout.setVisibility(View.GONE);
+        visiblelayout.setVisibility(View.GONE);
+        Animation animation = AnimationUtils.loadAnimation(context, R.anim.goup);
+        forwardlayout.setAnimation(animation);
+        invisiblebutton.setVisibility(View.VISIBLE);
+        reactionlayout.setVisibility(View.VISIBLE);
+        reactionlayout.setAnimation(animation);
+
+
+        templongpressmessage = mode;
+        String s = DefaultED(mode.getBody(), "deocode");
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+            Log.e("jsonobject", jsonObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        templongpressstring = message;
+
+        Log.e("mode", mode.getStanzaId());
+
+
+    }
 
 
     public static class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ImageResponse, ImageResponseImageView {
@@ -1395,7 +2215,14 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
             private final ImageView timericon;
             private final ImageView boundageicon;
             private final ImageView deliveryreport;
-            private final ImageView replaybutton;
+
+
+            String replaymessagetxt = "";
+            private final LinearLayout replayarea;
+            private final LinearLayout containerlayout;
+            private final TextView replaymessage;
+            private final LinearLayout mainlayout;
+            private final TextView reaction;
 
             MessageInViewHolder(final View itemView) {
                 super(itemView);
@@ -1412,193 +2239,224 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
                 timericon = itemView.findViewById(R.id.timericon);
                 boundageicon = itemView.findViewById(R.id.boundageicon);
                 deliveryreport = itemView.findViewById(R.id.sendstatus);
-                replaybutton = itemView.findViewById(R.id.replaybutton);
+
+                replayarea = itemView.findViewById(R.id.replayarea);
+                replaymessage = itemView.findViewById(R.id.replaymessage);
+                mainlayout = itemView.findViewById(R.id.mainlayotu);
+                containerlayout = itemView.findViewById(R.id.containerlayout);
+                reaction = itemView.findViewById(R.id.reaction);
+
             }
 
             void bind(int position) {
 
+
+
                 Message messageModel = list.get(position);
-                String mode = DefaultED(messageModel.getBody(), "deocode");
+                if (!messageModel.getStanzaId().contains("reaction ")) {
 
 
-                Log.e("body",mode);
+                    String mode = DefaultED(messageModel.getBody(), "deocode");
+                    Log.e("body", mode);
+                    replayarea.setVisibility(View.GONE);
+                    reaction.setVisibility(View.GONE);
 
 
+                    try {
+                        JSONObject jsonObject = new JSONObject(mode);
+                        String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                        String encodec = StringEscapeUtils.unescapeJava(test);
 
-                try {
-                    JSONObject jsonObject = new JSONObject(mode);
-                    String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
-                    String encodec = StringEscapeUtils.unescapeJava(test);
+                        Log.e("message", encodec);
 
-                    Log.e("message", encodec);
+                        Log.e("type", jsonObject.getString("type"));
+                        String stanzaid = jsonObject.getString("stanzaid");
 
-                    Log.e("type", jsonObject.getString("type"));
+                        if (!jsonObject.getString("reaction").equals("")) {
+                            reaction.setVisibility(View.VISIBLE);
+                            String rec = StringEscapeUtils.unescapeJava(jsonObject.getString("reaction"));
+                            reaction.setText(rec);
+                        }
 
-
-                    if (jsonObject.getString("type").equals("txt")) {
-                        //initialize for text message
-                        message.setVisibility(View.VISIBLE);
-                        imageview.setVisibility(View.GONE);
-                        playerlayout.setVisibility(View.GONE);
-                        fullscreen.setVisibility(View.GONE);
-                        file.setVisibility(View.GONE);
-                        Log.e("encodec",encodec);
-                        message.setText(encodec);
-
-                        message.setOnLongClickListener(new View.OnLongClickListener() {
+                        replayarea.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public boolean onLongClick(View view) {
-
-//                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-//                                View forwordview =inflater.inflate(R.layout.messageforword,null,false);
-//                                RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
-//                                simpleAdapter adapter = new simpleAdapter(MainActivity.data,context,mode);
-//                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//                                recyclerView.setAdapter(adapter);
-//                                builder.setView(forwordview);
-//                                builder.setCancelable(true);
-//                                messagelongclickdialog = builder.create();
-//                                messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-//                                messagelongclickdialog.show();
-
-                                forwardlayout.setVisibility(View.VISIBLE);
-                                invisiblelayout.setVisibility(View.GONE);
-                                visiblelayout.setVisibility(View.GONE);
-                                TransitionManager.beginDelayedTransition(forwardlayout,new AutoTransition());
-                                invisiblebutton.setVisibility(View.VISIBLE);
-                                return true;
+                            public void onClick(View view) {
+                                for (Message mes : messages) {
+                                    if (mes.getStanzaId().equals(stanzaid)) {
+                                        int pos = messages.indexOf(mes);
+                                        focustoposition(pos);
+                                    }
+                                }
                             }
                         });
-                    } else if (jsonObject.getString("type").equals("image")) {
-                        //initialize for imagemessage
-                        if (URLUtil.isValidUrl(encodec)) {
-                            message.setVisibility(View.GONE);
-                            imageview.setVisibility(View.VISIBLE);
-                            loadImage(imageview, encodec);
-                        } else {
-                            message.setVisibility(View.VISIBLE);
-                            message.setText(encodec);
-                        }
-                        playerlayout.setVisibility(View.GONE);
-                        fullscreen.setVisibility(View.GONE);
-                        file.setVisibility(View.GONE);
-                    } else if (jsonObject.getString("type").equals("file")) {
-                        if (URLUtil.isValidUrl(encodec)) {
-                            message.setVisibility(View.GONE);
-                            file.setVisibility(View.VISIBLE);
 
-                            file.setOnClickListener(new View.OnClickListener() {
+
+                        if (jsonObject.getString("isreplied").equals("true")) {
+                            replayarea.setVisibility(View.VISIBLE);
+                            replaymessage.setText(jsonObject.getString("replaymessage"));
+                        } else {
+                            //todo margin komate hobe
+                            replayarea.setVisibility(View.GONE);
+                            ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            layoutParams.setMargins(0, 4, 0, 6);
+                            mainlayout.setLayoutParams(layoutParams);
+                        }
+
+
+                        if (jsonObject.getString("type").equals("txt")) {
+                            //initialize for text message
+                            message.setVisibility(View.VISIBLE);
+                            imageview.setVisibility(View.GONE);
+                            playerlayout.setVisibility(View.GONE);
+                            fullscreen.setVisibility(View.GONE);
+                            file.setVisibility(View.GONE);
+                            Log.e("encodec", encodec);
+                            message.setText(encodec);
+                            replaymessagetxt = encodec;
+
+                            message.setOnLongClickListener(new View.OnLongClickListener() {
                                 @Override
-                                public void onClick(View view) {
-                                    downloadFile(encodec);
+                                public boolean onLongClick(View view) {
+
+
+                                    setUpLongPressOptions(messageModel, encodec);
+
+                                    return true;
                                 }
                             });
-                        } else {
-                            message.setVisibility(View.VISIBLE);
-                            message.setText(encodec);
-                        }
-                        imageview.setVisibility(View.GONE);
-                        playerlayout.setVisibility(View.GONE);
-                        fullscreen.setVisibility(View.GONE);
-                    } else if (jsonObject.getString("type").equals("video")) {
-                        if (URLUtil.isValidUrl(encodec)) {
-                            message.setVisibility(View.GONE);
-                            playerlayout.setVisibility(View.VISIBLE);
-
-                            playerlayout.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    playerView = videoplayer;
-                                    initVideoPlayer(encodec);
-                                    mResumePosition = 0L;
-                                }
-                            });
-
-                            fullscreen.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    if (isFullscreene) {
-                                        closeFullscreenDialog(playerView);
-                                    } else {
-                                        enterfullScreene(playerView);
-                                    }
-
-                                }
-                            });
-
-                        } else {
-                            message.setVisibility(View.VISIBLE);
-                            message.setText(encodec);
-                        }
-                        imageview.setVisibility(View.GONE);
-                        file.setVisibility(View.GONE);
-                    }
-
-                    //check for boundage or expiry time
-                    String timestamp = jsonObject.getString("timestamp");
-                    String expirytime = jsonObject.getString("expiry");
-                    String boundagetime = jsonObject.getString("boundage");
-                    time.setText(Functions.getMessageTime(jsonObject.getString("timestamp")));
-                    if (!boundagetime.equals("0")) {
-                        if (list.size() - 1 == position) {
-                            if (!boundageposition.equals("1")) {
-                                Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
-                                boundageicon.setVisibility(View.VISIBLE);
-                                RestartActivity("type1");
-                                isboundageitemavailable = true;
+                        } else if (jsonObject.getString("type").equals("image")) {
+                            //initialize for imagemessage
+                            if (URLUtil.isValidUrl(encodec)) {
+                                message.setVisibility(View.GONE);
+                                imageview.setVisibility(View.VISIBLE);
+                                loadImage(imageview, encodec);
+                                replaymessagetxt = "Photo";
                             } else {
-                                if (!isboundageitemavailable) {
-                                    RestartActivity("type0");
-                                }
+                                message.setVisibility(View.VISIBLE);
+                                message.setText(encodec);
+                                replaymessagetxt = encodec;
                             }
-                        }
-                    }
-                    if (!expirytime.equals(timestamp)) {
-                        SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
-                        try {
-                            Date expiredate = format.parse(expirytime);
-                            Date currentime = format.parse(getDate("0"));
-                            Date timestampdate = format.parse(timestamp);
-                            if (currentime.compareTo(expiredate) > 0) {
-                                message.setText("Message Expired!");
-                            } else {
-                                long difference = dateDifference(timestampdate, expiredate);
-                                new Handler().postDelayed(new Runnable() {
+                            playerlayout.setVisibility(View.GONE);
+                            fullscreen.setVisibility(View.GONE);
+                            file.setVisibility(View.GONE);
+                        } else if (jsonObject.getString("type").equals("file")) {
+                            if (URLUtil.isValidUrl(encodec)) {
+                                message.setVisibility(View.GONE);
+                                file.setVisibility(View.VISIBLE);
+                                replaymessagetxt = "Attachment";
+                                file.setOnClickListener(new View.OnClickListener() {
                                     @Override
-                                    public void run() {
-                                        ((Activity) context).runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                message.setText("Message Expired!");
-                                                messagerecyclerview.postDelayed(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
-                                                    }
-                                                }, 10);
-                                            }
-                                        });
+                                    public void onClick(View view) {
+                                        downloadFile(encodec);
+                                    }
+                                });
+                            } else {
+                                message.setVisibility(View.VISIBLE);
+                                message.setText(encodec);
+                                replaymessagetxt = encodec;
+                            }
+                            imageview.setVisibility(View.GONE);
+                            playerlayout.setVisibility(View.GONE);
+                            fullscreen.setVisibility(View.GONE);
+                        } else if (jsonObject.getString("type").equals("video")) {
+                            if (URLUtil.isValidUrl(encodec)) {
+                                message.setVisibility(View.GONE);
+                                playerlayout.setVisibility(View.VISIBLE);
+                                replaymessagetxt = "Video";
+                                playerlayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        playerView = videoplayer;
+                                        initVideoPlayer(encodec);
+                                        mResumePosition = 0L;
+                                    }
+                                });
+
+                                fullscreen.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        if (isFullscreene) {
+                                            closeFullscreenDialog(playerView);
+                                        } else {
+                                            enterfullScreene(playerView);
+                                        }
 
                                     }
-                                }, difference);
-                                //todo timertext show korte hobe
-                            }
+                                });
 
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                            } else {
+                                message.setVisibility(View.VISIBLE);
+                                message.setText(encodec);
+                                replaymessagetxt = encodec;
+                            }
+                            imageview.setVisibility(View.GONE);
+                            file.setVisibility(View.GONE);
                         }
 
+                        //check for boundage or expiry time
+                        String timestamp = jsonObject.getString("timestamp");
+                        String expirytime = jsonObject.getString("expiry");
+                        String boundagetime = jsonObject.getString("boundage");
+                        time.setText(Functions.getMessageTime(jsonObject.getString("timestamp")));
+                        if (!boundagetime.equals("0")) {
+                            if (list.size() - 1 == position) {
+                                if (!boundageposition.equals("1")) {
+                                    Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
+                                    boundageicon.setVisibility(View.VISIBLE);
+                                    RestartActivity("type1");
+                                    isboundageitemavailable = true;
+                                } else {
+                                    if (!isboundageitemavailable) {
+                                        RestartActivity("type0");
+                                    }
+                                }
+                            }
+                        }
+                        if (!expirytime.equals(timestamp)) {
+                            SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
+                            try {
+                                Date expiredate = format.parse(expirytime);
+                                Date currentime = format.parse(getDate("0"));
+                                Date timestampdate = format.parse(timestamp);
+                                if (currentime.compareTo(expiredate) > 0) {
+                                    message.setText("Message Expired!");
+                                } else {
+                                    long difference = dateDifference(timestampdate, expiredate);
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    message.setText("Message Expired!");
+                                                    messagerecyclerview.postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                                                        }
+                                                    }, 10);
+                                                }
+                                            });
+
+                                        }
+                                    }, difference);
+                                    //todo timertext show korte hobe
+                                }
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             }
+
         }
-
-
 
 
         private class MessageOutViewHolder extends RecyclerView.ViewHolder {
@@ -1614,7 +2472,14 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
             private final ImageView timericon;
             private final ImageView boundageicon;
             private final ImageView deliveryreport;
-            private final ImageView replaybutton;
+            String replaymessagetxt = "";
+            private final LinearLayout replayarea;
+            private final TextView replaymessage;
+            private final LinearLayout messagelayout;
+            private final LinearLayout containerlayout;
+            private final ConstraintLayout constraintLayout;
+            private final View tempview;
+            private final TextView reaction;
 
 
             MessageOutViewHolder(final View itemView) {
@@ -1632,194 +2497,228 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
                 timericon = itemView.findViewById(R.id.timericon);
                 boundageicon = itemView.findViewById(R.id.boundageicon);
                 deliveryreport = itemView.findViewById(R.id.sendstatus);
-                replaybutton = itemView.findViewById(R.id.replaybutton);
+
+                replayarea = itemView.findViewById(R.id.replayarea);
+                replaymessage = itemView.findViewById(R.id.replaymessage);
+                messagelayout = itemView.findViewById(R.id.messagelayout);
+                constraintLayout = itemView.findViewById(R.id.constrainlayout);
+                containerlayout = itemView.findViewById(R.id.containerlayout);
+                tempview = itemView.findViewById(R.id.view1);
+                reaction = itemView.findViewById(R.id.reaction);
 
 
             }
 
             void bind(int position) {
+
+
                 Message messageModel = list.get(position);
 
-
-                String mode = DefaultED(messageModel.getBody(), "deocode");
-
-                Log.e("body",mode);
+                if (!messageModel.getStanzaId().contains("reaction ")) {
 
 
-                try {
-                    JSONObject jsonObject = new JSONObject(mode);
+                    String mode = DefaultED(messageModel.getBody(), "deocode");
 
-                    String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
-                    String encodec = StringEscapeUtils.unescapeJava(test);
+                    Log.e("body", mode);
+                    replayarea.setVisibility(View.GONE);
+                    reaction.setVisibility(View.GONE);
 
-                    Log.e("message", encodec);
+                    try {
+                        JSONObject jsonObject = new JSONObject(mode);
 
+                        String test = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                        String encodec = StringEscapeUtils.unescapeJava(test);
 
-                    Log.e("type", jsonObject.getString("type"));
-
-
-                    if (jsonObject.getString("type").equals("txt")) {
-                        //initialize for text message
-                        message.setVisibility(View.VISIBLE);
-                        imageview.setVisibility(View.GONE);
-                        playerlayout.setVisibility(View.GONE);
-                        fullscreen.setVisibility(View.GONE);
-                        file.setVisibility(View.GONE);
-                        Log.e("encodec",encodec);
-                        message.setText(encodec);
+                        Log.e("message", encodec);
+                        String stanzaid = jsonObject.getString("stanzaid");
+                        if (!jsonObject.getString("reaction").equals("")) {
+                            reaction.setVisibility(View.VISIBLE);
+                            String rec = StringEscapeUtils.unescapeJava(jsonObject.getString("reaction"));
+                            reaction.setText(rec);
+                        }
 
 
-                        message.setOnLongClickListener(new View.OnLongClickListener() {
+                        replayarea.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public boolean onLongClick(View view) {
-//                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-//                                View forwordview =inflater.inflate(R.layout.messageforword,null,false);
-//                                RecyclerView recyclerView = forwordview.findViewById(R.id.selecefriend);
-//                                simpleAdapter adapter = new simpleAdapter(MainActivity.data,context,mode);
-//                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//                                recyclerView.setAdapter(adapter);
-//                                builder.setView(forwordview);
-//                                builder.setCancelable(true);
-//                                messagelongclickdialog = builder.create();
-//                                messagelongclickdialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.parseColor("#00000000")));
-//                                messagelongclickdialog.show();
-                                forwardlayout.setVisibility(View.VISIBLE);
-                                invisiblelayout.setVisibility(View.GONE);
-                                visiblelayout.setVisibility(View.GONE);
-                                TransitionManager.beginDelayedTransition(forwardlayout,new AutoTransition());
-                                invisiblebutton.setVisibility(View.VISIBLE);
-
-
-                                return true;
+                            public void onClick(View view) {
+                                for (Message mes : messages) {
+                                    if (mes.getStanzaId().equals(stanzaid)) {
+                                        int pos = messages.indexOf(mes);
+                                        focustoposition(pos);
+                                    }
+                                }
                             }
                         });
 
-                    } else if (jsonObject.getString("type").equals("image")) {
-                        //initialize for imagemessage
-                        if (URLUtil.isValidUrl(encodec)) {
-                            message.setVisibility(View.GONE);
-                            imageview.setVisibility(View.VISIBLE);
-                            loadImage(imageview, encodec);
-
+                        if (jsonObject.getString("isreplied").equals("true")) {
+                            replayarea.setVisibility(View.VISIBLE);
+                            replaymessage.setText(jsonObject.getString("replaymessage"));
                         } else {
-                            message.setVisibility(View.VISIBLE);
-                            message.setText(encodec);
+                            //todo constrain toptotopofparent korte hobe r margin top 4 dp dite hobe.
+                            replayarea.setVisibility(View.GONE);
+                            tempview.setVisibility(View.GONE);
+                            constraintLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
                         }
-                        playerlayout.setVisibility(View.GONE);
-                        fullscreen.setVisibility(View.GONE);
-                        file.setVisibility(View.GONE);
-                    } else if (jsonObject.getString("type").equals("file")) {
-                        if (URLUtil.isValidUrl(encodec)) {
-                            message.setVisibility(View.GONE);
-                            file.setVisibility(View.VISIBLE);
 
-                            file.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    downloadFile(encodec);
-                                }
-                            });
-                        } else {
+
+                        Log.e("type", jsonObject.getString("type"));
+
+
+                        if (jsonObject.getString("type").equals("txt")) {
+                            //initialize for text message
                             message.setVisibility(View.VISIBLE);
+                            imageview.setVisibility(View.GONE);
+                            playerlayout.setVisibility(View.GONE);
+                            fullscreen.setVisibility(View.GONE);
+                            file.setVisibility(View.GONE);
+                            Log.e("encodec", encodec);
                             message.setText(encodec);
-                        }
-                        imageview.setVisibility(View.GONE);
-                        playerlayout.setVisibility(View.GONE);
-                        fullscreen.setVisibility(View.GONE);
-                    } else if (jsonObject.getString("type").equals("video")) {
-                        if (URLUtil.isValidUrl(encodec)) {
-                            message.setVisibility(View.GONE);
-                            playerlayout.setVisibility(View.VISIBLE);
+                            replaymessagetxt = encodec;
 
 
-                            playerlayout.setOnClickListener(new View.OnClickListener() {
+                            message.setOnLongClickListener(new View.OnLongClickListener() {
                                 @Override
-                                public void onClick(View view) {
-                                    playerView = videoplayer;
-                                    initVideoPlayer(encodec);
-                                    mResumePosition = 0L;
+                                public boolean onLongClick(View view) {
+                                    setUpLongPressOptions(messageModel, encodec);
+                                    return true;
                                 }
                             });
 
-                            fullscreen.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    if (isFullscreene) {
-                                        closeFullscreenDialog(playerView);
-                                    } else {
-                                        enterfullScreene(playerView);
-                                    }
-
-                                }
-                            });
+                        } else if (jsonObject.getString("type").equals("image")) {
+                            //initialize for imagemessage
+                            if (URLUtil.isValidUrl(encodec)) {
+                                message.setVisibility(View.GONE);
+                                imageview.setVisibility(View.VISIBLE);
+                                loadImage(imageview, encodec);
+                                replaymessagetxt = "Photo";
 
 
-                        } else {
-                            message.setVisibility(View.VISIBLE);
-                            message.setText(encodec);
-                        }
-                        imageview.setVisibility(View.GONE);
-                        file.setVisibility(View.GONE);
-                    }
-                    time.setText(Functions.getMessageTime(jsonObject.getString("timestamp")));
-
-                    //check for boundage or expiry time
-                    String timestamp = jsonObject.getString("timestamp");
-                    String expirytime = jsonObject.getString("expiry");
-                    String boundagetime = jsonObject.getString("boundage");
-
-                    if (!boundagetime.equals("0")) {
-                        if (list.size() - 1 == position) {
-                            if (!boundageposition.equals("1")) {
-                                Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
-                                RestartActivity("type1");
-                                isboundageitemavailable = true;
                             } else {
-                                if (!isboundageitemavailable) {
-                                    RestartActivity("type0");
-                                }
+                                message.setVisibility(View.VISIBLE);
+                                message.setText(encodec);
+                                replaymessagetxt = encodec;
+
                             }
-                        }
-                    }
-                    if (!expirytime.equals(timestamp)) {
-                        SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
-                        try {
-                            Date expiredate = format.parse(expirytime);
-                            Date currentime = format.parse(getDate("0"));
-                            Date timestampdate = format.parse(timestamp);
-                            if (currentime.compareTo(expiredate) > 0) {
-                                message.setText("Message Expired!");
-                            } else {
-                                long difference = dateDifference(timestampdate, expiredate);
-                                new Handler().postDelayed(new Runnable() {
+                            playerlayout.setVisibility(View.GONE);
+                            fullscreen.setVisibility(View.GONE);
+                            file.setVisibility(View.GONE);
+                        } else if (jsonObject.getString("type").equals("file")) {
+                            if (URLUtil.isValidUrl(encodec)) {
+                                message.setVisibility(View.GONE);
+                                file.setVisibility(View.VISIBLE);
+                                replaymessagetxt = "Attachment";
+
+                                file.setOnClickListener(new View.OnClickListener() {
                                     @Override
-                                    public void run() {
-                                        ((Activity) context).runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                message.setText("Message Expired!");
-                                                messagerecyclerview.postDelayed(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
-                                                    }
-                                                }, 10);
-                                            }
-                                        });
+                                    public void onClick(View view) {
+                                        downloadFile(encodec);
+                                    }
+                                });
+                            } else {
+                                message.setVisibility(View.VISIBLE);
+                                message.setText(encodec);
+                                replaymessagetxt = encodec;
+                            }
+                            imageview.setVisibility(View.GONE);
+                            playerlayout.setVisibility(View.GONE);
+                            fullscreen.setVisibility(View.GONE);
+                        } else if (jsonObject.getString("type").equals("video")) {
+                            if (URLUtil.isValidUrl(encodec)) {
+                                message.setVisibility(View.GONE);
+                                playerlayout.setVisibility(View.VISIBLE);
+
+                                replaymessagetxt = "Video";
+                                playerlayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        playerView = videoplayer;
+                                        initVideoPlayer(encodec);
+                                        mResumePosition = 0L;
+                                    }
+                                });
+
+                                fullscreen.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        if (isFullscreene) {
+                                            closeFullscreenDialog(playerView);
+                                        } else {
+                                            enterfullScreene(playerView);
+                                        }
 
                                     }
-                                }, difference);
+                                });
+
+
+                            } else {
+                                message.setVisibility(View.VISIBLE);
+                                message.setText(encodec);
+                                replaymessagetxt = encodec;
+                            }
+                            imageview.setVisibility(View.GONE);
+                            file.setVisibility(View.GONE);
+                        }
+                        time.setText(Functions.getMessageTime(jsonObject.getString("timestamp")));
+
+                        //check for boundage or expiry time
+                        String timestamp = jsonObject.getString("timestamp");
+                        String expirytime = jsonObject.getString("expiry");
+                        String boundagetime = jsonObject.getString("boundage");
+
+                        if (!boundagetime.equals("0")) {
+                            if (list.size() - 1 == position) {
+                                if (!boundageposition.equals("1")) {
+                                    Toast.makeText(context, "Boundage content found Refreshing layout!", Toast.LENGTH_SHORT).show();
+                                    RestartActivity("type1");
+                                    isboundageitemavailable = true;
+                                } else {
+                                    if (!isboundageitemavailable) {
+                                        RestartActivity("type0");
+                                    }
+                                }
+                            }
+                        }
+                        if (!expirytime.equals(timestamp)) {
+                            SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss Z"); //
+                            try {
+                                Date expiredate = format.parse(expirytime);
+                                Date currentime = format.parse(getDate("0"));
+                                Date timestampdate = format.parse(timestamp);
+                                if (currentime.compareTo(expiredate) > 0) {
+                                    message.setText("Message Expired!");
+                                } else {
+                                    long difference = dateDifference(timestampdate, expiredate);
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    message.setText("Message Expired!");
+                                                    messagerecyclerview.postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            messagerecyclerview.smoothScrollToPosition(messagerecyclerview.getAdapter().getItemCount());
+                                                        }
+                                                    }, 10);
+                                                }
+                                            });
+
+                                        }
+                                    }, difference);
+                                }
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
                             }
 
-                        } catch (ParseException e) {
-                            e.printStackTrace();
                         }
-
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
+
             }
 
         }
@@ -1850,6 +2749,11 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
                 ((MessageInViewHolder) holder).bind(position);
 
             }
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return super.getItemId(position);
         }
 
         public Message getItem(int position) {
@@ -1943,6 +2847,7 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        messages.clear();
         super.onDestroy();
     }
 
@@ -2062,6 +2967,8 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
 
     }
 
+    static boolean isForworded = false;
+
     private static Dialog mFullScreenDialog;
 
     static void enterfullScreene(PlayerView playerView) {
@@ -2104,7 +3011,7 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
     }
 
 
-    public static class simpleAdapter extends RecyclerView.Adapter<simpleAdapter.ViewHolder> {
+    public static class simpleAdapter extends RecyclerView.Adapter<simpleAdapter.ViewHolder> implements ImageResponse {
         protected ArrayList<JSONObject> listdata;
         protected AlertDialog dialog;
 
@@ -2112,7 +3019,7 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
         String message;
 
 
-        public simpleAdapter(ArrayList<JSONObject> listdata, Context context,String message) {
+        public simpleAdapter(ArrayList<JSONObject> listdata, Context context, String message) {
             Log.e("listviewcxvbcvb", listdata.toString());
             this.listdata = listdata;
             this.context = context;
@@ -2134,17 +3041,31 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
 
                 holder.friendname.setText(myListData.getString("name"));
 
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("friend", myListData.getString("id"));
+                    ImageRequest(this, holder.profilepicture, "GET", Important.getViewprofilepicture(), jsonObject, 1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 holder.sendbutton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        Log.e("listdata", myListData.toString());
 
-                        if (MainActivity.connection != null && MainActivity.connection.isConnected() && MainActivity.connection.isAuthenticated()) {
-//                            try {
-//                                //sendMessage(message,myListData.getString("phone"),"txt");
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
+                        try {
+                            Log.e("listdata", myListData.toString());
+                            isForworded = true;
+                            sendMessage(message, myListData.getString("phone_no"), "txt", "false", "", "");
+                            Toast.makeText(context, "Message forwarded!", Toast.LENGTH_SHORT).show();
+                            holder.sendbutton.setEnabled(false);
+                            holder.sendbutton.setImageDrawable(context.getResources().getDrawable(R.drawable.sendgray));
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
 
                     }
                 });
@@ -2157,17 +3078,39 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
 
         }
 
-        protected JSONObject mylistdata;
-
-
         @Override
         public int getItemCount() {
             return listdata.size();
         }
 
+        @Override
+        public void onImageResponse(Response response, int code, int requestcode, CircleImageView imageView) throws JSONException {
+
+            InputStream inputStream = response.body().byteStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            ((Activity) context).runOnUiThread(() -> {
+
+
+                if (bitmap != null) {
+                    Log.e("bitmap", "notnull");
+                    Log.e("bitmap", bitmap.toString());
+                    imageView.setImageBitmap(bitmap);
+
+                } else {
+                    Log.e("bitmap", "null");
+                }
+            });
+        }
+
+        @Override
+        public void onImageFailure(String failresponse) throws JSONException {
+
+        }
+
         public class ViewHolder extends RecyclerView.ViewHolder {
             public ImageView sendbutton;
             public TextView friendname;
+            public CircleImageView profilepicture;
 
 
             public ViewHolder(View itemView) {
@@ -2175,8 +3118,12 @@ invisiblebutton.setOnClickListener(new View.OnClickListener() {
 
                 this.sendbutton = itemView.findViewById(R.id.sendtofriendbutton);
                 this.friendname = (TextView) itemView.findViewById(R.id.friendname);
+                this.profilepicture = itemView.findViewById(R.id.profile_image);
+
 
             }
+
+
         }
     }
 

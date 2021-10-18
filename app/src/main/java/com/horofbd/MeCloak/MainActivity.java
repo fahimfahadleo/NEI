@@ -83,6 +83,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Response;
+import okhttp3.logging.LoggingEventListener;
 
 public class MainActivity extends AppCompatActivity implements ServerResponse, ImageResponse {
 
@@ -108,8 +109,8 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     public static final int PICK_IMAGE = 1;
     String number;
     static DrawerLayout drawerLayout;
-    TextView logout, Settings, gopremiumtext, helptext, contactustext, tnctext, policytext, aboutustext,pagelogout;
-    CardView logoutview, SettingsView, gopremiumview, helpview, contactusview, tncview, policyview, aboutusview,pagelogoutview;
+    TextView logout, Settings, gopremiumtext, helptext, contactustext, tnctext, policytext, aboutustext, pagelogout;
+    CardView logoutview, SettingsView, gopremiumview, helpview, contactusview, tncview, policyview, aboutusview, pagelogoutview;
 
 
     static ServerResponse serverResponse;
@@ -127,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     EditText searchedt;
 
 
-
-
     public static void setUpNotificationData(ArrayList<JSONObject> listdata) {
         for (int i = 0; i < listdata.size(); i++) {
             if (!myNotificationData.contains(listdata.get(i))) {
@@ -139,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         for (int i = 0; i < myNotificationData.size(); i++) {
             Log.e("data1" + i, myNotificationData.get(i).toString());
         }
-
 
 
         ((Activity) context).runOnUiThread(new Runnable() {
@@ -156,10 +154,9 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
                 notificationrecyclerview.setLayoutManager(new LinearLayoutManager(context));
                 notificationrecyclerview.setAdapter(notificationAdapter);
-                if(!nextnotificationpageurl.equals("")){
-                    notificationcounttext.setText(firstvisibleitem+" to "+lastVisibleitem+" of "+notificationAdapter.getItemCount());
+                if (!nextnotificationpageurl.equals("")) {
+                    notificationcounttext.setText(firstvisibleitem + " to " + lastVisibleitem + " of " + notificationAdapter.getItemCount());
                 }
-
 
 
                 notificationrecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -172,23 +169,22 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                     public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
 
-                        LinearLayoutManager linearLayoutManager = (LinearLayoutManager)recyclerView.getLayoutManager();
+                        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                         firstvisibleitem = linearLayoutManager.findFirstVisibleItemPosition();
                         lastVisibleitem = linearLayoutManager.findLastVisibleItemPosition();
 
                         if (!recyclerView.canScrollVertically(1) && dy > 0) {
-                            if(!nextnotificationpageurl.equals("")){
+                            if (!nextnotificationpageurl.equals("")) {
                                 globalRequest(serverResponse, "GET", nextnotificationpageurl, new JSONObject(), 22, context);
                                 nextnotificationpageurl = "";
                                 notificaionpageposition = linearLayoutManager.findFirstVisibleItemPosition();
                             }
                         }
 
-                        notificationcounttext.setText(firstvisibleitem+" to "+lastVisibleitem+" of "+notificationAdapter.getItemCount());
+                        notificationcounttext.setText(firstvisibleitem + " to " + lastVisibleitem + " of " + notificationAdapter.getItemCount());
 
                     }
                 });
-
 
 
                 notificationAdapter.notifyDataSetChanged();
@@ -199,20 +195,20 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
     }
 
-    static void setNotificationRecyclerviewposition(){
+    static void setNotificationRecyclerviewposition() {
         recyclerView.postDelayed(new Runnable() {
             @Override
             public void run() {
                 notificationrecyclerview.getLayoutManager().scrollToPosition(notificaionpageposition);
             }
-        },50);
+        }, 50);
     }
 
-    public static void setNextNotificationpageurl(String next){
-        nextnotificationpageurl =next;
+    public static void setNextNotificationpageurl(String next) {
+        nextnotificationpageurl = next;
     }
 
-    public static void showNotification(){
+    public static void showNotification() {
 
         AlertDialog dialog;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -222,9 +218,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         TextView deleteall = view1.findViewById(R.id.deleteall);
         notificationrecyclerview = view1.findViewById(R.id.notificationrecyclerview);
         globalRequest(serverResponse, "GET", Important.getGetNotification(), new JSONObject(), 22, context);
-
-
-
 
 
         builder.setView(view1);
@@ -243,17 +236,14 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
 
         TypedValue tv = new TypedValue();
-        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-        {
-            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,context.getResources().getDisplayMetrics());
-            InsetDrawable inset = new InsetDrawable(back, 8, actionBarHeight, 8, 8);;
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+            InsetDrawable inset = new InsetDrawable(back, 8, actionBarHeight, 8, 8);
+            ;
             dialog.getWindow().setBackgroundDrawable(inset);
 
         }
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //style id
-
-
-
 
 
         dialog.show();
@@ -357,27 +347,27 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         return cursor.getString(idx);
     }
 
-    ArrayList<JSONObject>temparraylist;
+    ArrayList<JSONObject> temparraylist;
 
-    boolean isPermissionGranted(){
+    boolean isPermissionGranted() {
         boolean b = false;
-        for(String s:permissions){
-            b =  ActivityCompat.checkSelfPermission(this, s) == PackageManager.PERMISSION_GRANTED;
-            if(!b){
+        for (String s : permissions) {
+            b = ActivityCompat.checkSelfPermission(this, s) == PackageManager.PERMISSION_GRANTED;
+            if (!b) {
                 return false;
             }
         }
         return true;
     }
 
-    void askPermission(){
+    void askPermission() {
         ActivityCompat.requestPermissions(this, permissions, 15);
     }
 
 
-    String [] permissions = new String[]{Manifest.permission.INTERNET,Manifest.permission.ACCESS_NETWORK_STATE,Manifest.permission.ACCESS_MEDIA_LOCATION,Manifest.permission.READ_PHONE_STATE
-    ,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_WIFI_STATE,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.READ_SMS,
-            Manifest.permission.SEND_SMS,Manifest.permission.RECEIVE_SMS};
+    String[] permissions = new String[]{Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.ACCESS_MEDIA_LOCATION, Manifest.permission.READ_PHONE_STATE
+            , Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_SMS,
+            Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -420,12 +410,9 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         InitLinks(this);
         myNotificationData = new ArrayList<>();
 
-        if(!isPermissionGranted()){
+        if (!isPermissionGranted()) {
             askPermission();
         }
-
-
-
 
 
         Window window = getWindow();
@@ -435,21 +422,23 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
 
 
+
         searchedt.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String text = charSequence.toString();
                 temparraylist = new ArrayList<>();
-                if(text.length()!=0&& data.size()!=0){
-                    for(JSONObject jsonObject:data){
+                if (text.length() != 0 && data.size() != 0) {
+                    for (JSONObject jsonObject : data) {
                         try {
-                            if(jsonObject.getString("name").toLowerCase().contains(text.toLowerCase())){
+                            if (jsonObject.getString("name").toLowerCase().contains(text.toLowerCase())) {
                                 temparraylist.add(jsonObject);
                             }
-                            if(jsonObject.getString("phone_no").toLowerCase().contains(text.toLowerCase())){
+                            if (jsonObject.getString("phone_no").toLowerCase().contains(text.toLowerCase())) {
                                 temparraylist.add(jsonObject);
                             }
                         } catch (JSONException e) {
@@ -458,19 +447,15 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                     }
                     setUpData(temparraylist);
                 }
-                if(text.length() == 0){
+                if (text.length() == 0) {
                     setUpData(data);
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {}
+            public void afterTextChanged(Editable editable) {
+            }
         });
-
-
-
-
-
 
 
         if (connection != null) {
@@ -509,7 +494,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        
+
         init();
 
 
@@ -522,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                                 .MODE_NIGHT_NO);
 
 
-        if(connection==null || !connection.isConnected()){
+        if (connection == null || !connection.isConnected()) {
             new ConnnectXmpp(this, getLoginInfo("phone_no"), getLoginInfo("sec"));
         }
 
@@ -534,18 +519,18 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     }
 
 
-    static void setRecyclerviewposition(){
+    static void setRecyclerviewposition() {
         recyclerView.postDelayed(new Runnable() {
             @Override
             public void run() {
                 recyclerView.getLayoutManager().scrollToPosition(pageposition);
             }
-        },50);
+        }, 50);
     }
 
 
-    public static void setNextpageurl(String next){
-        nextpageurl =next;
+    public static void setNextpageurl(String next) {
+        nextpageurl = next;
     }
 
 
@@ -568,12 +553,9 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             @Override
             public void onClick(View view) {
                 globalRequest(MainActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        connection.disconnect();
-                    }
-                });
+                if(connection!=null)
+                connection.disconnect();
+
 
             }
         });
@@ -581,26 +563,22 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             @Override
             public void onClick(View view) {
                 globalRequest(MainActivity.this, "POST", Important.getProfile_logout(), new JSONObject(), 8, context);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        connection.disconnect();
-                    }
-                });
+                if(connection!=null)
+                connection.disconnect();
             }
         });
 
         pagelogoutview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(MainActivity.this,"POST",Important.getPagelogout(),new JSONObject(),37,context);
+                globalRequest(MainActivity.this, "POST", Important.getPagelogout(), new JSONObject(), 37, context);
             }
         });
 
         pagelogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                globalRequest(MainActivity.this,"POST",Important.getPagelogout(),new JSONObject(),37,context);
+                globalRequest(MainActivity.this, "POST", Important.getPagelogout(), new JSONObject(), 37, context);
 
             }
         });
@@ -616,7 +594,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
 
         profileimage.setOnClickListener(view -> StartActivity(MainActivity.this, "Profile", ""));
     }
-
 
 
     @Override
@@ -643,22 +620,18 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             Functions.dismissDialogue();
         });
     }
+
     public static ArrayList<JSONObject> data;
 
 
-
-
-
     public static void setUpData(ArrayList<JSONObject> listdata) {
-        if(data == null){
+        if (data == null) {
             data = listdata;
         }
 
 
-
-        Log.e("mainlist", listdata.toString());
         ((Activity) context).runOnUiThread(() -> {
-            Log.e("listviewdata", listdata.toString());
+            // Log.e("listviewdata", listdata.toString());
             adapter = new ListviewAdapter(listdata, context, R.layout.singlefriend);
             recyclerView.setHasFixedSize(true);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -674,13 +647,13 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
                     if (!recyclerView.canScrollVertically(1) && dy > 0) {
-                        if(!nextpageurl.equals("")){
+                        if (!nextpageurl.equals("")) {
                             NotificationActivity.globalRequest(serverResponse, "GET", nextpageurl, new JSONObject(), 22, context);
                             nextpageurl = "";
-                            LinearLayoutManager linearLayoutManager = (LinearLayoutManager)recyclerView.getLayoutManager();
+                            LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                             pageposition = linearLayoutManager.findFirstVisibleItemPosition();
 
-                        }else {
+                        } else {
                             Toast.makeText(context, "Reached Bottom", Toast.LENGTH_SHORT).show();
                         }
 
@@ -751,7 +724,7 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         @Override
         protected void imageViewSetUp(String id, CircleImageView imageView) {
             if (!id.equals("id")) {
-                Log.e("mainid",id);
+                Log.e("mainid", id);
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("friend", id);
@@ -770,7 +743,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
         protected void longPressOptions(JSONObject jsonObject) {
 
             Log.e("jsonobject", jsonObject.toString());
-
 
 
             mutenotification.setOnClickListener(new View.OnClickListener() {
@@ -891,8 +863,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             markasunread.setOnClickListener(view -> {
 
             });
-
-
 
 
             ignoremessage.setOnClickListener(view -> {
@@ -1039,7 +1009,6 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
             super(context, userid, pass);
 
             Log.e("connection", "estublished");
-
 
 
             connectionListener = new ConnectionListener() {
@@ -1192,12 +1161,11 @@ public class MainActivity extends AppCompatActivity implements ServerResponse, I
     protected void onDestroy() {
         super.onDestroy();
         active = false;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                connection.disconnect();
-                
-            }
-        });
+        if(connection!=null){
+            connection.disconnect();
+        }
+
+
+
     }
 }

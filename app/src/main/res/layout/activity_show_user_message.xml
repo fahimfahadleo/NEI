@@ -102,17 +102,19 @@
             android:layout_below="@id/titlelayout"
             android:divider="@null"
             android:layoutAnimation="@anim/layout_animation"
+            android:paddingStart="@dimen/_2sdp"
+            android:paddingEnd="@dimen/_2sdp"
+            android:paddingBottom="@dimen/_16sdp"
             android:stackFromBottom="true"
             android:transcriptMode="alwaysScroll" />
 
         <TextView
+            android:id="@+id/invisiblebutton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/sendmessagelayout"
-            android:background="@null"
+            android:layout_above="@id/reactionlayout"
             android:layout_below="@id/titlelayout"
-            android:id="@+id/invisiblebutton"/>
-
+            android:background="@null" />
 
 
         <LinearLayout
@@ -181,18 +183,144 @@
 
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/sendmessagelayout"
+            android:id="@+id/reactionlayout"
+            android:paddingStart="@dimen/_4sdp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/love"
+                android:text="\u2764\uFE0F"
+                android:padding="@dimen/_6sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:id="@+id/wow"
+                android:layout_height="wrap_content"
+                android:text="\uD83D\uDE31"
+                android:padding="@dimen/_6sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/loveable"
+                android:text="\uD83E\uDD70"
+                android:padding="@dimen/_6sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/sad"
+                android:text="\uD83D\uDE25"
+                android:padding="@dimen/_6sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/gelitui"
+                android:text="\uD83D\uDE01"
+                android:padding="@dimen/_6sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/haha"
+                android:text="\uD83D\uDE02"
+                android:padding="@dimen/_6sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="\uD83D\uDE2D"
+                android:id="@+id/cry"
+                android:padding="@dimen/_6sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            <ImageView
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:id="@+id/addreaction"
+                android:layout_gravity="center"
+                android:src="@drawable/add_white"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/sendmessagelayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:orientation="vertical">
+            android:background="@drawable/onsideborder"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/_4sdp">
+
+
+
+            <LinearLayout
+                android:id="@+id/replaylayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/messagetoolbarcolor"
+                android:orientation="horizontal"
+                android:paddingEnd="@dimen/_8sdp"
+                android:paddingBottom="@dimen/_8sdp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingTop="@dimen/_4sdp"
+                        android:text="Forwarding to . . ."
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/repliedmessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginEnd="@dimen/_4sdp"
+                        android:paddingStart="@dimen/_8sdp"
+                        android:paddingTop="@dimen/_4sdp"
+                        android:paddingBottom="@dimen/_4sdp"
+                        android:text="Some User Message"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                </LinearLayout>
+
+
+                <ImageView
+                    android:id="@+id/closereplaylayout"
+                    android:layout_width="@dimen/_24sdp"
+                    android:layout_height="@dimen/_24sdp"
+                    android:layout_gravity="center"
+                    android:background="@color/messagetoolbarcolor"
+                    android:rotation="45"
+                    android:src="@drawable/cross" />
+
+
+            </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/visiblelayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/_16sdp"
-                android:orientation="horizontal">
+                android:background="@color/messagetoolbarcolor"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/_4sdp"
+                android:paddingBottom="@dimen/_16sdp">
 
                 <ImageView
                     android:id="@+id/showbelow"
@@ -208,7 +336,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_2sdp"
                     android:layout_marginTop="2dp"
-                    android:layout_marginEnd="@dimen/_2sdp"
+                    android:layout_marginEnd="@dimen/_4sdp"
                     android:layout_weight="1"
                     android:background="@drawable/edtshapewhite"
                     android:hint="Type Here..."
@@ -234,12 +362,13 @@
             <ScrollView
                 android:id="@+id/belowbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/messagetoolbarcolor"
+                android:paddingTop="@dimen/_6sdp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/_4sdp"
                     android:orientation="horizontal"
                     android:paddingStart="@dimen/_8sdp">
 
@@ -247,7 +376,9 @@
                         android:id="@+id/enablebelowboundageview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/_4sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginEnd="@dimen/_4sdp"
+                        android:layout_marginBottom="@dimen/_8sdp"
                         app:cardBackgroundColor="@color/red_500"
                         app:cardCornerRadius="@dimen/_8sdp"
                         app:cardElevation="@dimen/_6sdp"
@@ -270,7 +401,9 @@
                         android:id="@+id/belowtimerview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/_4sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginEnd="@dimen/_4sdp"
+                        android:layout_marginBottom="@dimen/_4sdp"
                         app:cardBackgroundColor="@color/red_500"
                         app:cardCornerRadius="@dimen/_8sdp"
                         app:cardElevation="@dimen/_6sdp"
@@ -291,7 +424,9 @@
                         android:id="@+id/belowpasswordview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/_4sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginEnd="@dimen/_4sdp"
+                        android:layout_marginBottom="@dimen/_4sdp"
                         app:cardBackgroundColor="@color/red_500"
                         app:cardCornerRadius="@dimen/_8sdp"
                         app:cardElevation="@dimen/_6sdp"
@@ -313,7 +448,9 @@
                         android:id="@+id/fileview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/_4sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginEnd="@dimen/_4sdp"
+                        android:layout_marginBottom="@dimen/_4sdp"
                         app:cardBackgroundColor="@color/red_500"
                         app:cardCornerRadius="@dimen/_8sdp"
                         app:cardElevation="@dimen/_6sdp"
@@ -334,7 +471,9 @@
                         android:id="@+id/videoview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/_4sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginEnd="@dimen/_4sdp"
+                        android:layout_marginBottom="@dimen/_4sdp"
                         app:cardBackgroundColor="@color/red_500"
                         app:cardCornerRadius="@dimen/_8sdp"
                         app:cardElevation="@dimen/_6sdp"
@@ -355,7 +494,9 @@
                         android:id="@+id/imageview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/_4sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginEnd="@dimen/_4sdp"
+                        android:layout_marginBottom="@dimen/_4sdp"
                         app:cardBackgroundColor="@color/red_500"
                         app:cardCornerRadius="@dimen/_8sdp"
                         app:cardElevation="@dimen/_6sdp"
@@ -376,111 +517,115 @@
 
             </ScrollView>
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/_4sdp"
-                android:orientation="horizontal"
                 android:id="@+id/forwordlayout"
+                android:paddingBottom="@dimen/_8sdp"
                 android:background="@color/messagetoolbarcolor"
-                android:paddingStart="@dimen/_8sdp">
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
 
                 <LinearLayout
+                    android:id="@+id/forwardmessagelayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_gravity="center"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:layout_weight="1">
+                    android:orientation="vertical">
 
                     <ImageView
                         android:id="@+id/forwordmessage"
                         android:layout_width="@dimen/_20sdp"
                         android:layout_height="@dimen/_20sdp"
                         android:layout_gravity="center"
-                        android:layout_marginTop="@dimen/_8sdp"
-
                         android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginTop="@dimen/_6sdp"
                         android:layout_marginEnd="@dimen/_4sdp"
                         android:src="@drawable/forward"
                         android:textColor="@color/white" />
 
                     <TextView
+                        android:id="@+id/forwardmessagetext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:gravity="center"
-                        android:text="Forward"/>
+                        android:text="Forward"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/copymessagelayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_gravity="center"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:layout_weight="1">
+                    android:orientation="vertical">
 
                     <ImageView
                         android:id="@+id/copymessage"
                         android:layout_width="@dimen/_20sdp"
                         android:layout_height="@dimen/_20sdp"
                         android:layout_gravity="center"
-                        android:layout_marginTop="@dimen/_8sdp"
-
                         android:layout_marginStart="@dimen/_4sdp"
+
+                        android:layout_marginTop="@dimen/_6sdp"
                         android:layout_marginEnd="@dimen/_4sdp"
                         android:src="@drawable/copy"
                         android:textColor="@color/white" />
 
                     <TextView
+                        android:id="@+id/copymessagetext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textStyle="bold"
-
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:gravity="center"
-                        android:text="Copy"/>
+                        android:text="Copy"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/deletemessagelayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_gravity="center"
+                    android:layout_weight="1"
                     android:gravity="center"
-
-                    android:layout_weight="1">
+                    android:orientation="vertical">
 
                     <ImageView
                         android:id="@+id/deletemessage"
                         android:layout_width="@dimen/_20sdp"
-                        android:layout_marginTop="@dimen/_8sdp"
                         android:layout_height="@dimen/_20sdp"
                         android:layout_gravity="center"
                         android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginTop="@dimen/_6sdp"
                         android:layout_marginEnd="@dimen/_4sdp"
                         android:src="@drawable/deletevector"
                         android:textColor="@color/white" />
 
                     <TextView
+                        android:id="@+id/deletemessagetext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:gravity="center"
-                        android:text="Delete"/>
+                        android:text="Delete"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold" />
                 </LinearLayout>
-
-
 
             </LinearLayout>
 
         </LinearLayout>
+
 
     </RelativeLayout>
 

@@ -1175,6 +1175,8 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                                                    env->NewStringUTF("response"));
 
 
+
+
             if (!env->CallBooleanMethod(object , isNull , env->NewStringUTF("user"))) {
                 printlogcat(env , "sometag" , "usernotnull");
                 jobject jobject1 = env->CallObjectMethod(object , getJsonObject ,
@@ -1248,6 +1250,9 @@ void saveLoginData(JNIEnv *env , jobject context , jstring response) {
                     printlogcat(env , "tag10" , jstring2string(env , created_at));
                     printlogcat(env , "tag11" , jstring2string(env , updated_at));
                     printlogcat(env , "tag12" , jstring2string(env , premium));
+
+
+
 
                     setSharedPreference(env , env->NewStringUTF("access_token") , access_token);
 

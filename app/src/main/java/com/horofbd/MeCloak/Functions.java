@@ -261,6 +261,12 @@ public class Functions {
     }
 
     public static void ClearSharedPreference() {
+        if(preferences.edit().clear().commit()){
+            Log.e("preference","cleared");
+        }else {
+            Log.e("preference","not cleared");
+        }
+
         preferences.edit().clear().apply();
     }
 
