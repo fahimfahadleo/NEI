@@ -96,6 +96,9 @@ public class RegisterNewUser extends AppCompatActivity implements ServerResponse
 
 
 
+        phone.setText(countryCodePicker.getSelectedCountryCodeWithPlus());
+
+
 //        name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 //            @Override
 //            public void onFocusChange(View view, boolean hasFocus) {

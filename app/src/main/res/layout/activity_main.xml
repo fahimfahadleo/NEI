@@ -21,11 +21,11 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/customtoolbarcolor"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@id/toplayout"
-            android:orientation="horizontal">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -43,9 +43,9 @@
             <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="@dimen/_26sdp"
-                android:layout_marginEnd="@dimen/_4sdp"
-
                 android:layout_gravity="center"
+
+                android:layout_marginEnd="@dimen/_4sdp"
                 android:layout_weight="1">
 
                 <EditText
@@ -53,19 +53,26 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_26sdp"
                     android:background="@drawable/searchedt"
-                    android:paddingEnd="@dimen/_4sdp"
-                    android:paddingStart="@dimen/_8sdp"
                     android:hint="Search"
-                    android:drawableEnd="@drawable/search"
+                    android:paddingStart="@dimen/_8sdp"
+                    android:paddingEnd="@dimen/_4sdp"
+
                     android:textColor="@color/textcolor"
                     android:textColorHint="@color/hintcolor"
                     android:textSize="@dimen/_12sdp" />
 
-
+                <ImageView
+                    android:id="@+id/searchaction"
+                    android:layout_width="@dimen/_16sdp"
+                    android:layout_height="@dimen/_16sdp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/contact"
+                    android:layout_marginEnd="@dimen/_6sdp"
+                    />
 
 
             </RelativeLayout>
-
 
 
             <LinearLayout
@@ -76,8 +83,8 @@
 
                 <RelativeLayout
                     android:layout_width="@dimen/_38sdp"
-                    android:layout_gravity="center"
-                    android:layout_height="@dimen/_38sdp">
+                    android:layout_height="@dimen/_38sdp"
+                    android:layout_gravity="center">
 
 
                     <ImageView
@@ -94,9 +101,9 @@
                         android:layout_height="@dimen/_10sdp"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
-                        android:layout_marginBottom="@dimen/_6sdp"
                         android:layout_marginEnd="@dimen/_6sdp"
-                        app:cardBackgroundColor="@color/notificationnotifier"
+                        android:layout_marginBottom="@dimen/_6sdp"
+                        app:cardBackgroundColor="@color/green"
                         app:cardCornerRadius="@dimen/_6sdp"
                         app:cardElevation="4dp">
 
@@ -105,7 +112,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="center"
-                            android:text="99"
+                            android:text="0"
                             android:textColor="@color/white"
                             android:textSize="9sp"
                             android:textStyle="bold" />
@@ -119,8 +126,8 @@
 
                 <RelativeLayout
                     android:layout_width="@dimen/_38sdp"
-                    android:layout_gravity="center"
-                    android:layout_height="@dimen/_38sdp">
+                    android:layout_height="@dimen/_38sdp"
+                    android:layout_gravity="center">
 
                     <ImageView
                         android:id="@+id/notification"
@@ -133,12 +140,12 @@
                         android:id="@+id/notificationcounterview"
                         android:layout_width="@dimen/_10sdp"
                         android:layout_height="@dimen/_10sdp"
-                        android:layout_gravity="center"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
-                        android:layout_marginBottom="@dimen/_6sdp"
+                        android:layout_gravity="center"
                         android:layout_marginEnd="@dimen/_6sdp"
-                        app:cardBackgroundColor="@color/notificationnotifier"
+                        android:layout_marginBottom="@dimen/_6sdp"
+                        app:cardBackgroundColor="@color/green"
                         app:cardCornerRadius="@dimen/_6sdp"
                         app:cardElevation="4dp">
 
@@ -170,57 +177,68 @@
         </LinearLayout>
 
 
-        <include layout="@layout/chatlist_title_options"
-            android:layout_height="wrap_content"
+        <include
+            android:id="@+id/toplayout"
+            layout="@layout/chatlist_title_options"
             android:layout_width="match_parent"
-            app:layout_constraintTop_toBottomOf="@id/titlelayout"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@id/recyclerview"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/swipelayout"
-            android:id="@+id/toplayout"/>
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titlelayout" />
 
 
-
-
-
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipelayout"
+        <LinearLayout
+            android:id="@+id/progressbarlayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintVertical_weight="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toplayout"
+            android:alpha="0.9"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@id/copywrite"
-           >
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titlelayout"
+            app:layout_constraintVertical_weight="1">
 
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview"
+            <ProgressBar
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:divider="@null"
-                android:scrollbars="vertical" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
 
 
+        </LinearLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:divider="@null"
+            android:scrollbars="vertical"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@id/copywrite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toplayout"
+            app:layout_constraintVertical_weight="1" />
 
 
         <TextView
+            android:id="@+id/copywrite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:layout_constraintTop_toBottomOf="@id/swipelayout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:id="@+id/copywrite"
-            android:text="@string/copyright"
-            android:textStyle="bold"
             android:layout_marginBottom="@dimen/_10sdp"
+            android:text="@string/copyright"
             android:textColor="@color/copyrightcolor"
-            android:textSize="@dimen/_8sdp" />
+            android:textSize="@dimen/_8sdp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recyclerview" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

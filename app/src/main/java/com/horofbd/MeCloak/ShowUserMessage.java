@@ -185,6 +185,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     static LinearLayout reactionlayout;
     TextView love, wow, loveable, sad, gelitui, haha, cry;
     ImageView addreaction;
+    int i ;
 
 
     static native void StartActivity(Context context, String activity, String data);
@@ -267,7 +268,10 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
         } else if (!isKeyboardShowing) {
             super.onBackPressed();
+            finish();
         }
+
+        //super.onBackPressed();
 
     }
 
@@ -489,6 +493,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         addreaction = findViewById(R.id.addreaction);
 
         reactionlayout.setVisibility(View.GONE);
+        i=0;
 
 
         love.setText("\u2764\uFE0F");
@@ -629,7 +634,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         invisiblebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               forworddown();
+                forworddown();
             }
         });
 
@@ -1092,10 +1097,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
     }
 
     static int testing = 0;
+    static MessageEventManager messageEventManager;
+    static MessageEventNotificationListener messageEventNotificationListener;
 
 
     static void InitConnection() throws Settings.SettingNotFoundException {
         if (connection != null) {
+
+            messages = new LinkedList<>();
+
             Log.e("connection", "notnull");
             chatManager = ChatManager.getInstanceFor(connection);
             chatManager.addIncomingListener(incomingChatMessageListener);
@@ -1111,7 +1121,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             });
 
 
-            MessageEventNotificationListener listener = new MessageEventNotificationListener() {
+            messageEventNotificationListener = new MessageEventNotificationListener() {
                 @Override
                 public void deliveredNotification(Jid from, String packetID) {
                     Log.e("messaereceived", "from: " + from.toString() + " id: " + packetID);
@@ -1139,8 +1149,8 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
             };
 
 
-            MessageEventManager messageEventManager = MessageEventManager.getInstanceFor(connection);
-            messageEventManager.addMessageEventNotificationListener(listener);
+            messageEventManager = MessageEventManager.getInstanceFor(connection);
+            messageEventManager.addMessageEventNotificationListener(messageEventNotificationListener);
             DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
             dm.setAutoReceiptMode(DeliveryReceiptManager.AutoReceiptMode.always);
             dm.autoAddDeliveryReceiptRequests();
@@ -1194,51 +1204,51 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
 
-                              for(int i = 0;i<temparraylist.size();i++){
-                                  Message mess = temparraylist.get(i);
-                                  if(mess.getStanzaId().contains("reaction")){
-                                      String s = DefaultED(mess.getBody(),"deocode");
-                                      try {
-                                          JSONObject jsonObject = new JSONObject(s);
-                                          String reactionemoji = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
-                                          String reactstanzaid = jsonObject.getString("stanzaid");
+                                for(int i = 0;i<temparraylist.size();i++){
+                                    Message mess = temparraylist.get(i);
+                                    if(mess.getStanzaId().contains("reaction")){
+                                        String s = DefaultED(mess.getBody(),"deocode");
+                                        try {
+                                            JSONObject jsonObject = new JSONObject(s);
+                                            String reactionemoji = EncrytpAndDecrypt(jsonObject.getString("body"), "decode", passstr);
+                                            String reactstanzaid = jsonObject.getString("stanzaid");
 
-                                          Log.e("reactionemoji",reactionemoji);
+                                            Log.e("reactionemoji",reactionemoji);
 
-                                          for(int j = 0;j<messages.size();j++){
-                                              Message mainmessage = messages.get(j);
-                                              if(mainmessage.getStanzaId().equals(reactstanzaid)){
-                                                 messages.remove(mainmessage);
-                                                 Message finalmessage = new Message();
-                                                  finalmessage.setFrom(mainmessage.getFrom());
-                                                  finalmessage.setTo(mainmessage.getTo());
-                                                  finalmessage.setType(mainmessage.getType());
-                                                  finalmessage.setStanzaId(mainmessage.getStanzaId());
+                                            for(int j = 0;j<messages.size();j++){
+                                                Message mainmessage = messages.get(j);
+                                                if(mainmessage.getStanzaId().equals(reactstanzaid)){
+                                                    messages.remove(mainmessage);
+                                                    Message finalmessage = new Message();
+                                                    finalmessage.setFrom(mainmessage.getFrom());
+                                                    finalmessage.setTo(mainmessage.getTo());
+                                                    finalmessage.setType(mainmessage.getType());
+                                                    finalmessage.setStanzaId(mainmessage.getStanzaId());
 
-                                                  String messagejsonobject = DefaultED(mainmessage.getBody(),"deocode");
-                                                  JSONObject tempjsonobject = new JSONObject(messagejsonobject);
-                                                  Log.e("tempjsonobject",tempjsonobject.toString());
-                                                  tempjsonobject.put("reaction",reactionemoji);
-                                                  Log.e("tempjsonobject2",tempjsonobject.toString());
-                                                  String finaljsonobject = tempjsonobject.toString();
+                                                    String messagejsonobject = DefaultED(mainmessage.getBody(),"deocode");
+                                                    JSONObject tempjsonobject = new JSONObject(messagejsonobject);
+                                                    Log.e("tempjsonobject",tempjsonobject.toString());
+                                                    tempjsonobject.put("reaction",reactionemoji);
+                                                    Log.e("tempjsonobject2",tempjsonobject.toString());
+                                                    String finaljsonobject = tempjsonobject.toString();
 
-                                                  finalmessage.setBody(DefaultED(finaljsonobject, "encode"));
-                                                  messages.add(j,finalmessage);
-                                                  messages.remove(mess);
-
-
+                                                    finalmessage.setBody(DefaultED(finaljsonobject, "encode"));
+                                                    messages.add(j,finalmessage);
+                                                    messages.remove(mess);
 
 
 
-                                              }
-                                          }
 
 
-                                      } catch (JSONException e) {
-                                          e.printStackTrace();
-                                      }
-                                  }
-                              }
+                                                }
+                                            }
+
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
 
 
 
@@ -1252,9 +1262,6 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                                 Log.e("messages", messages.toString());
 
                                 messagerecyclerview.scrollToPosition(adapter.getItemCount() - 1);
-                                messagerecyclerview.setItemViewCacheSize(30);
-                                messagerecyclerview.setDrawingCacheEnabled(true);
-                                messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                                 messagerecyclerview.setItemAnimator(new DefaultItemAnimator());
 
 
@@ -1593,9 +1600,7 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
 
 
         messagerecyclerview.scrollToPosition(adapter.getItemCount() - 1);
-        messagerecyclerview.setItemViewCacheSize(30);
-        messagerecyclerview.setDrawingCacheEnabled(true);
-        messagerecyclerview.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
         messagerecyclerview.setItemAnimator(new DefaultItemAnimator());
         messagerecyclerview.postDelayed(new Runnable() {
             @Override
@@ -1829,8 +1834,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    messagerecyclerview.getAdapter().notifyItemChanged(finalI);
-                                    messagerecyclerview.smoothScrollToPosition(messages.size());
+                                   // messagerecyclerview.setItemAnimator(null);
+                                    LinearLayoutManager manager1 = (LinearLayoutManager) messagerecyclerview.getLayoutManager();
+                                    int lastVisibleposition = manager1.findLastCompletelyVisibleItemPosition();
+
+                                    ((SimpleItemAnimator) messagerecyclerview.getItemAnimator()).setSupportsChangeAnimations(false);
+                                   messagerecyclerview.getAdapter().notifyDataSetChanged();
+
+                                    messagerecyclerview.smoothScrollToPosition(lastVisibleposition+1);
+
                                 }
                             });
 
@@ -1890,8 +1902,16 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    messagerecyclerview.getAdapter().notifyItemChanged(finalI);
-                                    messagerecyclerview.smoothScrollToPosition(messages.size());
+                                    //messagerecyclerview.setItemAnimator(null);
+                                    LinearLayoutManager manager1 = (LinearLayoutManager) messagerecyclerview.getLayoutManager();
+                                    int lastVisibleposition = manager1.findLastCompletelyVisibleItemPosition();
+
+
+
+                                    messagerecyclerview.getAdapter().notifyDataSetChanged();
+
+                                    messagerecyclerview.smoothScrollToPosition(lastVisibleposition+1);
+
                                 }
                             });
                         }
@@ -1993,14 +2013,17 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         if (!messages.contains(message)) {
             messages.add(message);
         }
-        Log.e("size ", String.valueOf(messages.size()));
+        Log.e("callingstatus", String.valueOf(i));
+        i++;
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 messagerecyclerview.setItemAnimator(new SlideUpItemAnimator());
+                adapter.notifyDataSetChanged();
                 adapter.notifyItemInserted(messages.size());
-                adapter.notifyItemRangeInserted(messages.size(), 1);
+
+
 
                 if (messagerecyclerview.canScrollVertically(1)) {
                     messagerecyclerview.postDelayed(new Runnable() {
@@ -2847,7 +2870,15 @@ public class ShowUserMessage extends AppCompatActivity implements ServerResponse
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        messages.clear();
+        messages=new ArrayList<>();
+        adapter.notifyDataSetChanged();
+        messagerecyclerview.setAdapter(null);
+        Log.e("size",String.valueOf(messages.size()));
+        Log.e("ondestroy","called");
+        chatManager.removeIncomingListener(this);
+        chatManager.removeOutgoingListener(this);
+        messageEventManager.removeMessageEventNotificationListener(messageEventNotificationListener);
+
         super.onDestroy();
     }
 

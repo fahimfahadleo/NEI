@@ -69,6 +69,9 @@ public class Important {
     protected static String accept_friend;
 
 
+    protected static String delete_friend;
+
+
 
     protected static String delete_friend_request;
     protected static String ignore_friend;
@@ -118,6 +121,16 @@ public class Important {
 
     ////////////Notification////////////
     protected static String get_notification;
+
+
+    public static String getDelete_friend() {
+        return delete_friend;
+    }
+
+    public static void setDelete_friend(String delete_friend) {
+        Important.delete_friend = delete_friend;
+    }
+
 
 
     public static String getChangeforgottenpassword() {

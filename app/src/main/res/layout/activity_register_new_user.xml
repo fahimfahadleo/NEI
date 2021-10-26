@@ -176,6 +176,7 @@
                             android:layout_weight="5"
                             android:background="@drawable/edtshapewhite"
                             android:gravity="start|center"
+                            android:inputType="phone"
                             android:hint="Phone"
                             android:paddingStart="16dp"
                             android:paddingTop="8dp"
